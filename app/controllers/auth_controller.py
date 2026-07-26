@@ -15,14 +15,14 @@ def login():
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
-        dni = request.form.get('dni', '').strip()
+        username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
         recordar = request.form.get('recordar')
 
-        usuario = Usuario.query.filter_by(dni=dni).first()
+        usuario = Usuario.query.filter_by(username=username).first()
 
         if not usuario:
-            flash('DNI o contraseña incorrectos.', 'danger')
+            flash('Usuario o contraseña incorrectos.', 'danger')
             return render_template('auth/login.html')
 
         if not usuario.estado:

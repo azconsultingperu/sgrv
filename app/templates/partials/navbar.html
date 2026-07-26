@@ -3,7 +3,7 @@
         <button class="btn btn-sm btn-outline-secondary me-2" id="sidebarToggle">
             <i class="bi bi-list"></i>
         </button>
-        <span class="navbar-brand mb-0 h6">
+        <span class="navbar-brand mb-0 h6 navbar-title">
             {% block title %}Sistema de Gestión de Registro de Visitas{% endblock %}
         </span>
         <div class="ms-auto d-flex align-items-center">
@@ -12,7 +12,7 @@
             </button>
             <div class="dropdown">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle me-1"></i> {{ current_user.nombres.split()[0] if current_user.nombres else current_user.username }}
+                    <i class="bi bi-person-circle me-1"></i> <span class="d-none d-sm-inline">{{ current_user.nombres.split()[0] if current_user.nombres else current_user.username }}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><span class="dropdown-item-text"><strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong><br><small class="text-muted">{{ current_user.rol.nombre if current_user.rol else '' }}</small></span></li>

@@ -16,24 +16,62 @@ document.addEventListener('DOMContentLoaded', function() {
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-bs-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            if (themeIcon) {
-                themeIcon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-            }
+            themeIcon.className = newTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
         });
     }
 
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-    if (sidebarToggle && sidebar) {
-        sidebarToggle.addEventListener('click', function() {
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('show');
+    function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('show');
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+    }
+
+    function openSidebar() {
+        if (sidebar) sidebar.classList.add('show');
+        if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+    }
+
+    function toggleSidebar() {
+        if (window.innerWidth < 992) {
+            if (sidebar && sidebar.classList.contains('show')) {
+                closeSidebar();
             } else {
-                sidebar.classList.toggle('collapsed');
+                openSidebar();
             }
+        } else {
+            sidebar.classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        }
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarBackdrop) {
+        sidebarBackdrop.addEventListener('click', closeSidebar);
+    }
+
+    if (sidebar) {
+        sidebar.querySelectorAll('.nav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 992) {
+                    closeSidebar();
+                }
+            });
         });
     }
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 992) {
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+        } else {
+            if (sidebar) sidebar.classList.remove('collapsed');
+        }
+    });
 
     document.querySelectorAll('.alert').forEach(function(alert) {
         setTimeout(function() {
@@ -53,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('form').forEach(function(form) {
         form.addEventListener('submit', function(e) {
             const submitBtn = this.querySelector('button[type="submit"]');
-            if (submitBtn) {
+            if (submitBtn && !submitBtn.disabled) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
             }
@@ -63,34 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
         new bootstrap.Tooltip(el);
     });
-
-    const selects = document.querySelectorAll('select[name="institucion_id"]');
-    const colegiosData = {};
-    selects.forEach(function(select) {
-        if (select.options.length > 0 && select.dataset.colegios) {
-            try {
-                Object.assign(colegiosData, JSON.parse(select.dataset.colegios));
-            } catch(e) {}
-        }
-    });
 });
 
 function confirmDelete(message) {
     return confirm(message || '¿Está seguro de eliminar este registro?');
-}
-
-function showLoading(btn) {
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
-}
-
-function hideLoading(btn, text) {
-    btn.disabled = false;
-    btn.textContent = text || 'Guardar';
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : dateStr;
 }

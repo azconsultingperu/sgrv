@@ -54,3 +54,5 @@ database/*.sqlite3
 # OS
 Thumbs.db
 Desktop.ini
+
+.env

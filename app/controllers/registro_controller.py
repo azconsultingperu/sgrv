@@ -190,12 +190,12 @@ def eliminar(id):
     flash('Registro eliminado permanentemente.', 'success')
     return redirect(url_for('consulta.index'))
 
-@registro_bp.route('/calcular-edad', methods=['POST'])
+@registro_bp.route('/calcular-edad', methods=['GET'])
 def calcular_edad_route():
-    data = request.get_json()
-    if data and 'fecha_nacimiento' in data:
+    fecha = request.args.get('fecha_nacimiento', '')
+    if fecha:
         try:
-            fn = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d').date()
+            fn = datetime.strptime(fecha, '%Y-%m-%d').date()
             return jsonify({'edad': calcular_edad(fn)})
         except:
             return jsonify({'edad': 0})

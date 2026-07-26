@@ -21,7 +21,7 @@ def seed_data():
             dni='12345678',
             nombres='Administrador',
             apellidos='del Sistema',
-            username='admin',
+            username='12345678',
             email='admin@iestppaijan.edu.pe',
             rol_id=1,
             estado=True
@@ -33,7 +33,7 @@ def seed_data():
             dni='87654321',
             nombres='Supervisor',
             apellidos='Principal',
-            username='supervisor',
+            username='87654321',
             email='supervisor@iestppaijan.edu.pe',
             rol_id=2,
             estado=True
@@ -45,7 +45,7 @@ def seed_data():
             dni='11112222',
             nombres='Operador',
             apellidos='de Campo',
-            username='operador',
+            username='11112222',
             email='operador@iestppaijan.edu.pe',
             rol_id=3,
             estado=True
@@ -56,12 +56,9 @@ def seed_data():
 
     if Carrera.query.count() == 0:
         carreras = [
-            Carrera(nombre='Administración de Empresas', area_profesional='Administración y Negocios'),
-            Carrera(nombre='Contabilidad', area_profesional='Administración y Negocios'),
+            Carrera(nombre='Administración de Centros de Cómputo', area_profesional='Tecnologías de la Información'),
             Carrera(nombre='Enfermería Técnica', area_profesional='Ciencias de la Salud'),
-            Carrera(nombre='Computación e Informática', area_profesional='Ingeniería y Tecnología'),
-            Carrera(nombre='Mecánica Automotriz', area_profesional='Ingeniería y Tecnología'),
-            Carrera(nombre='Electrónica Industrial', area_profesional='Ingeniería y Tecnología'),
+            Carrera(nombre='Producción Agropecuaria', area_profesional='Agroindustria'),
         ]
         db.session.add_all(carreras)
         db.session.commit()

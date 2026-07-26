@@ -34,7 +34,7 @@ def crear():
         dni = request.form.get('dni', '').strip()
         nombres = request.form.get('nombres', '').strip().upper()
         apellidos = request.form.get('apellidos', '').strip().upper()
-        username = request.form.get('username', '').strip()
+        username = dni
         password = request.form.get('password', '')
         email = request.form.get('email', '').strip()
         rol_id = request.form.get('rol_id', type=int)
@@ -44,7 +44,7 @@ def crear():
             return render_template('usuarios/crear.html', roles=roles)
 
         if Usuario.query.filter_by(username=username).first():
-            flash('El nombre de usuario ya existe.', 'danger')
+            flash('El DNI ya está registrado como usuario.', 'danger')
             return render_template('usuarios/crear.html', roles=roles)
 
         usuario = Usuario(

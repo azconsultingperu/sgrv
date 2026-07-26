@@ -8,6 +8,7 @@
 <div class="card border-0 shadow-sm">
     <div class="card-body p-4">
         <form method="POST" id="formRegistro" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <h5 class="text-primary mb-3"><i class="bi bi-person-vcard me-2"></i>Datos Personales</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
@@ -166,11 +167,8 @@
 <script>
 document.querySelector('input[name="fecha_nacimiento"]').addEventListener('change', function() {
     if (this.value) {
-        fetch('{{ url_for("registro.calcular_edad_route") }}', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({fecha_nacimiento: this.value})
-        }).then(r => r.json()).then(d => document.getElementById('edad').value = d.edad);
+        fetch('{{ url_for("registro.calcular_edad_route") }}?fecha_nacimiento=' + this.value)
+            .then(r => r.json()).then(d => document.getElementById('edad').value = d.edad);
     }
 });
 

@@ -83,7 +83,19 @@ gestion_registro_visitas/
 
 ---
 
-## Instalación
+## GitHub Codespaces (recomendado para probar desde el navegador)
+
+1. Ir a https://github.com/azconsultingperu/gestion-registro-visitas
+2. Click en **"Code"** → **"Open with Codespaces"** → **"New codespace"**
+3. Esperar a que se configure el entorno automáticamente (~2 min)
+4. La app se iniciará sola y se abrirá una vista previa en `http://localhost:5000`
+5. Si no se abre, ejecuta manualmente: `python run.py`
+
+> **Credenciales predeterminadas:** Usuario: `12345678` / Contraseña: `admin123`
+
+---
+
+## Instalación Local
 
 ### 1. Requisitos previos
 
@@ -132,13 +144,13 @@ La aplicación se iniciará en: `http://localhost:5000`
 
 ## Usuarios por defecto
 
-| Usuario    | Contraseña | Rol            |
-|------------|-----------|----------------|
-| admin      | admin123  | Administrador  |
-| supervisor | super123  | Supervisor     |
-| operador   | opera123  | Operador       |
+| Usuario (DNI) | Contraseña | Rol            |
+|---------------|-----------|----------------|
+| 12345678      | admin123  | Administrador  |
+| 87654321      | super123  | Supervisor     |
+| 11112222      | opera123  | Operador       |
 
-> **Nota**: Cambie estas credenciales inmediatamente después del primer inicio de sesión.
+> **Nota**: El usuario de acceso es el **DNI**. Cambie estas credenciales inmediatamente después del primer inicio de sesión.
 
 ---
 

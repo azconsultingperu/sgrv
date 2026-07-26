@@ -1,0 +1,26 @@
+{
+    "name": "SGRV - IESTP Paiján",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "forwardPorts": [5000],
+    "portsAttributes": {
+        "5000": {
+            "label": "SGRV App",
+            "onAutoForward": "openPreview"
+        }
+    },
+    "postCreateCommand": "pip install -r requirements.txt",
+    "postStartCommand": "python run.py",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "bierner.github-markdown-preview",
+                "batisteo.vscode-django"
+            ]
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    }
+}
