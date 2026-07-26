@@ -63,8 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (flashData && toastContainer) {
         try {
-            const messages = JSON.parse(flashData.getAttribute('data-messages'));
-            const icons = {
+            var messages = JSON.parse(flashData.getAttribute('data-messages'));
+            if (!messages || !messages.length) return;
+            var icons = {
                 success: 'bi-check-circle-fill',
                 danger: 'bi-exclamation-triangle-fill',
                 warning: 'bi-exclamation-circle-fill',
@@ -72,14 +73,17 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             messages.forEach(function(msg) {
-                const iconClass = icons[msg.category] || 'bi-bell-fill';
-                const toast = document.createElement('div');
-                toast.className = 'toast toast-custom show toast-' + msg.category;
+                var category = Array.isArray(msg) ? msg[0] : msg.category;
+                var text = Array.isArray(msg) ? msg[1] : msg.message;
+                if (!text) return;
+                var iconClass = icons[category] || 'bi-bell-fill';
+                var toast = document.createElement('div');
+                toast.className = 'toast toast-custom show toast-' + category;
                 toast.setAttribute('role', 'alert');
                 toast.style.pointerEvents = 'auto';
                 toast.innerHTML = '<div class="toast-body">' +
                     '<span class="toast-icon"><i class="bi ' + iconClass + '"></i></span>' +
-                    '<span class="toast-text">' + msg.message + '</span>' +
+                    '<span class="toast-text">' + text + '</span>' +
                     '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>' +
                     '</div>';
                 toastContainer.appendChild(toast);
