@@ -76,10 +76,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const toast = document.createElement('div');
                 toast.className = 'toast toast-custom show toast-' + msg.category;
                 toast.setAttribute('role', 'alert');
+                toast.style.pointerEvents = 'auto';
                 toast.innerHTML = '<div class="toast-body">' +
                     '<span class="toast-icon"><i class="bi ' + iconClass + '"></i></span>' +
                     '<span class="toast-text">' + msg.message + '</span>' +
-                    '<button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Cerrar"></button>' +
                     '</div>';
                 toastContainer.appendChild(toast);
 
