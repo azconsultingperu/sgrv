@@ -54,6 +54,8 @@ def registrar():
         observaciones = request.form.get('observaciones', '')
 
         errores = []
+        if not institucion_id:
+            errores.append('Debe seleccionar una institución educativa.')
         if not validar_dni(dni):
             errores.append('El DNI debe tener 8 dígitos.')
         if Alumno.query.filter_by(dni=dni).first():
