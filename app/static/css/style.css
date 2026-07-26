@@ -196,6 +196,7 @@ a:hover { color: #0a4020; }
 }
 
 .toast-custom {
+    position: relative;
     border: none !important;
     border-radius: 12px !important;
     box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
@@ -215,10 +216,19 @@ a:hover { color: #0a4020; }
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    padding: 14px 16px 14px 14px;
+    gap: 10px;
+    padding: 14px 40px 14px 20px;
     font-size: 0.9rem;
     font-weight: 500;
+}
+
+.toast-custom .btn-close {
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    font-size: 0.7rem !important;
+    opacity: 0.6;
+    z-index: 1;
 }
 
 .toast-custom .toast-icon {
@@ -229,16 +239,16 @@ a:hover { color: #0a4020; }
 }
 
 .toast-custom .toast-text {
-    flex: 1;
-    padding-right: 8px;
+    text-align: center;
 }
 
 .toast-custom .btn-close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    font-size: 0.7rem;
+    position: absolute !important;
+    top: 8px !important;
+    right: 8px !important;
+    font-size: 0.7rem !important;
     opacity: 0.6;
+    z-index: 1;
 }
 
 .toast-success {
