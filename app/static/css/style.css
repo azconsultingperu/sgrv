@@ -214,6 +214,7 @@ a:hover { color: #0a4020; }
 .toast-custom .toast-body {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     padding: 14px 16px 14px 14px;
     font-size: 0.9rem;
