@@ -6,6 +6,7 @@ from app.models.institucion_educativa import InstitucionEducativa
 from app.models.promotor import Promotor
 from app.models.carrera import Carrera
 from app.services.auditoria_service import registrar_auditoria
+from app.services.email_service import notificar_nuevo_registro
 from app import db
 from datetime import datetime, date
 import re
@@ -110,6 +111,10 @@ def registrar():
 
             registrar_auditoria(current_user.id, 'Creación de registro', 'Registro',
                 f'Registro creado: Alumno {dni} - {nombres} {apellidos}')
+            try:
+                notificar_nuevo_registro(alumno, visita)
+            except Exception as e:
+                print(f'Error al enviar notificación: {e}')
             flash('Registro creado exitosamente.', 'success')
             return redirect(url_for('consulta.index'))
 

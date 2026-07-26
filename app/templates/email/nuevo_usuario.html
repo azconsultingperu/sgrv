@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Usuario</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f0f4f0;font-family:'Segoe UI',Arial,sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f0f4f0;padding:30px 10px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+                    <tr>
+                        <td style="background:linear-gradient(135deg,#105030,#507050);padding:30px 40px;border-radius:16px 16px 0 0;text-align:center;">
+                            <img src="https://raw.githubusercontent.com/azconsultingperu/sgrv/main/app/static/img/logo.png" alt="Logo" style="max-height:60px;margin-bottom:10px;">
+                            <h1 style="color:#fff;margin:10px 0 0;font-size:22px;font-weight:700;">SGRV - IESTP Paiján</h1>
+                            <p style="color:rgba(255,255,255,0.8);margin:5px 0 0;font-size:14px;">Sistema de Gestión de Registro de Visitas</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background:#fff;padding:40px;border-radius:0 0 16px 16px;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
+                            <div style="text-align:center;margin-bottom:30px;">
+                                <div style="width:70px;height:70px;background:linear-gradient(135deg,#105030,#507050);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:15px;">
+                                    <span style="font-size:32px;color:#fff;">&#43;</span>
+                                </div>
+                                <h2 style="color:#105030;margin:0 0 5px;font-size:20px;">¡Nuevo Usuario Creado!</h2>
+                                <p style="color:#666;margin:0;font-size:14px;">Se ha creado un nuevo usuario en el sistema SGRV.</p>
+                            </div>
+
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fff8;border-radius:12px;padding:20px;margin-bottom:25px;border:1px solid #e0f0e0;">
+                                <tr>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;width:130px;">DNI</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ usuario.dni }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Nombres</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ usuario.nombres }} {{ usuario.apellidos }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Usuario</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ usuario.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Contraseña</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ password }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Email</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ usuario.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:8px 0;font-size:13px;color:#888;">Rol</td>
+                                    <td style="padding:8px 0;font-size:14px;color:#333;font-weight:600;">{{ usuario.rol.nombre if usuario.rol else '' }}</td>
+                                </tr>
+                            </table>
+
+                            <div style="background:linear-gradient(135deg,#fff8e1,#ffecb3);border-radius:12px;padding:16px 20px;margin-bottom:25px;border-left:4px solid #f57f17;">
+                                <p style="margin:0;color:#7c5800;font-size:13px;"><strong>&#9888; Importante:</strong><br>El usuario debe cambiar su contraseña en el primer inicio de sesión. Acceda a <strong>http://localhost:5000</strong> e inicie sesión con su DNI y contraseña proporcionada.</p>
+                            </div>
+
+                            <div style="text-align:center;margin-top:25px;padding-top:20px;border-top:1px solid #e0f0e0;">
+                                <p style="font-size:12px;color:#999;margin:0 0 5px;">Este es un mensaje automático del SGRV - IESTP Paiján</p>
+                                <p style="font-size:12px;color:#999;margin:0;">Instituto de Educación Superior Tecnológico Público "Paiján"</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

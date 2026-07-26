@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from app.models.usuario import Usuario
 from app.models.rol import Rol
 from app.services.auditoria_service import registrar_auditoria
+from app.services.email_service import notificar_nuevo_usuario
 from app import db
 from functools import wraps
 
@@ -57,6 +58,10 @@ def crear():
 
         registrar_auditoria(current_user.id, 'Creación de usuario', 'Usuarios',
             f'Usuario creado: {username} ({dni})')
+        try:
+            notificar_nuevo_usuario(usuario, password)
+        except Exception as e:
+            print(f'Error al enviar notificación: {e}')
         flash('Usuario creado exitosamente.', 'success')
         return redirect(url_for('usuarios.index'))
 

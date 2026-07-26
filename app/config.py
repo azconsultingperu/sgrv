@@ -15,6 +15,14 @@ class Config:
     MAX_LOGIN_ATTEMPTS = 5
     UPLOAD_FOLDER = os.path.join(os.path.dirname(basedir), 'app', 'static', 'uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') or True
+    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') or False
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'azconsultingperu@gmail.com'
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or ''
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'azconsultingperu@gmail.com'
+    NOTIFY_EMAIL = os.environ.get('NOTIFY_EMAIL') or 'azconsultingperu@gmail.com'
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
