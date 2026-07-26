@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Auditoría del Sistema{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-journal-check me-2"></i>Auditoría del Sistema</h4>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-3">
+                <select class="form-select form-select-sm" name="usuario_id">
+                    <option value="">Todos los usuarios</option>
+                    {% for u in usuarios %}
+                    <option value="{{ u.id }}" {% if search_params.usuario_id|string == u.id|string %}selected{% endif %}>{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control form-control-sm" name="accion" placeholder="Acción" value="{{ search_params.accion or '' }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" name="modulo">
+                    <option value="">Todos los módulos</option>
+                    <option value="Auth" {% if search_params.modulo == 'Auth' %}selected{% endif %}>Auth</option>
+                    <option value="Registro" {% if search_params.modulo == 'Registro' %}selected{% endif %}>Registro</option>
+                    <option value="Usuarios" {% if search_params.modulo == 'Usuarios' %}selected{% endif %}>Usuarios</option>
+                    <option value="Reportes" {% if search_params.modulo == 'Reportes' %}selected{% endif %}>Reportes</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control form-control-sm" name="fecha_desde" value="{{ search_params.fecha_desde or '' }}">
+            </div>
+            <div class="col-md-2">
+                <input type="date" class="form-control form-control-sm" name="fecha_hasta" value="{{ search_params.fecha_hasta or '' }}">
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search"></i></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha/Hora</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Módulo</th>
+                        <th>Detalle</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in auditorias %}
+                    <tr>
+                        <td><small>{{ a.creado_en.strftime('%d/%m/%Y %H:%M:%S') }}</small></td>
+                        <td><small>{{ a.usuario.username }}</small></td>
+                        <td><span class="badge bg-secondary">{{ a.accion }}</span></td>
+                        <td><small>{{ a.modulo }}</small></td>
+                        <td><small>{{ a.detalle or '' }}</small></td>
+                        <td><small>{{ a.ip_address or '' }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de auditoría</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if pagination.pages > 1 %}
+    <div class="card-footer bg-white">
+        <nav>
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% for p in range(1, pagination.pages + 1) %}
+                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('auditoria.index', page=p, **search_params) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

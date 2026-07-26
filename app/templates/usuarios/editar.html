@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Editar Usuario{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Usuario: {{ usuario.username }}</h4>
+</div>
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Nombres</label>
+                    <input type="text" class="form-control" name="nombres" value="{{ usuario.nombres }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" class="form-control" name="apellidos" value="{{ usuario.apellidos }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" value="{{ usuario.email }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Rol</label>
+                    <select class="form-select" name="rol_id">
+                        {% for r in roles %}
+                        <option value="{{ r.id }}" {% if usuario.rol_id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nueva Contraseña (dejar vacío para mantener)</label>
+                    <input type="password" class="form-control" name="password">
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="estado" id="estado" {% if usuario.estado %}checked{% endif %}>
+                        <label class="form-check-label" for="estado">Activo</label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Actualizar</button>
+                    <a href="{{ url_for('usuarios.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

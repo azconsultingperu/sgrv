@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Editar Registro{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Registro</h4>
+    <span class="badge bg-info">DNI: {{ alumno.dni }}</span>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-4">
+        <form method="POST">
+            <h5 class="text-primary mb-3">Datos Personales</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Apellidos</label>
+                    <input type="text" class="form-control" name="apellidos" value="{{ form.apellidos }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombres</label>
+                    <input type="text" class="form-control" name="nombres" value="{{ form.nombres }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Celular</label>
+                    <input type="tel" class="form-control" name="celular" value="{{ form.celular }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" name="email" value="{{ form.email }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" class="form-control" name="direccion" value="{{ form.direccion }}">
+                </div>
+            </div>
+
+            <h5 class="text-warning mb-3">Colegio</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Institución Educativa</label>
+                    <select class="form-select" name="institucion_id">
+                        {% for c in colegios %}
+                        <option value="{{ c.id }}" {% if form.institucion_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Carrera de Interés</label>
+                    <select class="form-select" name="carrera_id">
+                        <option value="">Seleccione...</option>
+                        {% for c in carreras %}
+                        <option value="{{ c.id }}" {% if form.carrera_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <h5 class="text-info mb-3">Datos Académicos</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Área de Interés</label>
+                    <input type="text" class="form-control" name="area_interes" value="{{ form.area_interes }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Modalidad de Contacto</label>
+                    <select class="form-select" name="modalidad_contacto">
+                        <option value="">Seleccione...</option>
+                        <option value="WhatsApp" {% if form.modalidad_contacto == 'WhatsApp' %}selected{% endif %}>WhatsApp</option>
+                        <option value="Email" {% if form.modalidad_contacto == 'Email' %}selected{% endif %}>Email</option>
+                        <option value="Teléfono" {% if form.modalidad_contacto == 'Teléfono' %}selected{% endif %}>Teléfono</option>
+                        <option value="Presencial" {% if form.modalidad_contacto == 'Presencial' %}selected{% endif %}>Presencial</option>
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-center gap-3">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="desea_estudiar" id="de" {% if form.desea_estudiar %}checked{% endif %}>
+                        <label class="form-check-label" for="de">Desea estudiar</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="solicita_info" id="si" {% if form.solicita_info %}checked{% endif %}>
+                        <label class="form-check-label" for="si">Solicita info</label>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="text-secondary mb-3">Datos de la Visita</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Fecha de Visita</label>
+                    <input type="date" class="form-control" name="fecha_visita" value="{{ form.fecha_visita }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Hora</label>
+                    <input type="time" class="form-control" name="hora_visita" value="{{ form.hora_visita }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Promotor Responsable</label>
+                    <select class="form-select" name="promotor_id">
+                        {% for p in promotores %}
+                        <option value="{{ p.id }}" {% if form.promotor_id == p.id %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Observaciones</label>
+                    <textarea class="form-control" name="observaciones" rows="2">{{ form.observaciones }}</textarea>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Actualizar</button>
+                <a href="{{ url_for('consulta.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

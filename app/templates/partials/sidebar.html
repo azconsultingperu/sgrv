@@ -1,0 +1,52 @@
+<nav class="sidebar d-flex flex-column" id="sidebar">
+    <div class="sidebar-header text-center py-3">
+        <i class="bi bi-building fs-2"></i>
+        <h6 class="mt-2 mb-0">SGRV</h6>
+        <small class="text-muted">IESTP Paiján</small>
+    </div>
+    <hr class="my-1">
+    <ul class="nav nav-pills flex-column mb-auto px-2">
+        <li class="nav-item">
+            <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('registro.registrar') }}" class="nav-link {% if request.endpoint and 'registro' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-plus-circle me-2"></i> Registrar
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('consulta.index') }}" class="nav-link {% if request.endpoint and 'consulta' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-search me-2"></i> Consultar
+            </a>
+        </li>
+        {% if current_user.rol_id <= 2 %}
+        <li class="nav-item">
+            <a href="{{ url_for('reportes.index') }}" class="nav-link {% if request.endpoint and 'reportes' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-file-earmark-bar-graph me-2"></i> Reportes
+            </a>
+        </li>
+        {% endif %}
+        {% if current_user.rol_id == 1 %}
+        <li class="nav-item">
+            <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if request.endpoint and 'usuarios' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-people me-2"></i> Usuarios
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ url_for('auditoria.index') }}" class="nav-link {% if request.endpoint and 'auditoria' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-journal-check me-2"></i> Auditoría
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+    <hr class="my-1">
+    <ul class="nav nav-pills flex-column px-2 mb-2">
+        <li class="nav-item">
+            <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger">
+                <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
+            </a>
+        </li>
+    </ul>
+</nav>

@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand navbar-light bg-light border-bottom px-3">
+    <div class="container-fluid">
+        <button class="btn btn-sm btn-outline-secondary me-2" id="sidebarToggle">
+            <i class="bi bi-list"></i>
+        </button>
+        <span class="navbar-brand mb-0 h6">
+            {% block title %}Sistema de Gestión de Registro de Visitas{% endblock %}
+        </span>
+        <div class="ms-auto d-flex align-items-center">
+            <button class="btn btn-sm btn-outline-secondary me-2" id="themeToggle">
+                <i class="bi bi-moon-fill" id="themeIcon"></i>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle me-1"></i> {{ current_user.nombres.split()[0] if current_user.nombres else current_user.username }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><span class="dropdown-item-text"><strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong><br><small class="text-muted">{{ current_user.rol.nombre if current_user.rol else '' }}</small></span></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual Environment
+venv/
+env/
+.venv/
+virtualenv/
+
+# Flask
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment Variables
+.env
+*.env.local
+
+# Uploads
+app/static/uploads/*
+
+# Logs
+*.log
+logs/
+
+# Migrations
+migrations/versions/*.pyc
+
+# Database
+database/*.db
+database/*.sqlite3
+
+# OS
+Thumbs.db
+Desktop.ini

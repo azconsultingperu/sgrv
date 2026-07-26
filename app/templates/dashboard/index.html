@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
+    <small class="text-muted">Última actualización: {{ now().strftime('%d/%m/%Y %H:%M') if now is defined else '' }}</small>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+            <div class="card-body text-center">
+                <i class="bi bi-journal-text fs-2 text-primary"></i>
+                <h5 class="mt-2 mb-0">{{ totales.total_registros }}</h5>
+                <small class="text-muted">Total Registros</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+            <div class="card-body text-center">
+                <i class="bi bi-building fs-2 text-success"></i>
+                <h5 class="mt-2 mb-0">{{ totales.total_colegios }}</h5>
+                <small class="text-muted">Colegios Visitados</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-2 text-info"></i>
+                <h5 class="mt-2 mb-0">{{ totales.total_promotores }}</h5>
+                <small class="text-muted">Promotores</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+            <div class="card-body text-center">
+                <i class="bi bi-person-vcard fs-2 text-warning"></i>
+                <h5 class="mt-2 mb-0">{{ totales.total_alumnos }}</h5>
+                <small class="text-muted">Alumnos Registrados</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg">
+        <div class="card border-0 shadow-sm stat-card">
+            <div class="card-body text-center">
+                <i class="bi bi-person-gear fs-2 text-danger"></i>
+                <h5 class="mt-2 mb-0">{{ totales.total_usuarios }}</h5>
+                <small class="text-muted">Usuarios</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-4 col-md-4">
+        <div class="card border-0 shadow-sm bg-primary text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-day fs-3"></i>
+                <h3 class="mb-0">{{ registros_dia }}</h3>
+                <small>Registros del Día</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 col-md-4">
+        <div class="card border-0 shadow-sm bg-success text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-week fs-3"></i>
+                <h3 class="mb-0">{{ registros_semana }}</h3>
+                <small>Registros Semanales</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-4 col-md-4">
+        <div class="card border-0 shadow-sm bg-info text-white">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-month fs-3"></i>
+                <h3 class="mb-0">{{ registros_mes }}</h3>
+                <small>Registros Mensuales</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Registros por Mes</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartRegistrosMes"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Alumnos por Sexo</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartSexo"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-building me-2"></i>Alumnos por Colegio</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartColegios"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Alumnos por Distrito</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="chartDistritos"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-trophy me-2"></i>Ranking de Colegios Visitados</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>#</th><th>Colegio</th><th>Visitas</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for item in ranking_colegios %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ item.colegio }}</td>
+                                <td><span class="badge bg-primary">{{ item.total }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Proyección de Postulantes</h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h4 class="text-primary mb-0">{{ proyeccion.total_alumnos }}</h4>
+                        <small>Total Alumnos</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-success mb-0">{{ proyeccion.interesados }}</h4>
+                        <small>Interesados</small>
+                    </div>
+                    <div class="col-4">
+                        <h4 class="text-warning mb-0">{{ proyeccion.proyeccion|int }}</h4>
+                        <small>Proyección</small>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="mb-1">Tasa de Conversión: <strong>{{ proyeccion.tasa_conversion }}%</strong></p>
+                    <div class="progress" style="height: 10px;">
+                        <div class="progress-bar bg-success" style="width: {{ proyeccion.tasa_conversion }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const registrosPorMes = {{ registros_por_mes | tojson | safe }};
+const labelsMes = registrosPorMes.map(r => meses[r.mes - 1] + ' ' + r.anio);
+const dataMes = registrosPorMes.map(r => r.total);
+new Chart(document.getElementById('chartRegistrosMes'), {
+    type: 'line',
+    data: { labels: labelsMes, datasets: [{ label: 'Registros', data: dataMes, borderColor: '#0d6efd', tension: 0.3, fill: true, backgroundColor: 'rgba(13,110,253,0.1)' }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+const sexos = {{ alumnos_por_sexo | tojson | safe }};
+new Chart(document.getElementById('chartSexo'), {
+    type: 'doughnut',
+    data: { labels: sexos.map(s => s.sexo == 'M' ? 'Masculino' : 'Femenino'), datasets: [{ data: sexos.map(s => s.total), backgroundColor: ['#0d6efd', '#dc3545'] }] },
+    options: { responsive: true }
+});
+
+const colegios = {{ alumnos_por_colegio | tojson | safe }};
+new Chart(document.getElementById('chartColegios'), {
+    type: 'bar',
+    data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: '#0d6efd' }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+const distritos = {{ alumnos_por_distrito | tojson | safe }};
+new Chart(document.getElementById('chartDistritos'), {
+    type: 'bar',
+    data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: '#198754' }] },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+</script>
+{% endblock %}

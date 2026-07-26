@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Reportes{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reportes del Sistema</h4>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 text-primary"></i>
+                <h5 class="mt-2">Alumnos</h5>
+                <p class="text-muted small">Exportar lista completa de alumnos registrados</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('reportes.alumnos_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.alumnos_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calendar-check fs-1 text-success"></i>
+                <h5 class="mt-2">Visitas</h5>
+                <p class="text-muted small">Exportar registro de visitas realizadas</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('reportes.visitas_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.visitas_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-building fs-1 text-warning"></i>
+                <h5 class="mt-2">Colegios</h5>
+                <p class="text-muted small">Reporte de instituciones educativas visitadas</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('reportes.colegios_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.colegios_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-book fs-1 text-info"></i>
+                <h5 class="mt-2">Carreras</h5>
+                <p class="text-muted small">Reporte de carreras y alumnos interesados</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ url_for('reportes.carreras_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.carreras_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if reportes %}
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-white">
+        <h6 class="mb-0">Últimos Reportes Generados</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Fecha</th><th>Título</th><th>Tipo</th><th>Formato</th><th>Usuario</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in reportes %}
+                    <tr>
+                        <td><small>{{ r.creado_en.strftime('%d/%m/%Y %H:%M') }}</small></td>
+                        <td>{{ r.titulo }}</td>
+                        <td>{{ r.tipo }}</td>
+                        <td><span class="badge bg-secondary">{{ r.formato }}</span></td>
+                        <td><small>{{ r.usuario.username if r.usuario else '' }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

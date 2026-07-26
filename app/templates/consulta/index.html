@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Consultar Registros{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-search me-2"></i>Consultar Registros</h4>
+    <a href="{{ url_for('registro.registrar') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Nuevo Registro</a>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros de Búsqueda</h6>
+    </div>
+    <div class="card-body">
+        <form method="GET" class="row g-2">
+            <div class="col-md-2">
+                <input type="text" class="form-control form-control-sm" name="dni" placeholder="DNI" value="{{ search_params.dni or '' }}">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control form-control-sm" name="nombres" placeholder="Nombres" value="{{ search_params.nombres or '' }}">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control form-control-sm" name="apellidos" placeholder="Apellidos" value="{{ search_params.apellidos or '' }}">
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" name="sexo">
+                    <option value="">Sexo</option>
+                    <option value="M" {% if search_params.sexo == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="F" {% if search_params.sexo == 'F' %}selected{% endif %}>Femenino</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select form-select-sm" name="carrera_id">
+                    <option value="">Carrera</option>
+                    {% for c in carreras %}
+                    <option value="{{ c.id }}" {% if search_params.carrera_id|string == c.id|string %}selected{% endif %}>{{ c.nombre[:20] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search me-1"></i>Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DNI</th>
+                        <th>Apellidos</th>
+                        <th>Nombres</th>
+                        <th>Edad</th>
+                        <th>Sexo</th>
+                        <th>Celular</th>
+                        <th>Colegio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in alumnos %}
+                    <tr>
+                        <td>{{ a.dni }}</td>
+                        <td>{{ a.apellidos }}</td>
+                        <td>{{ a.nombres }}</td>
+                        <td>{{ a.edad }}</td>
+                        <td>{{ 'M' if a.sexo == 'M' else 'F' }}</td>
+                        <td>{{ a.celular }}</td>
+                        <td>{{ a.institucion.nombre[:25] if a.institucion else '' }}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('consulta.detalle', id=a.id) }}" class="btn btn-info" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a href="{{ url_for('registro.editar', id=a.id) }}" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('registro.eliminar', id=a.id) }}" class="btn btn-danger" title="Eliminar" onclick="return confirm('¿Eliminar este registro?')"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8" class="text-center py-4 text-muted">No se encontraron registros</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if pagination.pages > 1 %}
+    <div class="card-footer bg-white">
+        <nav>
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% for p in range(1, pagination.pages + 1) %}
+                <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('consulta.index', page=p, **search_params) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
