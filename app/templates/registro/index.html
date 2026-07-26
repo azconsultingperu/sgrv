@@ -165,11 +165,23 @@
 {% endblock %}
 {% block extra_js %}
 <script>
-document.querySelector('input[name="fecha_nacimiento"]').addEventListener('change', function() {
-    if (this.value) {
-        fetch('{{ url_for("registro.calcular_edad_route") }}?fecha_nacimiento=' + this.value)
-            .then(r => r.json()).then(d => document.getElementById('edad').value = d.edad);
+document.addEventListener('DOMContentLoaded', function() {
+    var fnInput = document.querySelector('input[name="fecha_nacimiento"]');
+    if (!fnInput) return;
+
+    fnInput.addEventListener('change', calcularEdad);
+    fnInput.addEventListener('blur', calcularEdad);
+
+    function calcularEdad() {
+        if (fnInput.value) {
+            fetch('{{ url_for("registro.calcular_edad_route") }}?fecha_nacimiento=' + fnInput.value)
+                .then(function(r) { return r.json(); })
+                .then(function(d) { document.getElementById('edad').value = d.edad; })
+                .catch(function() {});
+        }
     }
+
+    if (fnInput.value) { calcularEdad(); }
 });
 
 document.querySelector('select[name="institucion_id"]').addEventListener('change', function() {
