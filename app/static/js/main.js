@@ -29,17 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
     }
 
-    function openSidebar() {
-        if (sidebar) sidebar.classList.add('show');
-        if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
-    }
-
     function toggleSidebar() {
         if (window.innerWidth < 992) {
             if (sidebar && sidebar.classList.contains('show')) {
                 closeSidebar();
             } else {
-                openSidebar();
+                if (sidebar) sidebar.classList.add('show');
+                if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
             }
         } else {
             sidebar.classList.toggle('collapsed');
@@ -47,38 +43,53 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-    }
-
-    if (sidebarBackdrop) {
-        sidebarBackdrop.addEventListener('click', closeSidebar);
-    }
+    if (sidebarToggle) { sidebarToggle.addEventListener('click', toggleSidebar); }
+    if (sidebarBackdrop) { sidebarBackdrop.addEventListener('click', closeSidebar); }
 
     if (sidebar) {
         sidebar.querySelectorAll('.nav-link').forEach(function(link) {
             link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    closeSidebar();
-                }
+                if (window.innerWidth < 992) { closeSidebar(); }
             });
         });
     }
 
     window.addEventListener('resize', function() {
-        if (window.innerWidth >= 992) {
-            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
-        } else {
-            if (sidebar) sidebar.classList.remove('collapsed');
-        }
+        if (window.innerWidth >= 992 && sidebarBackdrop) { sidebarBackdrop.classList.remove('show'); }
     });
 
-    document.querySelectorAll('.alert').forEach(function(alert) {
-        setTimeout(function() {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
-    });
+    const toastContainer = document.getElementById('toastContainer');
+    const flashData = document.getElementById('flashData');
+
+    if (flashData && toastContainer) {
+        try {
+            const messages = JSON.parse(flashData.getAttribute('data-messages'));
+            const icons = {
+                success: 'bi-check-circle-fill',
+                danger: 'bi-exclamation-triangle-fill',
+                warning: 'bi-exclamation-circle-fill',
+                info: 'bi-info-circle-fill'
+            };
+
+            messages.forEach(function(msg) {
+                const iconClass = icons[msg.category] || 'bi-bell-fill';
+                const toast = document.createElement('div');
+                toast.className = 'toast toast-custom show toast-' + msg.category;
+                toast.setAttribute('role', 'alert');
+                toast.innerHTML = '<div class="toast-body">' +
+                    '<span class="toast-icon"><i class="bi ' + iconClass + '"></i></span>' +
+                    '<span class="toast-text">' + msg.message + '</span>' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="toast"></button>' +
+                    '</div>';
+                toastContainer.appendChild(toast);
+
+                setTimeout(function() {
+                    toast.classList.remove('show');
+                    setTimeout(function() { toast.remove(); }, 300);
+                }, 5000);
+            });
+        } catch(e) {}
+    }
 
     document.querySelectorAll('input[pattern]').forEach(function(input) {
         input.addEventListener('input', function() {
