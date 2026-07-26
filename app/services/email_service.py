@@ -23,7 +23,7 @@ def enviar_correo(destinatario, asunto, template, **kwargs):
         server.quit()
         return True
     except Exception as e:
-        print(f'Error al enviar correo: {e}')
+        current_app.logger.error(f'Error al enviar correo a {destinatario}: {e}')
         return False
 
 def notificar_nuevo_registro(alumno, visita):

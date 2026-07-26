@@ -93,13 +93,12 @@ def recuperar():
             serializer = get_serializer()
             token = serializer.dumps(usuario.id)
             reset_url = url_for('auth.reset_password', token=token, _external=True)
-            try:
-                enviar_correo_recuperacion(usuario, reset_url)
+            if enviar_correo_recuperacion(usuario, reset_url):
                 registrar_auditoria(usuario.id, 'Solicitud de recuperación', 'Auth',
                     f'Correo de recuperación enviado a {email}')
                 flash('Se han enviado las instrucciones a su correo electrónico.', 'success')
-            except Exception as e:
-                flash('Error al enviar el correo. Intente más tarde.', 'danger')
+            else:
+                flash('Error al enviar el correo de recuperación. Verifique la configuración de correo.', 'danger')
         else:
             flash('No se encontró una cuenta con esos datos.', 'danger')
 
