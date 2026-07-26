@@ -37,3 +37,9 @@ def notificar_nuevo_usuario(usuario, password):
     destinatario = current_app.config['NOTIFY_EMAIL']
     return enviar_correo(destinatario, asunto, 'nuevo_usuario.html',
         usuario=usuario, password=password)
+
+def enviar_correo_recuperacion(usuario, reset_url):
+    asunto = 'RecuperaciÃ³n de ContraseÃ±a - SGRV IESTP PaijÃ¡n'
+    destinatario = usuario.email
+    return enviar_correo(destinatario, asunto, 'recuperar_contrasena.html',
+        usuario=usuario, reset_url=reset_url)

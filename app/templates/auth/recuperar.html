@@ -1,29 +1,32 @@
 {% extends "base.html" %}
 {% block auth_content %}
-<div class="row justify-content-center align-items-center min-vh-100">
-    <div class="col-11 col-sm-8 col-md-6 col-lg-4">
-        <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-body p-5">
+<div class="login-bg" style="min-height:100vh;display:flex;align-items:center;justify-content:center;">
+    <div class="col-11 col-sm-8 col-md-5 col-lg-4 px-3">
+        <div class="card shadow-lg border-0 rounded-4" style="border:none;border-radius:20px;overflow:hidden;">
+            <div style="height:4px;background:linear-gradient(90deg,#105030,#507050,#3090b0);"></div>
+            <div class="card-body p-4 p-md-5">
                 <div class="text-center mb-4">
-                    <i class="bi bi-key fs-1 text-warning"></i>
-                    <h4 class="mt-2">Recuperar Contraseña</h4>
-                    <p class="text-muted small">Ingrese sus datos para recuperar el acceso</p>
+                    <div style="width:70px;height:70px;margin:0 auto;background:linear-gradient(135deg,#f57f17,#ffb74d);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(245,127,23,0.25);">
+                        <i class="bi bi-key" style="font-size:30px;color:#fff;"></i>
+                    </div>
+                    <h4 class="mt-3 fw-bold" style="color:#105030;">Recuperar Contraseña</h4>
+                    <p style="color:#666;font-size:0.85rem;">Ingrese sus datos para recuperar el acceso</p>
                 </div>
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="form-label">DNI</label>
-                        <input type="text" class="form-control form-control-lg" name="dni" required>
+                        <label class="form-label fw-bold" style="color:#444;font-size:0.85rem;"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
+                        <input type="text" class="form-control" name="username" placeholder="Ingrese su DNI" required style="border-radius:10px;padding:12px 16px;border:2px solid #e0e0e0;">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Correo Electrónico</label>
-                        <input type="email" class="form-control form-control-lg" name="email" required>
+                        <label class="form-label fw-bold" style="color:#444;font-size:0.85rem;"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
+                        <input type="email" class="form-control" name="email" placeholder="Ingrese su correo" required style="border-radius:10px;padding:12px 16px;border:2px solid #e0e0e0;">
                     </div>
-                    <button type="submit" class="btn btn-warning btn-lg w-100 mb-2">
-                        <i class="bi bi-send me-2"></i>Enviar
+                    <button type="submit" class="btn btn-primary w-100 mb-2" style="border-radius:10px;padding:12px;font-weight:600;background:linear-gradient(135deg,#105030,#507050);border:none;">
+                        <i class="bi bi-send me-2"></i>Enviar Instrucciones
                     </button>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-lg w-100">
-                        <i class="bi bi-arrow-left me-2"></i>Volver
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px;padding:12px;font-weight:500;">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al Login
                     </a>
                 </form>
             </div>
