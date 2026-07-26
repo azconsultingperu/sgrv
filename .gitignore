@@ -34,6 +34,7 @@ instance/
 .DS_Store
 
 # Environment Variables
+.env
 .env.local
 
 # Uploads
