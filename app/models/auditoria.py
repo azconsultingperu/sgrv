@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Auditoria(db.Model):
     __tablename__ = 'auditorias'
@@ -11,7 +11,7 @@ class Auditoria(db.Model):
     detalle = db.Column(db.Text, nullable=True)
     ip_address = db.Column(db.String(45), nullable=True)
     user_agent = db.Column(db.String(200), nullable=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    creado_en = db.Column(db.DateTime, default=peru_now, index=True)
 
     def __repr__(self):
         return f'<Auditoria {self.accion} - {self.creado_en}>'

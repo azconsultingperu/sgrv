@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Promotor(db.Model):
     __tablename__ = 'promotores'
@@ -11,7 +11,7 @@ class Promotor(db.Model):
     email = db.Column(db.String(120), nullable=True)
     telefono = db.Column(db.String(15), nullable=True)
     activo = db.Column(db.Boolean, default=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=peru_now)
 
     visitas = db.relationship('Visita', backref='promotor', lazy='dynamic')
 

@@ -1,7 +1,8 @@
 from app import db, login_manager
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.utils.time_utils import peru_now
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -22,8 +23,8 @@ class Usuario(db.Model, UserMixin):
     ultimo_acceso = db.Column(db.DateTime)
     intentos_fallidos = db.Column(db.Integer, default=0)
     bloqueado_hasta = db.Column(db.DateTime, nullable=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
-    actualizado_en = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=peru_now)
+    actualizado_en = db.Column(db.DateTime, default=peru_now, onupdate=peru_now)
 
     rol = db.relationship('Rol', backref='usuarios')
     auditorias = db.relationship('Auditoria', backref='usuario', lazy='dynamic')
@@ -35,15 +36,14 @@ class Usuario(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def is_bloqueado(self):
-        if self.bloqueado_hasta and self.bloqueado_hasta > datetime.utcnow():
+        if self.bloqueado_hasta and self.bloqueado_hasta > peru_now():
             return True
         return False
 
     def incrementar_intentos(self):
         self.intentos_fallidos += 1
         if self.intentos_fallidos >= 5:
-            from datetime import timedelta
-            self.bloqueado_hasta = datetime.utcnow() + timedelta(minutes=30)
+            self.bloqueado_hasta = peru_now() + timedelta(minutes=30)
         db.session.commit()
 
     def resetear_intentos(self):

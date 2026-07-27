@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Visita(db.Model):
     __tablename__ = 'visitas'
@@ -11,8 +11,8 @@ class Visita(db.Model):
     fecha_visita = db.Column(db.Date, nullable=False, index=True)
     hora_visita = db.Column(db.Time, nullable=False)
     observaciones = db.Column(db.Text, nullable=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
-    actualizado_en = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=peru_now)
+    actualizado_en = db.Column(db.DateTime, default=peru_now, onupdate=peru_now)
 
     def __repr__(self):
         return f'<Visita {self.id} - Alumno {self.alumno_id}>'

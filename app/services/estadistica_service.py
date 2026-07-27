@@ -5,7 +5,8 @@ from app.models.promotor import Promotor
 from app.models.usuario import Usuario
 from app.models.carrera import Carrera
 from app import db
-from datetime import datetime, timedelta, date
+from app.utils.time_utils import peru_today, peru_now
+from datetime import timedelta
 from sqlalchemy import func, extract
 
 class EstadisticaService:
@@ -59,18 +60,20 @@ class EstadisticaService:
 
     @staticmethod
     def get_registros_dia():
-        return Visita.query.filter(Visita.fecha_visita == date.today()).count()
+        return Visita.query.filter(Visita.fecha_visita == peru_today()).count()
 
     @staticmethod
     def get_registros_semana():
-        inicio_semana = date.today() - timedelta(days=date.today().weekday())
+        hoy = peru_today()
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
         return Visita.query.filter(Visita.fecha_visita >= inicio_semana).count()
 
     @staticmethod
     def get_registros_mes():
+        hoy = peru_today()
         return Visita.query.filter(
-            extract('month', Visita.fecha_visita) == date.today().month,
-            extract('year', Visita.fecha_visita) == date.today().year
+            extract('month', Visita.fecha_visita) == hoy.month,
+            extract('year', Visita.fecha_visita) == hoy.year
         ).count()
 
     @staticmethod

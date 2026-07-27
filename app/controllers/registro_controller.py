@@ -8,13 +8,14 @@ from app.models.carrera import Carrera
 from app.services.auditoria_service import registrar_auditoria
 from app.services.email_service import notificar_nuevo_registro
 from app import db
-from datetime import datetime, date
+from app.utils.time_utils import peru_now, peru_today
+from datetime import datetime
 import re
 
 registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
 
 def calcular_edad(fecha_nac):
-    hoy = date.today()
+    hoy = peru_today()
     return hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
 
 def validar_dni(dni):
@@ -97,8 +98,8 @@ def registrar():
             db.session.add(alumno)
             db.session.flush()
 
-            fv = datetime.strptime(fecha_visita, '%Y-%m-%d').date() if fecha_visita else date.today()
-            hv = datetime.strptime(hora_visita, '%H:%M').time() if hora_visita else datetime.now().time()
+            fv = datetime.strptime(fecha_visita, '%Y-%m-%d').date() if fecha_visita else peru_today()
+            hv = datetime.strptime(hora_visita, '%H:%M').time() if hora_visita else peru_now().time()
 
             visita = Visita(
                 alumno_id=alumno.id,

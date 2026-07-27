@@ -4,7 +4,8 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from flask_migrate import Migrate
 import os
-from datetime import datetime
+
+from app.utils.time_utils import peru_now
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -46,7 +47,7 @@ def create_app():
 
     @app.context_processor
     def inject_now():
-        return {'now': datetime.utcnow}
+        return {'now': peru_now}
 
     @app.errorhandler(404)
     def not_found(e):

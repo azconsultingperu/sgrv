@@ -6,8 +6,9 @@ from app.models.sesion import Sesion
 from app.services.auditoria_service import registrar_auditoria
 from app.services.email_service import enviar_correo_recuperacion
 from app import db
+from app.utils.time_utils import peru_now
 import secrets
-from datetime import datetime, timedelta
+from datetime import timedelta
 from itsdangerous import URLSafeTimedSerializer
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -41,7 +42,7 @@ def login():
 
         if usuario.check_password(password):
             usuario.resetear_intentos()
-            usuario.ultimo_acceso = datetime.utcnow()
+            usuario.ultimo_acceso = peru_now()
             session.permanent = True if recordar else False
             login_user(usuario, remember=bool(recordar))
 
@@ -76,7 +77,7 @@ def logout():
     sesion_activa = Sesion.query.filter_by(usuario_id=current_user.id, activa=True).first()
     if sesion_activa:
         sesion_activa.activa = False
-        sesion_activa.fin = datetime.utcnow()
+        sesion_activa.fin = peru_now()
         db.session.commit()
     logout_user()
     flash('Sesión cerrada correctamente.', 'info')

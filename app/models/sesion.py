@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Sesion(db.Model):
     __tablename__ = 'sesiones'
@@ -9,7 +9,7 @@ class Sesion(db.Model):
     token = db.Column(db.String(256), unique=True, nullable=True)
     ip_address = db.Column(db.String(45), nullable=True)
     user_agent = db.Column(db.String(200), nullable=True)
-    inicio = db.Column(db.DateTime, default=datetime.utcnow)
+    inicio = db.Column(db.DateTime, default=peru_now)
     fin = db.Column(db.DateTime, nullable=True)
     activa = db.Column(db.Boolean, default=True)
 

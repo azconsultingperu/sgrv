@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Reporte(db.Model):
     __tablename__ = 'reportes'
@@ -11,7 +11,7 @@ class Reporte(db.Model):
     formato = db.Column(db.String(10), nullable=False)
     parametros = db.Column(db.Text, nullable=True)
     archivo_generado = db.Column(db.String(200), nullable=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=peru_now)
 
     def __repr__(self):
         return f'<Reporte {self.titulo} - {self.tipo}>'

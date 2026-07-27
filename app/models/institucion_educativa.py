@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class InstitucionEducativa(db.Model):
     __tablename__ = 'instituciones_educativas'
@@ -14,7 +14,7 @@ class InstitucionEducativa(db.Model):
     latitud = db.Column(db.Float, nullable=True)
     longitud = db.Column(db.Float, nullable=True)
     activo = db.Column(db.Boolean, default=True)
-    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+    creado_en = db.Column(db.DateTime, default=peru_now)
 
     def __repr__(self):
         return f'<Institucion {self.nombre}>'

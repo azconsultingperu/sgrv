@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime
+from app.utils.time_utils import peru_now
 
 class Alumno(db.Model):
     __tablename__ = 'alumnos'
@@ -20,8 +20,8 @@ class Alumno(db.Model):
     desea_estudiar = db.Column(db.Boolean, default=False)
     solicita_info = db.Column(db.Boolean, default=False)
     modalidad_contacto = db.Column(db.String(50))
-    fecha_registro = db.Column(db.DateTime, default=datetime.utcnow)
-    actualizado_en = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    fecha_registro = db.Column(db.DateTime, default=peru_now)
+    actualizado_en = db.Column(db.DateTime, default=peru_now, onupdate=peru_now)
     activo = db.Column(db.Boolean, default=True)
 
     institucion = db.relationship('InstitucionEducativa', backref='alumnos')
