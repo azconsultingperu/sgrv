@@ -17,6 +17,10 @@ def seed_data():
         db.session.add_all(roles)
         db.session.commit()
 
+    if not Rol.query.filter_by(nombre='Consultas').first():
+        db.session.add(Rol(nombre='Consultas', descripcion='Acceso solo de lectura a Dashboard, Consultar y Reportes'))
+        db.session.commit()
+
     if Usuario.query.count() == 0:
         admin = Usuario(
             dni='12345678',
