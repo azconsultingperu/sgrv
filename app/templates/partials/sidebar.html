@@ -11,17 +11,19 @@
                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
         </li>
+        {% if current_user.rol_id != 4 %}
         <li class="nav-item">
             <a href="{{ url_for('registro.registrar') }}" class="nav-link {% if request.endpoint and 'registro' in request.endpoint %}active{% endif %}">
                 <i class="bi bi-plus-circle me-2"></i> Registrar
             </a>
         </li>
+        {% endif %}
         <li class="nav-item">
             <a href="{{ url_for('consulta.index') }}" class="nav-link {% if request.endpoint and 'consulta' in request.endpoint %}active{% endif %}">
                 <i class="bi bi-search me-2"></i> Consultar
             </a>
         </li>
-        {% if current_user.rol_id <= 2 %}
+        {% if current_user.rol_id <= 2 or current_user.rol_id == 4 %}
         <li class="nav-item">
             <a href="{{ url_for('reportes.index') }}" class="nav-link {% if request.endpoint and 'reportes' in request.endpoint %}active{% endif %}">
                 <i class="bi bi-file-earmark-bar-graph me-2"></i> Reportes

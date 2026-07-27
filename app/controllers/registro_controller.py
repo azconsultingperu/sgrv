@@ -10,9 +10,19 @@ from app.services.email_service import notificar_nuevo_registro
 from app import db
 from app.utils.time_utils import peru_now, peru_today
 from datetime import datetime
+from functools import wraps
 import re
 
 registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
+
+def escribir_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.rol_id == 4:
+            flash('No tiene permisos para realizar esta acción.', 'danger')
+            return redirect(url_for('dashboard.index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def calcular_edad(fecha_nac):
     hoy = peru_today()
@@ -29,6 +39,7 @@ def validar_email(email):
 
 @registro_bp.route('/', methods=['GET', 'POST'])
 @login_required
+@escribir_required
 def registrar():
     colegios = InstitucionEducativa.query.filter_by(activo=True).all()
     promotores = Promotor.query.filter_by(activo=True).all()
@@ -130,6 +141,7 @@ def registrar():
 
 @registro_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
+@escribir_required
 def editar(id):
     alumno = Alumno.query.get_or_404(id)
     visita = Visita.query.filter_by(alumno_id=alumno.id).first()
@@ -187,6 +199,7 @@ def editar(id):
 
 @registro_bp.route('/eliminar/<int:id>')
 @login_required
+@escribir_required
 def eliminar(id):
     alumno = Alumno.query.get_or_404(id)
     Visita.query.filter_by(alumno_id=alumno.id).delete()

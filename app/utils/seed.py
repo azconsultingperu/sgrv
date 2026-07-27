@@ -12,6 +12,7 @@ def seed_data():
             Rol(nombre='Administrador', descripcion='Acceso total al sistema'),
             Rol(nombre='Supervisor', descripcion='Puede registrar, consultar, editar y generar reportes'),
             Rol(nombre='Operador', descripcion='Puede registrar alumnos y consultar registros'),
+            Rol(nombre='Consultas', descripcion='Acceso solo de lectura a Dashboard, Consultar y Reportes'),
         ]
         db.session.add_all(roles)
         db.session.commit()
