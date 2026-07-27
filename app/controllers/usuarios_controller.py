@@ -1,3 +1,4 @@
+import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.models.usuario import Usuario
@@ -40,13 +41,25 @@ def crear():
         email = request.form.get('email', '').strip()
         rol_id = request.form.get('rol_id', type=int)
 
+        if not re.match(r'^\d{8}$', dni):
+            flash('El DNI debe tener exactamente 8 dígitos numéricos.', 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
         if Usuario.query.filter_by(dni=dni).first():
             flash('El DNI ya está registrado.', 'danger')
-            return render_template('usuarios/crear.html', roles=roles)
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
-        if Usuario.query.filter_by(username=username).first():
+        if Usuario.query.filter_by(username=dni).first():
             flash('El DNI ya está registrado como usuario.', 'danger')
-            return render_template('usuarios/crear.html', roles=roles)
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+        if not email or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash('El correo electrónico no es válido.', 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+        if Usuario.query.filter_by(email=email).first():
+            flash('El correo electrónico ya está registrado.', 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
         usuario = Usuario(
             dni=dni, nombres=nombres, apellidos=apellidos,
@@ -65,7 +78,7 @@ def crear():
         flash('Usuario creado exitosamente.', 'success')
         return redirect(url_for('usuarios.index'))
 
-    return render_template('usuarios/crear.html', roles=roles)
+    return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
 @usuarios_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -76,9 +89,18 @@ def editar(id):
     if request.method == 'POST':
         usuario.nombres = request.form.get('nombres', '').strip().upper()
         usuario.apellidos = request.form.get('apellidos', '').strip().upper()
-        usuario.email = request.form.get('email', '').strip()
         usuario.rol_id = request.form.get('rol_id', type=int)
         usuario.estado = request.form.get('estado') == 'on'
+
+        email = request.form.get('email', '').strip()
+        if not email or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash('El correo electrónico no es válido.', 'danger')
+            return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
+        existe = Usuario.query.filter(Usuario.email == email, Usuario.id != usuario.id).first()
+        if existe:
+            flash('El correo electrónico ya está registrado por otro usuario.', 'danger')
+            return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
+        usuario.email = email
 
         password = request.form.get('password', '')
         if password:

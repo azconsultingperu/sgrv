@@ -10,27 +10,27 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">DNI</label>
-                    <input type="text" class="form-control" name="dni" maxlength="8" required>
+                    <label class="form-label">DNI <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Nombres</label>
-                    <input type="text" class="form-control" name="nombres" required>
+                    <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="nombres" value="{{ form.nombres or '' }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Apellidos</label>
-                    <input type="text" class="form-control" name="apellidos" required>
+                    <label class="form-label">Apellidos <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="apellidos" value="{{ form.apellidos or '' }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" name="password" required>
+                    <label class="form-label">Contraseña <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control" name="password" minlength="6" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" required>
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" name="email" value="{{ form.email or '' }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Rol</label>
+                    <label class="form-label">Rol <span class="text-danger">*</span></label>
                     <select class="form-select" name="rol_id" required>
                         {% for r in roles %}
                         <option value="{{ r.id }}">{{ r.nombre }}</option>
