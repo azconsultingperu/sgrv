@@ -117,6 +117,25 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
         new bootstrap.Tooltip(el);
     });
+
+    var relojEl = document.getElementById('relojNavbar');
+    var uaEl = document.getElementById('ultimaActualizacion');
+    if (relojEl || uaEl) {
+        function actualizarReloj() {
+            var ahora = new Date();
+            var dia = String(ahora.getDate()).padStart(2, '0');
+            var mes = String(ahora.getMonth() + 1).padStart(2, '0');
+            var anio = ahora.getFullYear();
+            var hh = String(ahora.getHours()).padStart(2, '0');
+            var mm = String(ahora.getMinutes()).padStart(2, '0');
+            var ss = String(ahora.getSeconds()).padStart(2, '0');
+            var texto = dia + '/' + mes + '/' + anio + ' ' + hh + ':' + mm + ':' + ss;
+            if (relojEl) relojEl.textContent = texto;
+            if (uaEl) uaEl.textContent = texto;
+        }
+        actualizarReloj();
+        setInterval(actualizarReloj, 1000);
+    }
 });
 
 function confirmDelete(message) {

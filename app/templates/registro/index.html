@@ -211,5 +211,13 @@ document.querySelector('input[name="dni"]').addEventListener('blur', function() 
 const today = new Date();
 document.querySelector('input[name="fecha_visita"]').value = today.toISOString().split('T')[0];
 document.querySelector('input[name="hora_visita"]').value = today.toTimeString().slice(0,5);
+
+setInterval(function() {
+    var ahora = new Date();
+    var fv = document.querySelector('input[name="fecha_visita"]');
+    var hv = document.querySelector('input[name="hora_visita"]');
+    if (fv) fv.value = ahora.toISOString().split('T')[0];
+    if (hv) hv.value = ahora.toTimeString().slice(0,5);
+}, 1000);
 </script>
 {% endblock %}
