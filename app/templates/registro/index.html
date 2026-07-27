@@ -124,11 +124,11 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
                     <label class="form-label">Fecha de Visita <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" name="fecha_visita" value="{{ form.fecha_visita or '' }}" required>
+                    <input type="date" class="form-control" name="fecha_visita" value="{{ form.fecha_visita or fecha_actual }}" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Hora <span class="text-danger">*</span></label>
-                    <input type="time" class="form-control" name="hora_visita" value="{{ form.hora_visita or '' }}" required>
+                    <input type="time" class="form-control" name="hora_visita" value="{{ form.hora_visita or hora_actual }}" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Promotor Responsable <span class="text-danger">*</span></label>
@@ -223,9 +223,6 @@ function actualizarCampos() {
     if (hvInput && autoHora) hvInput.value = ahora.toTimeString().slice(0,5);
 }
 
-var today = new Date();
-if (fvInput) fvInput.value = today.toISOString().split('T')[0];
-if (hvInput) hvInput.value = today.toTimeString().slice(0,5);
 setInterval(actualizarCampos, 1000);
 </script>
 {% endblock %}

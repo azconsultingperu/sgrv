@@ -72,7 +72,7 @@ def registrar():
             for e in errores:
                 flash(e, 'danger')
             return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
-                form=request.form)
+                form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
         try:
             fecha_nac_date = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
@@ -126,7 +126,7 @@ def registrar():
             flash(f'Error al registrar: {str(e)}', 'danger')
 
     return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
-        form=request.form)
+        form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
 @registro_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
