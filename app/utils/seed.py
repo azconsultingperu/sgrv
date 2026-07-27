@@ -53,6 +53,32 @@ def seed_data():
         )
         operador.set_password('opera123')
         db.session.add(operador)
+
+        consultas = Usuario(
+            dni='99998888',
+            nombres='Usuario',
+            apellidos='Consultas',
+            username='99998888',
+            email='consultas@iestppaijan.edu.pe',
+            rol_id=4,
+            estado=True
+        )
+        consultas.set_password('consul123')
+        db.session.add(consultas)
+        db.session.commit()
+
+    if not Usuario.query.filter_by(dni='99998888').first():
+        consultas = Usuario(
+            dni='99998888',
+            nombres='Usuario',
+            apellidos='Consultas',
+            username='99998888',
+            email='consultas@iestppaijan.edu.pe',
+            rol_id=4,
+            estado=True
+        )
+        consultas.set_password('consul123')
+        db.session.add(consultas)
         db.session.commit()
 
     if Carrera.query.count() == 0:
