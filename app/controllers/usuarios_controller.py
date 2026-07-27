@@ -1,5 +1,5 @@
 import re
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app.models.usuario import Usuario
 from app.models.rol import Rol
@@ -131,3 +131,12 @@ def eliminar(id):
         f'Usuario eliminado: {username}')
     flash('Usuario eliminado.', 'success')
     return redirect(url_for('usuarios.index'))
+
+@usuarios_bp.route('/verificar-dni')
+@login_required
+def verificar_dni():
+    dni = request.args.get('dni', '').strip()
+    if not re.match(r'^\d{8}$', dni):
+        return jsonify({'existe': False})
+    existe = Usuario.query.filter_by(dni=dni).first() is not None
+    return jsonify({'existe': existe})

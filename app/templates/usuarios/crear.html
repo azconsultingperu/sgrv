@@ -11,7 +11,8 @@
             <div class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label">DNI <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" required>
+                    <input type="text" class="form-control" name="dni" id="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" required autocomplete="off">
+                    <div id="dniFeedback" class="invalid-feedback"></div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">Nombres <span class="text-danger">*</span></label>
@@ -45,4 +46,32 @@
         </form>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var dniInput = document.getElementById('dni');
+    var feedback = document.getElementById('dniFeedback');
+
+    dniInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 8);
+        if (this.value.length === 8) {
+            fetch('{{ url_for("usuarios.verificar_dni") }}?dni=' + this.value)
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    if (d.existe) {
+                        dniInput.classList.add('is-invalid');
+                        feedback.textContent = 'El DNI ya está registrado.';
+                    } else {
+                        dniInput.classList.remove('is-invalid');
+                        feedback.textContent = '';
+                    }
+                });
+        } else {
+            dniInput.classList.remove('is-invalid');
+            feedback.textContent = '';
+        }
+    });
+});
+</script>
 {% endblock %}
