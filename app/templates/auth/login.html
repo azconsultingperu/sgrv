@@ -124,7 +124,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                     <label class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario</label>
-                    <input type="text" class="form-control login-input" name="username" placeholder="Ingrese su DNI" maxlength="8" required>
+                    <input type="text" class="form-control login-input" name="username" placeholder="Ingrese su DNI" maxlength="8" pattern="[0-9]{8}" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'')" required>
                     </div>
                     <div class="mb-3">
                         <label class="login-label"><i class="bi bi-lock me-1"></i>Contraseña</label>
