@@ -208,16 +208,24 @@ document.querySelector('input[name="dni"]').addEventListener('blur', function() 
     }
 });
 
-const today = new Date();
-document.querySelector('input[name="fecha_visita"]').value = today.toISOString().split('T')[0];
-document.querySelector('input[name="hora_visita"]').value = today.toTimeString().slice(0,5);
+var autoFecha = true, autoHora = true;
+var fvInput = document.querySelector('input[name="fecha_visita"]');
+var hvInput = document.querySelector('input[name="hora_visita"]');
 
-setInterval(function() {
+fvInput.addEventListener('change', function() { autoFecha = false; });
+fvInput.addEventListener('focus', function() { autoFecha = false; });
+hvInput.addEventListener('change', function() { autoHora = false; });
+hvInput.addEventListener('focus', function() { autoHora = false; });
+
+function actualizarCampos() {
     var ahora = new Date();
-    var fv = document.querySelector('input[name="fecha_visita"]');
-    var hv = document.querySelector('input[name="hora_visita"]');
-    if (fv) fv.value = ahora.toISOString().split('T')[0];
-    if (hv) hv.value = ahora.toTimeString().slice(0,5);
-}, 1000);
+    if (fvInput && autoFecha) fvInput.value = ahora.toISOString().split('T')[0];
+    if (hvInput && autoHora) hvInput.value = ahora.toTimeString().slice(0,5);
+}
+
+var today = new Date();
+if (fvInput) fvInput.value = today.toISOString().split('T')[0];
+if (hvInput) hvInput.value = today.toTimeString().slice(0,5);
+setInterval(actualizarCampos, 1000);
 </script>
 {% endblock %}
