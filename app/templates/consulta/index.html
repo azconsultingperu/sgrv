@@ -90,7 +90,7 @@
             <ul class="pagination pagination-sm justify-content-center mb-0">
                 {% for p in range(1, pagination.pages + 1) %}
                 <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('consulta.index', page=p, **search_params) }}">{{ p }}</a>
+                    <a class="page-link" href="{{ url_for('consulta.index', page=p, **search_params_without_page) }}">{{ p }}</a>
                 </li>
                 {% endfor %}
             </ul>

@@ -72,7 +72,8 @@ def index():
     return render_template('consulta/index.html',
         alumnos=alumnos, pagination=pagination,
         colegios=colegios, carreras=carreras,
-        search_params=request.args)
+        search_params=request.args,
+        search_params_without_page={k: v for k, v in request.args.items() if k != 'page'})
 
 @consulta_bp.route('/detalle/<int:id>')
 @login_required
