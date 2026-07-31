@@ -42,7 +42,7 @@
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Edad / Sexo</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.edad }} años / {{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.edad }} años / {{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Celular</td>

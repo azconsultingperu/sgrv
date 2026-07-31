@@ -15,10 +15,19 @@ import re
 
 registro_bp = Blueprint('registro', __name__, url_prefix='/registro')
 
-def escribir_required(f):
+def admin_or_supervisor_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.rol_id == 4:
+        if current_user.rol_id not in (1, 2):
+            flash('No tiene permisos para realizar esta acción.', 'danger')
+            return redirect(url_for('dashboard.index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def solo_admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.rol_id != 1:
             flash('No tiene permisos para realizar esta acción.', 'danger')
             return redirect(url_for('dashboard.index'))
         return f(*args, **kwargs)
@@ -37,9 +46,22 @@ def validar_celular(celular):
 def validar_email(email):
     return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) if email else True
 
+def calcular_edad(fecha_nac):
+    hoy = peru_today()
+    return hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
+
+def validar_dni(dni):
+    return re.match(r'^\d{8}$', dni)
+
+def validar_celular(celular):
+    return re.match(r'^\d{9}$', celular)
+
+def validar_email(email):
+    return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) if email else True
+
 @registro_bp.route('/', methods=['GET', 'POST'])
 @login_required
-@escribir_required
+@admin_or_supervisor_required
 def registrar():
     colegios = InstitucionEducativa.query.filter_by(activo=True).all()
     promotores = Promotor.query.filter_by(activo=True).all()
@@ -141,7 +163,7 @@ def registrar():
 
 @registro_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
-@escribir_required
+@admin_or_supervisor_required
 def editar(id):
     alumno = Alumno.query.get_or_404(id)
     visita = Visita.query.filter_by(alumno_id=alumno.id).first()
@@ -199,16 +221,17 @@ def editar(id):
 
 @registro_bp.route('/eliminar/<int:id>')
 @login_required
-@escribir_required
+@solo_admin_required
 def eliminar(id):
     alumno = Alumno.query.get_or_404(id)
     Visita.query.filter_by(alumno_id=alumno.id).delete()
     dni = alumno.dni
-    db.session.delete(alumno)
+    alumno.eliminado = True
+    alumno.fecha_eliminacion = peru_now()
     db.session.commit()
     registrar_auditoria(current_user.id, 'Eliminación de registro', 'Registro',
-        f'Registro eliminado: Alumno {dni}')
-    flash('Registro eliminado permanentemente.', 'success')
+        f'Registro eliminado (soft delete): Alumno {dni}')
+    flash('Registro eliminado correctamente.', 'success')
     return redirect(url_for('consulta.index'))
 
 @registro_bp.route('/calcular-edad', methods=['GET'])

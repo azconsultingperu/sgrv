@@ -17,7 +17,7 @@ class EstadisticaService:
             'total_registros': Visita.query.count(),
             'total_colegios': InstitucionEducativa.query.count(),
             'total_promotores': Promotor.query.count(),
-            'total_alumnos': Alumno.query.count(),
+            'total_alumnos': Alumno.query.filter_by(eliminado=False).count(),
             'total_usuarios': Usuario.query.count()
         }
 
@@ -27,7 +27,7 @@ class EstadisticaService:
             InstitucionEducativa.nombre,
             func.count(Alumno.id)
         ).join(Alumno, Alumno.institucion_id == InstitucionEducativa.id)\
-         .group_by(InstitucionEducativa.nombre).all()
+         .filter(Alumno.eliminado == False).group_by(InstitucionEducativa.nombre).all()
         return [{'colegio': r[0], 'total': r[1]} for r in results]
 
     @staticmethod
@@ -36,17 +36,17 @@ class EstadisticaService:
             InstitucionEducativa.distrito,
             func.count(Alumno.id)
         ).join(Alumno, Alumno.institucion_id == InstitucionEducativa.id)\
-         .group_by(InstitucionEducativa.distrito).all()
+         .filter(Alumno.eliminado == False).group_by(InstitucionEducativa.distrito).all()
         return [{'distrito': r[0], 'total': r[1]} for r in results]
 
     @staticmethod
     def get_edad_promedio():
-        result = db.session.query(func.avg(Alumno.edad)).scalar()
+        result = db.session.query(func.avg(Alumno.edad)).filter(Alumno.eliminado == False).scalar()
         return round(result, 1) if result else 0
 
     @staticmethod
     def get_alumnos_por_sexo():
-        results = db.session.query(Alumno.sexo, func.count(Alumno.id)).group_by(Alumno.sexo).all()
+        results = db.session.query(Alumno.sexo, func.count(Alumno.id)).filter(Alumno.eliminado == False).group_by(Alumno.sexo).all()
         return [{'sexo': r[0], 'total': r[1]} for r in results]
 
     @staticmethod
@@ -89,8 +89,8 @@ class EstadisticaService:
 
     @staticmethod
     def get_proyeccion_postulantes():
-        total_alumnos = Alumno.query.count()
-        interesados = Alumno.query.filter_by(desea_estudiar=True).count()
+        total_alumnos = Alumno.query.filter_by(eliminado=False).count()
+        interesados = Alumno.query.filter_by(desea_estudiar=True, eliminado=False).count()
         if total_alumnos > 0:
             tasa_conversion = (interesados / total_alumnos) * 100
         else:

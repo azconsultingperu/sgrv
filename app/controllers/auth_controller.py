@@ -7,6 +7,7 @@ from app.services.auditoria_service import registrar_auditoria
 from app.services.email_service import enviar_correo_recuperacion
 from app import db
 from app.utils.time_utils import peru_now
+from app.utils.helpers import validar_fortaleza_password, generar_password_segura, sanitizar_input
 import secrets
 from datetime import timedelta
 from itsdangerous import URLSafeTimedSerializer
@@ -123,8 +124,10 @@ def reset_password(token):
         password = request.form.get('password', '')
         confirm = request.form.get('confirm_password', '')
 
-        if not password or len(password) < 6:
-            flash('La contraseña debe tener al menos 6 caracteres.', 'danger')
+        errores = validar_fortaleza_password(password)
+        if errores:
+            for e in errores:
+                flash(e, 'danger')
             return render_template('auth/reset_password.html', token=token)
 
         if password != confirm:
@@ -132,6 +135,7 @@ def reset_password(token):
             return render_template('auth/reset_password.html', token=token)
 
         usuario.set_password(password)
+        usuario.debe_cambiar_password = False
         db.session.commit()
         registrar_auditoria(usuario.id, 'Cambio de contraseña', 'Auth',
             'Contraseña restablecida mediante recuperación')

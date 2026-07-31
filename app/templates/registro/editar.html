@@ -13,40 +13,40 @@
             <h5 class="text-primary mb-3">Datos Personales</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label">Apellidos</label>
-                    <input type="text" class="form-control" name="apellidos" value="{{ form.apellidos }}" required>
+                    <label class="form-label" for="apellidos">Apellidos</label>
+                    <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ form.apellidos }}" required>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Nombres</label>
-                    <input type="text" class="form-control" name="nombres" value="{{ form.nombres }}" required>
+                    <label class="form-label" for="nombres">Nombres</label>
+                    <input type="text" class="form-control" name="nombres" id="nombres" value="{{ form.nombres }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Celular</label>
-                    <input type="tel" class="form-control" name="celular" value="{{ form.celular }}" required>
+                    <label class="form-label" for="celular">Celular</label>
+                    <input type="tel" class="form-control" name="celular" id="celular" value="{{ form.celular }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" value="{{ form.email }}">
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" value="{{ form.email }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Dirección</label>
-                    <input type="text" class="form-control" name="direccion" value="{{ form.direccion }}">
+                    <label class="form-label" for="direccion">Dirección</label>
+                    <input type="text" class="form-control" name="direccion" id="direccion" value="{{ form.direccion }}">
                 </div>
             </div>
 
             <h5 class="text-warning mb-3">Colegio</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label">Institución Educativa</label>
-                    <select class="form-select" name="institucion_id">
+                    <label class="form-label" for="institucion_id">Institución Educativa</label>
+                    <select class="form-select" name="institucion_id" id="institucion_id">
                         {% for c in colegios %}
                         <option value="{{ c.id }}" {% if form.institucion_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Carrera de Interés</label>
-                    <select class="form-select" name="carrera_id">
+                    <label class="form-label" for="carrera_id">Carrera de Interés</label>
+                    <select class="form-select" name="carrera_id" id="carrera_id">
                         <option value="">Seleccione...</option>
                         {% for c in carreras %}
                         <option value="{{ c.id }}" {% if form.carrera_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
@@ -58,12 +58,12 @@
             <h5 class="text-info mb-3">Datos Académicos</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <label class="form-label">Área de Interés</label>
-                    <input type="text" class="form-control" name="area_interes" value="{{ form.area_interes }}">
+                    <label class="form-label" for="area_interes">Área de Interés</label>
+                    <input type="text" class="form-control" name="area_interes" id="area_interes" value="{{ form.area_interes }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Modalidad de Contacto</label>
-                    <select class="form-select" name="modalidad_contacto">
+                    <label class="form-label" for="modalidad_contacto">Modalidad de Contacto</label>
+                    <select class="form-select" name="modalidad_contacto" id="modalidad_contacto">
                         <option value="">Seleccione...</option>
                         <option value="WhatsApp" {% if form.modalidad_contacto == 'WhatsApp' %}selected{% endif %}>WhatsApp</option>
                         <option value="Email" {% if form.modalidad_contacto == 'Email' %}selected{% endif %}>Email</option>
@@ -86,24 +86,24 @@
             <h5 class="text-secondary mb-3">Datos de la Visita</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <label class="form-label">Fecha de Visita</label>
-                    <input type="date" class="form-control" name="fecha_visita" value="{{ form.fecha_visita }}">
+                    <label class="form-label" for="fecha_visita">Fecha de Visita</label>
+                    <input type="date" class="form-control" name="fecha_visita" id="fecha_visita" value="{{ form.fecha_visita }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Hora</label>
-                    <input type="time" class="form-control" name="hora_visita" value="{{ form.hora_visita }}">
+                    <label class="form-label" for="hora_visita">Hora</label>
+                    <input type="time" class="form-control" name="hora_visita" id="hora_visita" value="{{ form.hora_visita }}">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Promotor Responsable</label>
-                    <select class="form-select" name="promotor_id">
+                    <label class="form-label" for="promotor_id">Promotor Responsable</label>
+                    <select class="form-select" name="promotor_id" id="promotor_id">
                         {% for p in promotores %}
                         <option value="{{ p.id }}" {% if form.promotor_id == p.id %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-12">
-                    <label class="form-label">Observaciones</label>
-                    <textarea class="form-control" name="observaciones" rows="2">{{ form.observaciones }}</textarea>
+                    <label class="form-label" for="observaciones">Observaciones</label>
+                    <textarea class="form-control" name="observaciones" id="observaciones" rows="2">{{ form.observaciones }}</textarea>
                 </div>
             </div>
 

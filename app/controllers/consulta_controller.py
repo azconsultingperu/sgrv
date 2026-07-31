@@ -14,7 +14,7 @@ consulta_bp = Blueprint('consulta', __name__, url_prefix='/consulta')
 @consulta_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    query = Alumno.query
+    query = Alumno.query.filter_by(eliminado=False)
 
     dni = request.args.get('dni', '').strip()
     nombres = request.args.get('nombres', '').strip()
@@ -78,7 +78,7 @@ def index():
 @consulta_bp.route('/detalle/<int:id>')
 @login_required
 def detalle(id):
-    alumno = Alumno.query.get_or_404(id)
+    alumno = Alumno.query.filter_by(eliminado=False).get_or_404(id)
     visita = Visita.query.filter_by(alumno_id=alumno.id).first()
     return render_template('consulta/detalle.html', alumno=alumno, visita=visita)
 
@@ -86,5 +86,5 @@ def detalle(id):
 @login_required
 def verificar_dni():
     dni = request.args.get('dni', '').strip()
-    existe = Alumno.query.filter_by(dni=dni).first() is not None
+    existe = Alumno.query.filter_by(dni=dni, eliminado=False).first() is not None
     return jsonify({'existe': existe})

@@ -6,18 +6,10 @@ from app.models.rol import Rol
 from app.services.auditoria_service import registrar_auditoria
 from app.services.email_service import notificar_nuevo_usuario
 from app import db
-from functools import wraps
+from app.utils.decorators import admin_required
+from app.utils.helpers import validar_fortaleza_password, sanitizar_input
 
 usuarios_bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.rol_id != 1:
-            flash('No tiene permisos para acceder a esta sección.', 'danger')
-            return redirect(url_for('dashboard.index'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 @usuarios_bp.route('/')
 @login_required
@@ -65,6 +57,11 @@ def crear():
             dni=dni, nombres=nombres, apellidos=apellidos,
             username=username, email=email, rol_id=rol_id
         )
+        errores_password = validar_fortaleza_password(password)
+        if errores_password:
+            for e in errores_password:
+                flash(e, 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
         usuario.set_password(password)
         db.session.add(usuario)
         db.session.commit()
@@ -104,6 +101,11 @@ def editar(id):
 
         password = request.form.get('password', '')
         if password:
+            errores_password = validar_fortaleza_password(password)
+            if errores_password:
+                for e in errores_password:
+                    flash(e, 'danger')
+                return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
             usuario.set_password(password)
             registrar_auditoria(current_user.id, 'Cambio de contraseña', 'Usuarios',
                 f'Contraseña cambiada para: {usuario.username}')

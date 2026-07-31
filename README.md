@@ -75,9 +75,12 @@ gestion_registro_visitas/
 │   └── config.py        # Configuración de la aplicación
 ├── database/            # Archivos de base de datos
 ├── migrations/          # Migraciones de base de datos
+├── logs/                # URL temporal del túnel (logs/tunel.txt)
 ├── requirements.txt     # Dependencias del proyecto
 ├── run.py               # Punto de entrada
+├── .env.example         # Plantilla de variables de entorno
 ├── .gitignore           # Archivos ignorados por Git
+├── CHANGELOG.md         # Registro de cambios
 └── README.md            # Este archivo
 ```
 
@@ -126,19 +129,40 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 4. Instalar dependencias
+### 4. Configurar variables de entorno
+
+```bash
+# Windows
+copy .env.example .env
+
+# Linux/Mac
+cp .env.example .env
+```
+
+> **Nota:** Si `SECRET_KEY` se deja vacía, la aplicación genera una automáticamente en cada inicio (solo para desarrollo).
+
+### 5. Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Ejecutar la aplicación
+> **Nota para Windows:** usa `python -m pip install -r requirements.txt` si `pip` no está en el PATH.
+
+### 6. Ejecutar la aplicación
 
 ```bash
 python run.py
 ```
 
-La aplicación se iniciará en: `http://localhost:5000`
+La aplicación se iniciará en:
+- `http://localhost:5000` (local)
+- `http://192.168.0.131:5000` (red local)
+- `https://XXXX.trycloudflare.com` (URL pública temporal vía túnel Cloudflare)
+
+> **URL temporal:** al iniciar, la app crea automáticamente un túnel de Cloudflare para acceder desde cualquier dispositivo con internet. La URL se muestra en la consola y se guarda en `logs/tunel.txt`. Expira al cerrar el servidor. La primera vez descarga el binario de cloudflared (~52 MB).
+>
+> Para desactivar el túnel: `CLOUDFLARE_TUNNEL=0` en el `.env`.
 
 ---
 
@@ -149,6 +173,7 @@ La aplicación se iniciará en: `http://localhost:5000`
 | 12345678      | admin123  | Administrador  |
 | 87654321      | super123  | Supervisor     |
 | 11112222      | opera123  | Operador       |
+| 99998888      | consul123 | Consultas      |
 
 > **Nota**: El usuario de acceso es el **DNI**. Cambie estas credenciales inmediatamente después del primer inicio de sesión.
 
@@ -156,21 +181,25 @@ La aplicación se iniciará en: `http://localhost:5000`
 
 ## Roles y Permisos
 
-### Administrador
+### Administrador (rol 1)
 - Acceso total al sistema
-- Gestión de usuarios
+- Gestión de usuarios (crear, editar, eliminar)
 - Gestión de auditoría
-- Gestión del sistema
+- Eliminación de registros (eliminación lógica)
 
-### Supervisor
+### Supervisor (rol 2)
 - Registrar visitas
 - Consultar registros
 - Editar registros
 - Generar reportes
 
-### Operador
+### Operador (rol 3)
 - Registrar visitas
 - Consultar registros
+
+### Consultas (rol 4)
+- Consultar registros
+- Ver reportes
 
 ---
 
@@ -209,6 +238,8 @@ La aplicación se iniciará en: `http://localhost:5000`
 - CRUD completo de usuarios
 - Asignación de roles
 - Control de estado (activo/inactivo)
+- Indicador visual de fortaleza de contraseña al crear/editar
+- Cambio de contraseña obligatorio en el primer inicio (según política)
 
 ### 6. Auditoría
 - Registro automático de acciones
@@ -228,7 +259,7 @@ La aplicación se iniciará en: `http://localhost:5000`
 
 - `usuarios` - Usuarios del sistema
 - `roles` - Roles y permisos
-- `alumnos` - Alumnos registrados
+- `alumnos` - Alumnos registrados (con eliminación lógica: `eliminado`, `fecha_eliminacion`)
 - `instituciones_educativas` - Colegios
 - `visitas` - Registro de visitas
 - `promotores` - Promotores institucionales
@@ -237,6 +268,16 @@ La aplicación se iniciará en: `http://localhost:5000`
 - `carreras` - Carreras profesionales
 - `reportes` - Reportes generados
 - `dashboard_estadisticas` - Estadísticas del dashboard
+
+### Migraciones
+
+El proyecto usa Alembic (Flask-Migrate). Para aplicar migraciones:
+
+```bash
+python -m flask db upgrade
+```
+
+> **Nota:** la base de datos usa SQLite por defecto (`database/gestion_visitas.db`); no requiere servidor externo.
 
 ---
 

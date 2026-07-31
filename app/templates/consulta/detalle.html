@@ -20,7 +20,7 @@
                     <tr><th>Nombres</th><td>{{ alumno.nombres }}</td></tr>
                     <tr><th>Fecha de Nacimiento</th><td>{{ alumno.fecha_nacimiento.strftime('%d/%m/%Y') }}</td></tr>
                     <tr><th>Edad</th><td>{{ alumno.edad }} años</td></tr>
-                    <tr><th>Sexo</th><td>{{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' }}</td></tr>
+                    <tr><th>Sexo</th><td>{{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' }}</td></tr>
                 </table>
             </div>
         </div>

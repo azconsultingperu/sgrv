@@ -5,7 +5,7 @@ class Auditoria(db.Model):
     __tablename__ = 'auditorias'
 
     id = db.Column(db.Integer, primary_key=True)
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False, index=True)
     accion = db.Column(db.String(100), nullable=False)
     modulo = db.Column(db.String(50), nullable=False)
     detalle = db.Column(db.Text, nullable=True)

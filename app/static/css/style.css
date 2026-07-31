@@ -1,5 +1,5 @@
 :root {
-    --sidebar-width: 250px;
+    --sidebar-width: 220px;
     --logo-primary: #105030;
     --logo-secondary: #507050;
     --logo-accent: #b01030;
@@ -68,13 +68,18 @@
 [data-bs-theme="dark"] .bg-danger { background-color: #8a1a2a !important; }
 
 .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
     width: var(--sidebar-width);
+    height: 100vh;
     min-height: 100vh;
     background: linear-gradient(180deg, var(--sidebar-bg) 0%, #0a2a18 100%);
     color: var(--sidebar-text);
     transition: transform var(--transition-speed);
     flex-shrink: 0;
     z-index: 1040;
+    overflow-y: auto;
 }
 
 .sidebar .nav-link {
@@ -96,7 +101,7 @@
 .sidebar h6 { color: #fff; }
 
 .main-content {
-    margin-left: 0;
+    margin-left: var(--sidebar-width);
     transition: margin-left var(--transition-speed);
     min-height: 100vh;
     width: 100%;
@@ -148,13 +153,14 @@ a:hover { color: #0a4020; }
 @media (min-width: 992px) {
     .sidebar.collapsed { transform: translateX(-100%); }
     .sidebar.collapsed + .sidebar-backdrop { display: none !important; }
-    .main-content.expanded { margin-left: calc(-1 * var(--sidebar-width)); }
+    .main-content.expanded { margin-left: 0; }
 }
 
 @media (max-width: 991.98px) {
     .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
     .sidebar.show { transform: translateX(0); }
     .sidebar-backdrop.show { display: block; }
+    .main-content { margin-left: 0; }
 }
 
 .navbar-title { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
@@ -324,3 +330,38 @@ a:hover { color: #0a4020; }
 .bg-info { background-color: var(--logo-cyan) !important; }
 .bg-warning { background-color: var(--logo-gold) !important; }
 .bg-danger { background-color: var(--logo-accent) !important; }
+
+.password-strength {
+    position: relative;
+    height: 8px;
+    width: 60%;
+    border-radius: 4px;
+    margin-top: 6px;
+    background: #e0e0e0;
+    overflow: hidden;
+}
+.password-strength::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    border-radius: 4px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+.password-strength.weak::after { width: 25%; background: #dc3545; }
+.password-strength.fair::after { width: 50%; background: #ffc107; }
+.password-strength.good::after { width: 100%; background: #28a745; }
+.password-strength.strong::after { width: 100%; background: #105030; }
+[data-bs-theme="dark"] .password-strength {
+    background: #2a3d30;
+}
+.password-requirements {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+}
+[data-bs-theme="dark"] .password-requirements {
+    color: #aaa;
+}

@@ -4,18 +4,9 @@ from app.models.auditoria import Auditoria
 from app.models.usuario import Usuario
 from app import db
 from datetime import datetime
-from functools import wraps
+from app.utils.decorators import admin_required
 
 auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
-
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if current_user.rol_id != 1:
-            flash('No tiene permisos para acceder a esta sección.', 'danger')
-            return redirect(url_for('dashboard.index'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 @auditoria_bp.route('/')
 @login_required

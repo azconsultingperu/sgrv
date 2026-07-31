@@ -19,3 +19,4 @@ numpy==1.26.2
 requests==2.31.0
 gunicorn==21.2.0
 psycopg2-binary==2.9.9
+pycloudflared==0.3.0

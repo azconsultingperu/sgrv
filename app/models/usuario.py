@@ -25,9 +25,15 @@ class Usuario(db.Model, UserMixin):
     bloqueado_hasta = db.Column(db.DateTime, nullable=True)
     creado_en = db.Column(db.DateTime, default=peru_now)
     actualizado_en = db.Column(db.DateTime, default=peru_now, onupdate=peru_now)
+    debe_cambiar_password = db.Column(db.Boolean, default=False)
 
     rol = db.relationship('Rol', backref='usuarios')
     auditorias = db.relationship('Auditoria', backref='usuario', lazy='dynamic')
+
+    def has_permission(self, permiso):
+        if self.rol_id == 1:
+            return True
+        return False
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

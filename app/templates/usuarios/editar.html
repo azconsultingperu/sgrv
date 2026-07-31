@@ -10,28 +10,30 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label class="form-label">Nombres</label>
-                    <input type="text" class="form-control" name="nombres" value="{{ usuario.nombres }}" required>
+                    <label class="form-label" for="nombres">Nombres</label>
+                    <input type="text" class="form-control" name="nombres" id="nombres" value="{{ usuario.nombres }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Apellidos</label>
-                    <input type="text" class="form-control" name="apellidos" value="{{ usuario.apellidos }}" required>
+                    <label class="form-label" for="apellidos">Apellidos</label>
+                    <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ usuario.apellidos }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" name="email" value="{{ usuario.email }}" required>
+                    <label class="form-label" for="email">Email</label>
+                    <input type="email" class="form-control" name="email" id="email" value="{{ usuario.email }}" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Rol</label>
-                    <select class="form-select" name="rol_id">
+                    <label class="form-label" for="rol_id">Rol</label>
+                    <select class="form-select" name="rol_id" id="rol_id">
                         {% for r in roles %}
                         <option value="{{ r.id }}" {% if usuario.rol_id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label">Nueva Contraseña (dejar vacío para mantener)</label>
-                    <input type="password" class="form-control" name="password">
+                    <label class="form-label" for="password">Nueva Contraseña (dejar vacío para mantener)</label>
+                    <input type="password" class="form-control" name="password" id="password" oninput="checkPasswordStrength(this.value)">
+                    <div class="password-strength" id="passwordStrength"></div>
+                    <div class="password-requirements" id="passwordLabel">Mínimo 8 caracteres.</div>
                 </div>
                 <div class="col-md-4 d-flex align-items-center">
                     <div class="form-check">
@@ -47,4 +49,31 @@
         </form>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+function checkPasswordStrength(password) {
+    var bar = document.getElementById('passwordStrength');
+    var label = document.getElementById('passwordLabel');
+    bar.className = 'password-strength';
+    if (password.length === 0) {
+        label.textContent = 'Mínimo 8 caracteres.';
+        label.style.color = '#666';
+        return;
+    }
+    if (password.length < 3) {
+        bar.classList.add('weak');
+        label.textContent = 'Contraseña débil';
+        label.style.color = '#dc3545';
+    } else if (password.length < 8) {
+        bar.classList.add('fair');
+        label.textContent = 'Contraseña media';
+        label.style.color = '#ffc107';
+    } else {
+        bar.classList.add('good');
+        label.textContent = 'Contraseña buena';
+        label.style.color = '#28a745';
+    }
+}
+</script>
 {% endblock %}

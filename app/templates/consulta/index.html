@@ -26,6 +26,7 @@
                     <option value="">Sexo</option>
                     <option value="M" {% if search_params.sexo == 'M' %}selected{% endif %}>Masculino</option>
                     <option value="F" {% if search_params.sexo == 'F' %}selected{% endif %}>Femenino</option>
+                    <option value="O" {% if search_params.sexo == 'O' %}selected{% endif %}>Otros</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -66,7 +67,7 @@
                         <td>{{ a.apellidos }}</td>
                         <td>{{ a.nombres }}</td>
                         <td>{{ a.edad }}</td>
-                        <td>{{ 'M' if a.sexo == 'M' else 'F' }}</td>
+                        <td>{{ 'M' if a.sexo == 'M' else 'F' if a.sexo == 'F' else 'O' }}</td>
                         <td>{{ a.celular }}</td>
                         <td>{{ a.institucion.nombre[:25] if a.institucion else '' }}</td>
                         <td>
