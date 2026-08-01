@@ -1,0 +1,46 @@
+# .gitattributes
+# Normaliza saltos de línea a LF en el repositorio para garantizar
+# compatibilidad entre Linux, Windows y macOS.
+
+# Por defecto: normaliza todo texto a LF
+* text=auto eol=lf
+
+# Scripts Python: siempre LF
+*.py    text eol=lf
+
+# Archivos de configuración y documentación: siempre LF
+*.md    text eol=lf
+*.txt   text eol=lf
+*.cfg   text eol=lf
+*.ini   text eol=lf
+*.toml  text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.json  text eol=lf
+*.env   text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.sql   text eol=lf
+
+# Scripts de shell: siempre LF (obligatorio en Linux/macOS)
+*.sh    text eol=lf
+
+# Scripts de Windows: CRLF (para compatibilidad en CMD/PowerShell)
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# Archivos binarios: no tocar
+*.db        binary
+*.sqlite    binary
+*.sqlite3   binary
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pdf       binary
+*.zip       binary
+*.gz        binary
+*.tar       binary

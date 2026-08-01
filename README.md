@@ -55,7 +55,6 @@ sgrv/
 ├── app/
 │   ├── controllers/     # Controladores (blueprints)
 │   ├── models/          # Modelos SQLAlchemy
-│   ├── views/           # Vistas (reservado)
 │   ├── templates/       # Plantillas HTML
 │   │   ├── auth/        # Login, recuperar contraseña
 │   │   ├── dashboard/   # Dashboard principal
@@ -73,7 +72,6 @@ sgrv/
 │   ├── services/        # Lógica de negocio
 │   ├── utils/           # Utilidades y seed data
 │   └── config.py        # Configuración de la aplicación
-├── database/            # Archivos de base de datos
 ├── migrations/          # Migraciones de base de datos
 ├── logs/                # URL temporal del túnel (logs/tunel.txt)
 ├── requirements.txt     # Dependencias del proyecto
@@ -93,6 +91,7 @@ sgrv/
 3. Esperar a que se configure el entorno automáticamente (~2 min)
 4. La app se iniciará sola y se abrirá una vista previa en `http://localhost:5000`
 5. Si no se abre, ejecuta manualmente: `python run.py`
+
 
 > **Credenciales predeterminadas:** Usuario: `12345678` / Contraseña: `admin123`
 
@@ -117,29 +116,30 @@ cd sgrv
 
 ### 3. Crear entorno virtual
 
+**Si tu Python es 3.10 – 3.12 (Debian/Ubuntu, Fedora, macOS, Windows):**
 ```bash
 python -m venv venv
 ```
 
-> **¿Qué hace?** Crea una carpeta `venv/` con un Python aislado del sistema, para que las librerías del proyecto no se mezclen con las de tu equipo.
-
-**Si tu Python es 3.10 – 3.12 (Debian/Ubuntu, Fedora, etc.):**
-```bash
-python -m venv venv
-```
-
-**Si tu Python es 3.13 o superior (por ejemplo Arch Linux, Manjaro, Fedora reciente):**
+**Si tu Python es 3.13 o superior (Arch Linux, Manjaro, Fedora reciente):**
 ```bash
 uv venv --python 3.12 venv
 ```
-> por tal caso: las librerías del proyecto solo funcionan con Python 3.12, y `uv` lo instala automáticamente dentro del venv sin tocar tu sistema. Si no lo tienes, instálalo según tu distro: `sudo pacman -S uv` (Arch/Manjaro), `sudo apt install uv` (Debian/Ubuntu), `sudo dnf install uv` (Fedora) o desde [docs.astral.sh/uv](https://docs.astral.sh/uv/).
+> `uv` instala Python 3.12 automáticamente dentro del venv sin tocar el sistema.  
+> Si no lo tienes: `sudo pacman -S uv` (Arch/Manjaro), `sudo apt install uv` (Debian/Ubuntu), `sudo dnf install uv` (Fedora) o desde [docs.astral.sh/uv](https://docs.astral.sh/uv/).
+
+> **¿Qué hace `python -m venv venv`?** Crea una carpeta `venv/` con un Python aislado del sistema, para que las librerías del proyecto no interfieran con las de tu equipo.
 
 **Activar el entorno virtual:**
-```bash
-# Windows
-venv\Scripts\activate
 
-# Linux/Mac
+```bash
+# Windows (PowerShell)
+venv\Scripts\Activate.ps1
+
+# Windows (CMD)
+venv\Scripts\activate.bat
+
+# Linux / macOS
 source venv/bin/activate
 ```
 
@@ -148,16 +148,16 @@ source venv/bin/activate
 ### 4. Configurar variables de entorno
 
 ```bash
-# Windows
+# Windows (PowerShell o CMD)
 copy .env.example .env
 
-# Linux/Mac
+# Linux / macOS
 cp .env.example .env
 ```
 
 > **Nota:** Si `SECRET_KEY` se deja vacía, la aplicación genera una automáticamente en cada inicio (solo para desarrollo).
 >
-> **No necesitas crear nada manualmente:** la aplicación crea automáticamente la carpeta `database/` y el archivo de la base de datos en el primer arranque (funciona igual en Windows, Linux y Mac).
+> **No necesitas crear nada manualmente:** la aplicación crea automáticamente la carpeta `database/` y el archivo de la base de datos en el primer arranque (funciona igual en Windows, Linux y macOS).
 
 ### 5. Instalar dependencias
 
@@ -183,21 +183,76 @@ python run.py
 
 La aplicación se iniciará en:
 - `http://localhost:5000` (local)
-- `http://192.168.0.131:5000` (red local)
+- `http://<tu-IP-local>:5000` (red local, la IP varía según tu equipo)
 - `https://XXXX.trycloudflare.com` (URL pública temporal vía túnel Cloudflare)
 
 > **URL temporal:** al iniciar, la app crea automáticamente un túnel de Cloudflare para acceder desde cualquier dispositivo con internet. La URL se muestra en la consola y se guarda en `logs/tunel.txt`. Expira al cerrar el servidor. La primera vez descarga el binario de cloudflared (~52 MB).
 >
 > Para desactivar el túnel: `CLOUDFLARE_TUNNEL=0` en el `.env`.
 
+> **Linux:** si aparece `[Errno 13] Permission denied` al iniciar el túnel, ejecuta una sola vez:
+> ```bash
+> chmod +x venv/lib/python3.12/site-packages/pycloudflared/cloudflared-linux-amd64
+> ```
+
 ### 7. Solución de problemas comunes
 
 | Error | Causa | Solución |
 |---|---|---|
-| `ModuleNotFoundError: No module named 'flask_sqlalchemy'` | No se activó el entorno virtual o no se instalaron las dependencias | Activa el venv (`source venv/bin/activate`) y ejecuta `pip install -r requirements.txt` |
+| `ModuleNotFoundError: No module named 'flask_sqlalchemy'` | No se activó el entorno virtual o no se instalaron las dependencias | Activa el venv (`source venv/bin/activate` / `venv\Scripts\activate`) y ejecuta `pip install -r requirements.txt` |
 | `error: too few arguments to function '_PyLong_AsByteArray'` al instalar `pandas` | Python 3.13+ no es compatible con las versiones fijadas en `requirements.txt` (no existen binarios precompilados y no compilan desde fuente) | Crea el entorno virtual con Python 3.12: `uv venv --python 3.12 venv` (o instala `python312` con tu gestor de paquetes) |
+| `[Errno 13] Permission denied: '…/cloudflared-linux-amd64'` | El binario de Cloudflare no tiene permiso de ejecución (solo ocurre en Linux) | `chmod +x venv/lib/python3.12/site-packages/pycloudflared/cloudflared-linux-amd64` |
 | `sqlite3.OperationalError: unable to open database file` | Estás usando una versión antigua del proyecto (las versiones nuevas crean la carpeta `database/` automáticamente) | Actualiza el proyecto: `git pull` |
-| El error anterior persiste | Hay una variable `DATABASE_URL` con ruta inválida en la terminal (si antes pegaste un comando `DATABASE_URL=...`) | Ejecuta `unset DATABASE_URL` y vuelve a arrancar |
+| El error anterior persiste | Hay una variable `DATABASE_URL` con ruta inválida en la terminal (si antes pegaste un comando `DATABASE_URL=...`) | Ejecuta `unset DATABASE_URL` (Linux/macOS) o cierra y vuelve a abrir la terminal (Windows), y vuelve a arrancar |
+
+---
+
+## Trabajo colaborativo con Git (multi-OS)
+
+Este proyecto es seguro de usar en equipo con colaboradores que usen **diferentes sistemas operativos** (Linux, Windows, macOS), siempre que se respeten estas consideraciones:
+
+### ¿Qué NO se comparte entre colaboradores?
+
+Los siguientes elementos están en `.gitignore` y **no se sincronizan** con Git (cada colaborador los configura localmente):
+
+| Elemento | Motivo |
+|---|---|
+| `venv/` | El entorno virtual es específico de cada OS y versión de Python |
+| `.env` | Contiene datos sensibles (claves, contraseñas) |
+| `database/*.db` | La base de datos SQLite de desarrollo es local |
+| `logs/` | URLs de túnel temporales, no se comparten |
+| `instance/` | Carpeta interna de Flask, generada automáticamente |
+
+### ¿Qué SÍ se comparte?
+
+Todo el código fuente: `app/`, `migrations/`, `run.py`, `requirements.txt`, `.env.example`, `README.md`, etc.
+
+### Flujo de trabajo habitual
+
+```
+# Colaborador A (Linux) hace cambios y los sube:
+git add .
+git commit -m "feat: nueva funcionalidad"
+git push
+
+# Colaborador B (Windows) recibe los cambios:
+git pull
+# Si se agregaron nuevas dependencias:
+pip install -r requirements.txt
+# Si hay nuevas migraciones:
+python -m flask db upgrade
+# Ejecutar:
+python run.py
+```
+
+### Advertencias cross-OS
+
+| Situación | Detalle |
+|---|---|
+| **Saltos de línea** | Git en Windows puede convertir LF → CRLF. Para evitar problemas, el colaborador Windows debe ejecutar: `git config --global core.autocrlf true` |
+| **Permisos de archivos** | Los archivos ejecutables (como el binario de cloudflared) pueden perder sus permisos al pasar por Windows. Si esto ocurre en Linux/macOS, ejecuta el `chmod +x` de la sección anterior. |
+| **Rutas de archivos** | El proyecto usa `os.path.join` y `pathlib.Path`, que son compatibles con todos los sistemas operativos. No hay rutas hardcodeadas. |
+| **Python y venv** | Cada colaborador debe crear su propio `venv` localmente con la versión de Python compatible. |
 
 ---
 
@@ -343,16 +398,32 @@ El sistema incluye tablas y estructura de datos preparada para implementar model
 ```sql
 CREATE DATABASE gestion_visitas;
 ```
-3. Configurar variables de entorno:
+3. Configurar la variable de entorno `DATABASE_URL`:
+
 ```bash
+# Linux / macOS
+export DATABASE_URL=postgresql://usuario:password@localhost:5432/gestion_visitas
+
+# Windows (PowerShell)
+$env:DATABASE_URL="postgresql://usuario:password@localhost:5432/gestion_visitas"
+
+# Windows (CMD)
 set DATABASE_URL=postgresql://usuario:password@localhost:5432/gestion_visitas
 ```
+
+> **Recomendado:** define esta variable directamente en el archivo `.env` para que persista entre sesiones.
 
 ### Servidor de producción
 
 ```bash
 gunicorn -w 4 -b 0.0.0.0:8000 run:app
 ```
+
+> `gunicorn` solo está disponible en Linux/macOS. En Windows puedes usar `waitress`:
+> ```bash
+> pip install waitress
+> waitress-serve --port=8000 run:app
+> ```
 
 ---
 
@@ -364,6 +435,6 @@ Este proyecto es propiedad del Instituto de Educación Superior Tecnológico Pú
 
 ## Contacto
 
-**Desarrollado por:** azconsultingperu
-**GitHub:** [https://github.com/azconsultingperu](https://github.com/azconsultingperu)
+**Desarrollado por:** azconsultingperu  
+**GitHub:** [https://github.com/azconsultingperu](https://github.com/azconsultingperu)  
 **Repositorio:** [https://github.com/azconsultingperu/sgrv](https://github.com/azconsultingperu/sgrv)

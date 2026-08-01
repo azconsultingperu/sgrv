@@ -2,6 +2,26 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-01] — Auditoría y compatibilidad multi-OS
+
+### Agregado
+- **`.gitattributes`**: normaliza los saltos de línea a LF en el repositorio para todos los SO. Archivos `.bat`, `.cmd` y `.ps1` de Windows conservan CRLF. Previene conflictos al colaborar entre Linux, Windows y macOS.
+- **Sección "Trabajo colaborativo con Git (multi-OS)"** en el README: explica qué se comparte y qué no entre colaboradores de distintos SO, el flujo `push/pull` habitual y advertencias sobre saltos de línea, permisos y rutas.
+- **Auto-fix de permisos de cloudflared** (`run.py`): función `_fix_cloudflared_permissions()` que detecta y aplica `chmod +x` automáticamente al binario antes de lanzar el túnel, eliminando el error `[Errno 13] Permission denied` sin necesidad de pasos manuales.
+
+### Corregido
+- **`run.py`**: el binario `cloudflared-linux-amd64` ahora recibe permisos de ejecución automáticamente en Linux/macOS. Antes requería ejecutar `chmod +x` a mano tras cada instalación de dependencias.
+- **README — IP hardcodeada**: se eliminó la IP `192.168.0.131` (que corresponde a un equipo específico) y se reemplazó por `<tu-IP-local>` para no generar confusión en otros colaboradores.
+- **README — Carpeta `views/` inexistente**: se eliminó de la estructura del proyecto porque no existe en el código real.
+- **README — Variables de entorno en producción**: la sección solo mostraba `set` de Windows CMD; ahora incluye las variantes para Linux/macOS (`export`) y Windows PowerShell (`$env:`).
+- **README — `gunicorn` en Windows**: se aclaró que `gunicorn` no está disponible en Windows y se añadió la alternativa con `waitress`.
+- **`.env.example`**: corregidos caracteres con encoding roto (`Ã³`, `Ã©`, `Ã±` → `ó`, `é`, `ñ`) causados por abrir el archivo con codificación incorrecta.
+- **`.devcontainer/devcontainer.json`**: imagen actualizada de Python 3.11 a Python 3.12 para alinear con los requisitos de `requirements.txt` (pandas, numpy, etc.).
+
+### Documentado
+- **Solución de problemas**: nuevo caso `[Errno 13] Permission denied` en la tabla de errores del README, con el comando `chmod +x` como solución manual de respaldo.
+- **Activación del venv en Windows**: se diferencian las variantes PowerShell (`Activate.ps1`) y CMD (`activate.bat`).
+
 ## [2026-07-31]
 
 ### Agregado

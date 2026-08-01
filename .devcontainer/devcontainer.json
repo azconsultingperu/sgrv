@@ -1,6 +1,6 @@
 {
     "name": "SGRV - IESTP Paiján",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "image": "mcr.microsoft.com/devcontainers/python:3.12",
     "forwardPorts": [5000],
     "portsAttributes": {
         "5000": {
