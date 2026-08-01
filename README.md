@@ -106,7 +106,7 @@ sgrv/
 - Git
 - Navegador web moderno
 
-> **⚠ IMPORTANTE:** usa Python **3.10 – 3.12** para el entorno virtual. Con **Python 3.13 o superior** (por ejemplo el `python` por defecto de Arch Linux / Manjaro, que hoy es 3.14) la instalación falla al compilar `pandas==2.1.4` desde el código fuente, porque no existen binarios precompilados para esas versiones y el compilador no las soporta. Ver [Solución de problemas](#7-solución-de-problemas-comunes).
+> **⚠ IMPORTANTE:** usa Python **3.10 – 3.12** para el entorno virtual. Con **Python 3.13 o superior** (por ejemplo el Python por defecto de Arch Linux, Manjaro o Fedora reciente) la instalación falla al compilar `pandas==2.1.4` desde el código fuente, porque no existen binarios precompilados para esas versiones y el compilador no las soporta. Ver [Solución de problemas](#7-solución-de-problemas-comunes).
 
 ### 2. Clonar el repositorio
 
@@ -121,20 +121,29 @@ cd sgrv
 python -m venv venv
 ```
 
-> **Arch Linux / Manjaro:** el `python` del sistema es 3.14 y `pip` fuera de un entorno virtual está bloqueado (PEP 668). Usa `uv` (ya instalado en muchos sistemas; si no: `sudo pacman -S uv`) para crear el entorno con Python 3.12:
-> ```bash
-> uv venv --python 3.12 venv
-> ```
+> **¿Qué hace?** Crea una carpeta `venv/` con un Python aislado del sistema, para que las librerías del proyecto no se mezclen con las de tu equipo.
 
-**Windows:**
+**Si tu Python es 3.10 – 3.12 (Debian/Ubuntu, Fedora, etc.):**
 ```bash
-venv\Scripts\activate
+python -m venv venv
 ```
 
-**Linux/Mac:**
+**Si tu Python es 3.13 o superior (por ejemplo Arch Linux, Manjaro, Fedora reciente):**
 ```bash
+uv venv --python 3.12 venv
+```
+> por tal caso: las librerías del proyecto solo funcionan con Python 3.12, y `uv` lo instala automáticamente dentro del venv sin tocar tu sistema. Si no lo tienes, instálalo según tu distro: `sudo pacman -S uv` (Arch/Manjaro), `sudo apt install uv` (Debian/Ubuntu), `sudo dnf install uv` (Fedora) o desde [docs.astral.sh/uv](https://docs.astral.sh/uv/).
+
+**Activar el entorno virtual:**
+```bash
+# Windows
+venv\Scripts\activate
+
+# Linux/Mac
 source venv/bin/activate
 ```
+
+> ⚠ Si creaste el venv con `uv`, este **no incluye `pip`** (daría `error: externally-managed-environment`); en el paso 5 usa `uv pip install` en su lugar.
 
 ### 4. Configurar variables de entorno
 
@@ -164,7 +173,15 @@ cp .env.example .env
 pip install -r requirements.txt
 ```
 
-> **Nota para Windows:** usa `python -m pip install -r requirements.txt` si `pip` no está en el PATH.
+> **Windows:** si `pip` no está en el PATH, usa:
+> ```bash
+> python -m pip install -r requirements.txt
+> ```
+>
+> **Si creaste el venv con `uv`** (distros con Python 3.13+):
+> ```bash
+> uv pip install -r requirements.txt
+> ```
 
 ### 6. Ejecutar la aplicación
 
