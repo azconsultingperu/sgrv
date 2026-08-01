@@ -23,7 +23,7 @@ Sistema web para registrar y gestionar las visitas realizadas por promotores ins
 ## Tecnologías
 
 ### Backend
-- Python 3.10+
+- Python 3.10 – 3.12
 - Flask 3.0
 - SQLAlchemy 2.0
 - Flask-Login
@@ -102,9 +102,11 @@ gestion_registro_visitas/
 
 ### 1. Requisitos previos
 
-- Python 3.10 o superior
+- Python 3.10, 3.11 o **3.12** (ver advertencia abajo)
 - Git
 - Navegador web moderno
+
+> **⚠ IMPORTANTE:** usa Python **3.10 – 3.12** para el entorno virtual. Con **Python 3.13 o superior** (por ejemplo el `python` por defecto de Arch Linux / Manjaro, que hoy es 3.14) la instalación falla al compilar `pandas==2.1.4` desde el código fuente, porque no existen binarios precompilados para esas versiones y el compilador no las soporta. Ver [Solución de problemas](#7-solución-de-problemas-comunes).
 
 ### 2. Clonar el repositorio
 
@@ -118,6 +120,11 @@ cd gestion-registro-visitas
 ```bash
 python -m venv venv
 ```
+
+> **Arch Linux / Manjaro:** el `python` del sistema es 3.14 y `pip` fuera de un entorno virtual está bloqueado (PEP 668). Usa `uv` (ya instalado en muchos sistemas; si no: `sudo pacman -S uv`) para crear el entorno con Python 3.12:
+> ```bash
+> uv venv --python 3.12 venv
+> ```
 
 **Windows:**
 ```bash
@@ -141,6 +148,16 @@ cp .env.example .env
 
 > **Nota:** Si `SECRET_KEY` se deja vacía, la aplicación genera una automáticamente en cada inicio (solo para desarrollo).
 
+> **⚠ Importante:** crea la carpeta `database/` **antes de ejecutar la aplicación**. No viene en el repositorio (sus archivos `.db` están en `.gitignore`) y SQLite **no la crea automáticamente** — sin ella la app falla al iniciar con `sqlite3.OperationalError: unable to open database file`:
+> ```bash
+> mkdir -p database
+> ```
+>
+> Si vas a ejecutar la app desde otro directorio o sigues teniendo el error, cambia en tu `.env` la variable `DATABASE_URL` a una **ruta absoluta**:
+> ```bash
+> DATABASE_URL=sqlite:////ruta/absoluta/al/proyecto/database/gestion_visitas.db
+> ```
+
 ### 5. Instalar dependencias
 
 ```bash
@@ -163,6 +180,15 @@ La aplicación se iniciará en:
 > **URL temporal:** al iniciar, la app crea automáticamente un túnel de Cloudflare para acceder desde cualquier dispositivo con internet. La URL se muestra en la consola y se guarda en `logs/tunel.txt`. Expira al cerrar el servidor. La primera vez descarga el binario de cloudflared (~52 MB).
 >
 > Para desactivar el túnel: `CLOUDFLARE_TUNNEL=0` en el `.env`.
+
+### 7. Solución de problemas comunes
+
+| Error | Causa | Solución |
+|---|---|---|
+| `ModuleNotFoundError: No module named 'flask_sqlalchemy'` | No se activó el entorno virtual o no se instalaron las dependencias | Activa el venv (`source venv/bin/activate`) y ejecuta `pip install -r requirements.txt` |
+| `error: too few arguments to function '_PyLong_AsByteArray'` al instalar `pandas` | Python 3.13+ no es compatible con las versiones fijadas en `requirements.txt` (no existen binarios precompilados y no compilan desde fuente) | Crea el entorno virtual con Python 3.12: `uv venv --python 3.12 venv` (o instala `python312` con tu gestor de paquetes) |
+| `sqlite3.OperationalError: unable to open database file` | La carpeta `database/` no existe (está en `.gitignore`) y SQLite no la crea automáticamente | `mkdir -p database` y vuelve a ejecutar |
+| El error anterior persiste | La `DATABASE_URL` del `.env` es una ruta relativa y la app se ejecuta desde otro directorio | Usa una ruta absoluta en `.env`: `DATABASE_URL=sqlite:////ruta/absoluta/al/proyecto/database/gestion_visitas.db` |
 
 ---
 
