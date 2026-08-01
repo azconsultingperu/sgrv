@@ -108,7 +108,20 @@
     overflow-x: hidden;
 }
 
-.sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1035; }
+.sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1035;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed), visibility var(--transition-speed);
+}
+
+.sidebar-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
 
 .navbar {
     background: linear-gradient(135deg, var(--logo-secondary), var(--sidebar-bg)) !important;
@@ -152,14 +165,12 @@ a:hover { color: #0a4020; }
 
 @media (min-width: 992px) {
     .sidebar.collapsed { transform: translateX(-100%); }
-    .sidebar.collapsed + .sidebar-backdrop { display: none !important; }
     .main-content.expanded { margin-left: 0; }
 }
 
 @media (max-width: 991.98px) {
     .sidebar { position: fixed; left: 0; top: 0; transform: translateX(-100%); box-shadow: 4px 0 20px rgba(0,0,0,0.3); }
     .sidebar.show { transform: translateX(0); }
-    .sidebar-backdrop.show { display: block; }
     .main-content { margin-left: 0; }
 }
 

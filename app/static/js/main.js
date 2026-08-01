@@ -43,13 +43,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var sidebar         = document.getElementById('sidebar');
     var sidebarToggle   = document.getElementById('sidebarToggle');
     var sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    var movilQuery      = window.matchMedia('(max-width: 991.98px)');
 
     function closeSidebar() {
         if (sidebar)         sidebar.classList.remove('show');
         if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
     }
     function toggleSidebar() {
-        if (window.innerWidth < 992) {
+        if (movilQuery.matches) {
             if (sidebar && sidebar.classList.contains('show')) {
                 closeSidebar();
             } else {
@@ -67,12 +68,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (sidebar) {
         sidebar.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
-                if (window.innerWidth < 992) closeSidebar();
+                if (movilQuery.matches) closeSidebar();
             });
         });
     }
     window.addEventListener('resize', function () {
-        if (window.innerWidth >= 992 && sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+        if (!movilQuery.matches) {
+            if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+            closeSidebar();
+        }
     });
 
     /* --- Toasts (flash messages) ---------------------------- */
