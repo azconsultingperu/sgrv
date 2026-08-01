@@ -30,3 +30,13 @@ Todas las mejoras y correcciones del proyecto SGRV.
 - **Decoradores centralizados** en `app/utils/decorators.py` (`admin_required`, `supervisor_required`, `admin_or_supervisor_required`, `permiso_requerido`).
 - **Sanitización de entrada**: `sanitizar_input` en `app/utils/helpers.py`.
 - **Validación de contraseña**: mínima de 8 caracteres (server-side y client-side).
+
+## [2026-07-31] — Instalación y documentación
+
+### Cambiado
+- **Guía de instalación generalizada para cualquier sistema operativo**: la documentación explica cada caso por separado (Windows, Linux/Mac) e incluye instrucciones para distros con Python 3.13+ (Arch Linux, Manjaro, Fedora reciente) usando `uv` con Python 3.12, ya que las dependencias fijadas (`pandas==2.1.4`, etc.) no tienen binarios para versiones nuevas de Python y no compilan desde fuente.
+- **Nombre del repositorio corregido en toda la documentación**: ahora apunta a `azconsultingperu/sgrv` (antes decía `gestion-registro-visitas` en varias secciones).
+- **Nueva sección "Solución de problemas comunes"** en el README con los errores de instalación más frecuentes y su corrección (`ModuleNotFoundError: flask_sqlalchemy`, fallo de compilación de pandas, `unable to open database file`, variables de entorno heredadas).
+
+### Corregido
+- **Error `sqlite3.OperationalError: unable to open database file`**: la aplicación ahora crea automáticamente la carpeta `database/` y el archivo SQLite en el primer arranque (`app/__init__.py`), sin pasos manuales; antes fallaba en instalaciones nuevas porque la carpeta no existía en el repositorio.
