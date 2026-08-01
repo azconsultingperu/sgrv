@@ -62,6 +62,13 @@ def create_app():
         return render_template('errors/500.html'), 500
 
     with app.app_context():
+        from sqlalchemy.engine import make_url
+        from pathlib import Path
+        db_uri = app.config['SQLALCHEMY_DATABASE_URI']
+        if db_uri.startswith('sqlite'):
+            url = make_url(db_uri)
+            if url.database and url.database != ':memory:':
+                Path(url.database).parent.mkdir(parents=True, exist_ok=True)
         from app.models import usuario, rol, alumno, institucion_educativa, visita, promotor, auditoria, sesion, carrera, reporte, dashboard_estadistica
         db.create_all()
         from app.utils.seed import seed_data

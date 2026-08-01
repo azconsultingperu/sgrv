@@ -156,17 +156,8 @@ cp .env.example .env
 ```
 
 > **Nota:** Si `SECRET_KEY` se deja vacía, la aplicación genera una automáticamente en cada inicio (solo para desarrollo).
-
-> **⚠ Importante:** crea la carpeta `database/` **antes de ejecutar la aplicación**. No viene en el repositorio (sus archivos `.db` están en `.gitignore`) y SQLite **no la crea automáticamente** — sin ella la app falla al iniciar con `sqlite3.OperationalError: unable to open database file`:
-> ```bash
-> mkdir -p database
-> ```
 >
-> Si vas a ejecutar la app desde otro directorio o sigues teniendo el error, cambia en tu `.env` la variable `DATABASE_URL` a una **ruta absoluta** (reemplaza `TU_USUARIO` por tu usuario y ajusta la ruta si clonaste en otra carpeta; es solo un ejemplo):
-> ```bash
-> DATABASE_URL=sqlite:////home/TU_USUARIO/sgrv/database/gestion_visitas.db
-> ```
-> ⚠ La línea anterior va **dentro del archivo `.env`** (edítalo con tu editor). No la pegues como comando en la terminal: crearía una variable del entorno que tiene prioridad sobre el `.env` y seguiría fallando.
+> **No necesitas crear nada manualmente:** la aplicación crea automáticamente la carpeta `database/` y el archivo de la base de datos en el primer arranque (funciona igual en Windows, Linux y Mac).
 
 ### 5. Instalar dependencias
 
@@ -205,8 +196,8 @@ La aplicación se iniciará en:
 |---|---|---|
 | `ModuleNotFoundError: No module named 'flask_sqlalchemy'` | No se activó el entorno virtual o no se instalaron las dependencias | Activa el venv (`source venv/bin/activate`) y ejecuta `pip install -r requirements.txt` |
 | `error: too few arguments to function '_PyLong_AsByteArray'` al instalar `pandas` | Python 3.13+ no es compatible con las versiones fijadas en `requirements.txt` (no existen binarios precompilados y no compilan desde fuente) | Crea el entorno virtual con Python 3.12: `uv venv --python 3.12 venv` (o instala `python312` con tu gestor de paquetes) |
-| `sqlite3.OperationalError: unable to open database file` | La carpeta `database/` no existe (está en `.gitignore`) y SQLite no la crea automáticamente | `mkdir -p database` y vuelve a ejecutar |
-| El error anterior persiste | La `DATABASE_URL` del `.env` es una ruta relativa o hay una variable `DATABASE_URL` con ruta inválida en la terminal (si antes pegaste un comando `DATABASE_URL=...`, ejecuta `unset DATABASE_URL`) | Usa una ruta absoluta real en `.env`, por ejemplo `DATABASE_URL=sqlite:////home/TU_USUARIO/sgrv/database/gestion_visitas.db` (reemplaza `TU_USUARIO` por tu usuario) |
+| `sqlite3.OperationalError: unable to open database file` | Estás usando una versión antigua del proyecto (las versiones nuevas crean la carpeta `database/` automáticamente) | Actualiza el proyecto: `git pull` |
+| El error anterior persiste | Hay una variable `DATABASE_URL` con ruta inválida en la terminal (si antes pegaste un comando `DATABASE_URL=...`) | Ejecuta `unset DATABASE_URL` y vuelve a arrancar |
 
 ---
 
