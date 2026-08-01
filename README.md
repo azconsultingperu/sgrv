@@ -51,7 +51,7 @@ Sistema web para registrar y gestionar las visitas realizadas por promotores ins
 ## Estructura del Proyecto
 
 ```
-gestion_registro_visitas/
+sgrv/
 ├── app/
 │   ├── controllers/     # Controladores (blueprints)
 │   ├── models/          # Modelos SQLAlchemy
@@ -88,7 +88,7 @@ gestion_registro_visitas/
 
 ## GitHub Codespaces (recomendado para probar desde el navegador)
 
-1. Ir a https://github.com/azconsultingperu/gestion-registro-visitas
+1. Ir a https://github.com/azconsultingperu/sgrv
 2. Click en **"Code"** → **"Open with Codespaces"** → **"New codespace"**
 3. Esperar a que se configure el entorno automáticamente (~2 min)
 4. La app se iniciará sola y se abrirá una vista previa en `http://localhost:5000`
@@ -111,8 +111,8 @@ gestion_registro_visitas/
 ### 2. Clonar el repositorio
 
 ```bash
-git clone https://github.com/azconsultingperu/gestion-registro-visitas.git
-cd gestion-registro-visitas
+git clone https://github.com/azconsultingperu/sgrv.git
+cd sgrv
 ```
 
 ### 3. Crear entorno virtual
@@ -357,4 +357,4 @@ Este proyecto es propiedad del Instituto de Educación Superior Tecnológico Pú
 
 **Desarrollado por:** azconsultingperu
 **GitHub:** [https://github.com/azconsultingperu](https://github.com/azconsultingperu)
-**Repositorio:** [https://github.com/azconsultingperu/gestion-registro-visitas](https://github.com/azconsultingperu/gestion-registro-visitas)
+**Repositorio:** [https://github.com/azconsultingperu/sgrv](https://github.com/azconsultingperu/sgrv)
