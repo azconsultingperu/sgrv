@@ -118,7 +118,7 @@ def editar(id):
 
     return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
 
-@usuarios_bp.route('/eliminar/<int:id>')
+@usuarios_bp.route('/eliminar/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def eliminar(id):
@@ -126,12 +126,13 @@ def eliminar(id):
     if usuario.id == current_user.id:
         flash('No puede eliminarse a sí mismo.', 'danger')
         return redirect(url_for('usuarios.index'))
+    nombre_completo = f'{usuario.nombres} {usuario.apellidos}'
     username = usuario.username
     db.session.delete(usuario)
     db.session.commit()
     registrar_auditoria(current_user.id, 'Eliminación de usuario', 'Usuarios',
         f'Usuario eliminado: {username}')
-    flash('Usuario eliminado.', 'success')
+    flash(f'Usuario "{nombre_completo}" eliminado correctamente.', 'success')
     return redirect(url_for('usuarios.index'))
 
 @usuarios_bp.route('/verificar-dni')

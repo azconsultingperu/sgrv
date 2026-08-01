@@ -43,7 +43,25 @@
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('usuarios.editar', id=u.id) }}" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
-                                <a href="{{ url_for('usuarios.eliminar', id=u.id) }}" class="btn btn-danger" title="Eliminar" onclick="return confirm('¿Eliminar este usuario?')"><i class="bi bi-trash"></i></a>
+                                {# Formulario oculto para eliminar por POST (más seguro que GET) #}
+                                <form id="form-del-{{ u.id }}"
+                                      action="{{ url_for('usuarios.eliminar', id=u.id) }}"
+                                      method="POST"
+                                      style="display:none;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                </form>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm"
+                                        title="Eliminar"
+                                        data-confirm
+                                        data-confirm-type="danger"
+                                        data-confirm-title="Eliminar usuario"
+                                        data-confirm-message="¿Eliminar a {{ u.nombres }} {{ u.apellidos }}? Esta acción no se puede deshacer."
+                                        data-confirm-ok="Sí, eliminar"
+                                        data-confirm-cancel="Cancelar"
+                                        data-confirm-form="form-del-{{ u.id }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
