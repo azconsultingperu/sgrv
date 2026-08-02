@@ -45,9 +45,30 @@ document.addEventListener('DOMContentLoaded', function () {
     var sidebarBackdrop = document.getElementById('sidebarBackdrop');
     var movilQuery      = window.matchMedia('(max-width: 991.98px)');
 
+    function lockMainScroll(locked) {
+        var mc = document.querySelector('.main-content');
+        if (!mc) return;
+        if (locked) {
+            if (mc._lockWheel) return;
+            mc._lockWheel = function (e) { e.preventDefault(); };
+            mc._lockTouch = function (e) { e.preventDefault(); };
+            mc.addEventListener('wheel', mc._lockWheel, { passive: false });
+            mc.addEventListener('touchmove', mc._lockTouch, { passive: false });
+        } else {
+            if (mc._lockWheel) {
+                mc.removeEventListener('wheel', mc._lockWheel);
+                mc.removeEventListener('touchmove', mc._lockTouch);
+                mc._lockWheel = null;
+                mc._lockTouch = null;
+            }
+        }
+    }
+
     function closeSidebar() {
         if (sidebar)         sidebar.classList.remove('show');
         if (sidebarBackdrop) sidebarBackdrop.classList.remove('show');
+        document.body.classList.remove('sidebar-open');
+        lockMainScroll(false);
     }
     function toggleSidebar() {
         if (movilQuery.matches) {
@@ -56,6 +77,8 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 if (sidebar)         sidebar.classList.add('show');
                 if (sidebarBackdrop) sidebarBackdrop.classList.add('show');
+                document.body.classList.add('sidebar-open');
+                lockMainScroll(true);
             }
         } else {
             if (sidebar) sidebar.classList.toggle('collapsed');

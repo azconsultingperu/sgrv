@@ -1,3 +1,10 @@
+.auth-wrapper {
+    padding-left: 0;
+    padding-right: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow-y: auto;
+}
 .login-bg {
     position: relative;
     min-height: 100vh;
@@ -5,12 +12,15 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    background-color: #0a1a10;
 }
 .login-bg::before {
     content: '';
     position: absolute;
     inset: 0;
     background: url('../img/frontis.jpg') center/cover fixed no-repeat;
+    background-image: url('../img/frontis.webp');
+    background-image: url('../img/frontis.avif');
     filter: brightness(0.35) saturate(0.8);
     transform: scale(1.05);
 }
