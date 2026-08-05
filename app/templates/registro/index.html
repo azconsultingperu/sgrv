@@ -204,6 +204,7 @@ document.querySelector('input[name="dni"]').addEventListener('blur', function() 
                     document.getElementById('dniFeedback').textContent = 'El DNI ya está registrado.';
                 } else {
                     this.classList.remove('is-invalid');
+                    document.getElementById('dniFeedback').textContent = '';
                 }
             });
     }

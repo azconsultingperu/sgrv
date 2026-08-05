@@ -2,6 +2,76 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-05] — UI: centrado de iconos, layout responsive y limpieza de notificaciones redundantes
+
+### Corregido
+- **Icono `bi-building` descentrado en su cajita del navbar**: la caja `.navbar-logo` (36×36 px) usaba `display: inline-grid` que no alineaba correctamente el glifo Bootstrap Icons por sus métricas de font y `line-height`. Cambiado a `display: inline-flex` + `align-items: center` + `justify-content: center` + `line-height: 1` para centrar el icono perfectamente tanto en su eje horizontal como vertical. Sin cambios en HTML ni diseño visual.
+- **"Últimos datos actualizados" caía debajo de "Dashboard" en mobile**: en `@media (max-width: 767.98px)`, `.page-header` aplicaba `flex-direction: column` que apilaba el `<small class="status-pill">` bajo el título. Reemplazado por `flex-wrap: nowrap` + `align-items: center` + `flex-shrink: 0` en `h4` y `status-pill` para mantener el pill a la derecha del título "Dashboard" en el mismo renglón, incluso en pantallas estrechas.
+- **Botón "Iniciar Sesión" se tapaba al final de la página en desktop (viewport bajo)**: `.login-bg` tenía `overflow: hidden` + `min-height: 100vh`, lo que clip-eaba el contenido excedente en laptops con altura reducida. Cambiado a `overflow-x: hidden; overflow-y: auto` para permitir scroll interno y respetar el padding `2rem 0` simétrico (mismo aire arriba y abajo). El botón "Iniciar Sesión" y el motto "¡Crea, Innova e Inspira!" quedan completamente visibles.
+- **"¿Olvidó su contraseña?" demasiado cerca del centro en mobile**: en pantallas pequeñas, el `.form-check` "Recordar usuario" empujaba visualmente el link hacia el centro. Añadido `.login-link { margin-left: auto; text-align: right; }` dentro de `@media (max-width: 575.98px)` para anclar el link al lateral derecho.
+
+### Cambiado
+- **Notificaciones flash innecesarias removidas**:
+  - `app/__init__.py`: eliminado `login_manager.login_message = 'Por favor inicie sesión para acceder.'` junto con `login_message_category`. Esta advertencia aparecía en cada intento de acceso a ruta protegida sin sesión — es información implícita al ser redirigido al login y molestaba.
+  - `app/controllers/auth_controller.py:85`: eliminado `flash('Sesión cerrada correctamente.', 'info')`. El logout redirige al login; no es necesaria una confirmación visual cada vez que se cierra sesión.
+
+### Documentado
+- **README.md — Sección "Estructura del Proyecto"**: actualizada para reflejar la nueva organización (`templates/perfil/`, `templates/email/`, `static/fonts/`, `static/uploads/`, `instance/database/` como BD activa, `database/` con `.bak` preservado, `.devcontainer/`, y aclaraciones por subcarpeta). Facilita que otros desarrolladores o agentes de IA localicen dónde trabajar por funcionalidad (Login → `controllers/auth_controller.py` + `models/usuario.py` + `templates/auth/`; Dashboard → `controllers/dashboard_controller.py` + `services/estadistica_service.py` + `templates/dashboard/`; etc.).
+- **README.md — Nueva sección "Vista previa"**: añadida captura de pantalla del sistema (`app/static/img/exampleSGRV.png`) mostrando el dashboard principal con métricas, gráficos y menú lateral, accesible desde el inicio del README para dar contexto visual inmediato del proyecto.
+
+---
+
+## [2026-08-05] — Reorganización de estructura y consistencia de configuración de BD
+
+### Cambiado
+- **`app/templates/perfil.html` → `app/templates/perfil/index.html`**: se movió el template de "Mi Perfil" a su propia carpeta (`perfil/`) para mantener la convención del resto de módulos (`auth/`, `dashboard/`, `registro/`, `consulta/`, `usuarios/`, `auditoria/`, `reportes/`), que ya estaban organizados por funcionalidad. Actualizada la referencia en `perfil_controller.py:76`.
+- **`app/config.py` (default de `SQLALCHEMY_DATABASE_URI`)**: la URI por defecto pasó de ruta absoluta (`'sqlite:///' + os.path.join(os.path.dirname(basedir), 'database', 'gestion_visitas.db')`) a ruta relativa (`'sqlite:///database/gestion_visitas.db'`). Flask-SQLAlchemy resuelve las rutas SQLite relativas contra `app.instance_path` (`/home/juan/sgrv/instance/`), por lo que el default ahora apunta a `instance/database/gestion_visitas.db` — la BD activa real — en lugar de bifurcar hacia `database/gestion_visitas.db` (raíz del proyecto).
+
+### Corregido
+- **Inconsistencia de configuración de base de datos**: el default de `app/config.py` (ruta absoluta) y `.env.example` (ruta relativa `sqlite:///database/gestion_visitas.db`) apuntaban a **dos bases de datos SQLite distintas**. Una instalación nueva sin `.env` creaba `database/gestion_visitas.db`, mientras que una con `.env` usaba `instance/database/gestion_visitas.db`. Este era el origen de la duplicación de BD observada en el proyecto. Con la corrección, ambos caminos son coherentes y resuelven a `instance/database/gestion_visitas.db` (la BD gestionada por Flask-Migrate, con tabla `alembic_version`).
+- **Backup de BD obsoleta**: `database/gestion_visitas.db` (previa a las migraciones, sin `alembic_version`, sin datos reales) fue preservada como `database/gestion_visitas.db.bak` para no perder información histórica. No se eliminó ningún archivo.
+
+### Documentado
+- **Sección "Estructura del Proyecto" del README**: actualizada para reflejar la nueva estructura — se añadieron `templates/perfil/`, `templates/email/`, `static/fonts/`, `static/uploads/`, `instance/database/` (BD activa), `database/` (backup `.bak`), `.devcontainer/`, y se aclaró el contenido de cada subcarpeta de templates y static. Facilita que otros desarrolladores o agentes de IA localicen rápidamente dónde trabajar según la funcionalidad.
+
+### Beneficios
+- **Localización por funcionalidad**: cualquier agente de IA o desarrollador nuevo puede identificar de un vistazo el código de cada módulo (Login → `controllers/auth_controller.py` + `models/usuario.py` + `templates/auth/`; Dashboard → `controllers/dashboard_controller.py` + `services/estadistica_service.py` + `templates/dashboard/`; etc.).
+- **Una sola BD**: se elimina el riesgo de bifurcación de BD por configuración divergente. Con o sin `.env`, la app siempre usará `instance/database/gestion_visitas.db`.
+- **Permanencia**: no se modificó lógica de negocio, diseño visual, modelos, migraciones, ni se eliminaron archivos. Sólo se movió 1 template, se cambió 1 línea de configuración y se renombró 1 BD obsoleta a `.bak`.
+
+---
+
+## [2026-08-04] — Fix: foto de perfil no se actualiza + documentación
+
+### Corregido
+- **Foto de perfil no se actualiza en "Mi Perfil"** (y en edición de usuarios): la ruta `servir_avatar` devolvía la imagen con `max_age=86400` (24 horas de cache del navegador). Como la URL es solo `/perfil/avatar/<id>` (sin el nombre del archivo), el navegador cacheaba la versión anterior de la foto. Corregido cambiando a `Cache-Control: private, max-age=0, must-revalidate` (revalidación condicional con ETag, sin caché del navegador).
+- **Cache-buster en JS del perfil**: `actualizarAvatar()` en `perfil.js` ahora añade `?_=Date.now()` al `src` de la imagen al subir una foto nueva, invalidando cualquier cache residual del navegador.
+- **Función `no_cache_html` duplicada** en `__init__.py`: se consolidaron dos funciones idénticas en una sola.
+
+### Cambiado
+- **`perfil.js`** versionado: `?v=7` → `?v=8` (perfil.html y usuarios/editar.html).
+
+---
+
+## [2026-08-04] — UI: navbar, sidebar y paginación
+
+### Agregado
+- **Navbar rediseñado**: sombra bajo la barra, altura mínima de 58px, cajita con icono institucional (edificio) junto al título, badge del reloj con fondo vítreo, botón hamburguesa destacado y botones outline más visibles. El título "Sistema de Gestión de Registro de Visitas" ahora se muestra **completo en pantallas grandes** (antes se truncaba con "…" siempre por un `max-width` fijo de 200px).
+- **Sidebar rediseñado**: items con icono en cajita (32×32, esquinas redondeadas, hover con escala), etiqueta "MENÚ", item activo con gradiente, sombra y barra marcadora lateral, y **footer de usuario** con avatar, nombre, rol y accesos a "Mi Perfil" y "Cerrar Sesión" (el botón de salida ya no está dentro de la lista de enlaces).
+- **Paginación inteligente tipo Google**: nuevo partial `partials/paginacion.html` aplicado en **Auditoría y Consulta**. Muestra primera/última página + 2 vecinas de la actual con `…` en los huecos, flechas ‹ › (Anterior/Siguiente) que se deshabilitan en los extremos, y **`…` clicable** que salta al centro del hueco de páginas ocultas (con `title` descriptivo y hover resaltado).
+- **Modo oscuro con bordes visibles**: cards, tablas y componentes ahora muestran bordes y separadores con contraste (`--border-color`, superficies `--surface-1/2`) en lugar de desaparecer sobre el fondo; reglas dark para `.card.shadow-sm`/`.border-0` (excepto stat-cards y kpi-bands).
+- **Charts del dashboard adaptados al tema**: líneas de grid, ticks y ejes cambian de color al alternar modo claro/oscuro (evento `sgrv:themechange`), antes invisibles en modo oscuro.
+
+### Cambiado
+- **Título del navbar responsive**: usa `flex: 1 1 auto` con truncado con ellipsis solo cuando realmente no cabe; en móviles (<576px) el reloj se oculta para dar espacio al título.
+- **Hardcodes de color** (`#142e1c`, `#0f2618`, `#1a3d24`, etc.) reemplazados por tokens CSS en card-headers, barras de progreso y modal de confirmación.
+- **`style.css`** versionado: `?v=28` → `?v=35`; `main.js` `?v=21` → `?v=23`.
+
+### Corregido
+- **Título del navbar cortado** ("Sistema de Gesti…") incluso en pantalla completa: se eliminó el `max-width: 200px` fijo que lo limitaba siempre.
+- **Paginador con todos los números** ("1 2 3 … 15 16 17"): con muchas páginas se desbordaba el footer; ahora siempre muestra un máximo de 7 números + flechas.
+- **Error de sintaxis Jinja** en el partial de paginación (`ns.shown.append` → `ns.shown + [p]`).
+
 ## [2026-08-01] — Auditoría y compatibilidad multi-OS
 
 ### Agregado

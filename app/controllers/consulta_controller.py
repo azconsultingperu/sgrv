@@ -14,7 +14,10 @@ consulta_bp = Blueprint('consulta', __name__, url_prefix='/consulta')
 @consulta_bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    query = Alumno.query.filter_by(eliminado=False)
+    query = Alumno.query.options(
+        db.joinedload(Alumno.institucion),
+        db.joinedload(Alumno.carrera)
+    ).filter_by(eliminado=False)
 
     dni = request.args.get('dni', '').strip()
     nombres = request.args.get('nombres', '').strip()
@@ -50,18 +53,26 @@ def index():
     if edad_hasta:
         query = query.filter(Alumno.edad <= edad_hasta)
 
-    if promotor:
-        query = query.join(Visita).join(Promotor).filter(
-            db.or_(
-                Promotor.nombres.like(f'%{promotor}%'),
-                Promotor.apellidos.like(f'%{promotor}%')
-            )
-        )
+    try:
+        f_desde = datetime.strptime(fecha_desde, '%Y-%m-%d').date() if fecha_desde else None
+        f_hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d').date() if fecha_hasta else None
+    except ValueError:
+        flash('Rango de fechas inválido. Use el formato AAAA-MM-DD.', 'danger')
+        return redirect(url_for('consulta.index'))
 
-    if fecha_desde:
-        query = query.join(Visita).filter(Visita.fecha_visita >= datetime.strptime(fecha_desde, '%Y-%m-%d').date())
-    if fecha_hasta:
-        query = query.join(Visita).filter(Visita.fecha_visita <= datetime.strptime(fecha_hasta, '%Y-%m-%d').date())
+    if promotor or fecha_desde or fecha_hasta:
+        query = query.join(Visita, Visita.alumno_id == Alumno.id)
+        if promotor:
+            query = query.join(Promotor, Visita.promotor_id == Promotor.id).filter(
+                db.or_(
+                    Promotor.nombres.like(f'%{promotor}%'),
+                    Promotor.apellidos.like(f'%{promotor}%')
+                )
+            )
+        if f_desde:
+            query = query.filter(Visita.fecha_visita >= f_desde)
+        if f_hasta:
+            query = query.filter(Visita.fecha_visita <= f_hasta)
 
     query = query.order_by(Alumno.fecha_registro.desc())
     pagination = query.paginate(page=page, per_page=20, error_out=False)

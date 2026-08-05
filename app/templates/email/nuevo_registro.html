@@ -11,7 +11,7 @@
             <td align="center">
                 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
                     <tr>
-                        <td style="background:linear-gradient(135deg,#105030,#507050);padding:30px 40px;border-radius:16px 16px 0 0;text-align:center;">
+                        <td style="background:linear-gradient(135deg,#16264A,#2F80ED);padding:30px 40px;border-radius:16px 16px 0 0;text-align:center;">
                             <img src="https://raw.githubusercontent.com/azconsultingperu/sgrv/main/app/static/img/logo.png" alt="Logo" style="max-height:60px;margin-bottom:10px;">
                             <h1 style="color:#fff;margin:10px 0 0;font-size:22px;font-weight:700;">SGRV - IESTP Paiján</h1>
                             <p style="color:rgba(255,255,255,0.8);margin:5px 0 0;font-size:14px;">Sistema de Gestión de Registro de Visitas</p>
@@ -20,62 +20,62 @@
                     <tr>
                         <td style="background:#fff;padding:40px;border-radius:0 0 16px 16px;box-shadow:0 8px 30px rgba(0,0,0,0.08);">
                             <div style="text-align:center;margin-bottom:30px;">
-                                <div style="width:70px;height:70px;background:linear-gradient(135deg,#105030,#507050);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:15px;">
+                                <div style="width:70px;height:70px;background:linear-gradient(135deg,#16264A,#2F80ED);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:15px;">
                                     <span style="font-size:32px;color:#fff;">&#10003;</span>
                                 </div>
-                                <h2 style="color:#105030;margin:0 0 5px;font-size:20px;">¡Nuevo Registro de Visita!</h2>
+                                <h2 style="color:#16264A;margin:0 0 5px;font-size:20px;">¡Nuevo Registro de Visita!</h2>
                                 <p style="color:#666;margin:0;font-size:14px;">Se ha registrado un nuevo alumno en el sistema.</p>
                             </div>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fff8;border-radius:12px;padding:20px;margin-bottom:25px;border:1px solid #e0f0e0;">
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f7ff;border-radius:12px;padding:20px;margin-bottom:25px;border:1px solid #e0f0e0;">
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;width:130px;">DNI</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.dni }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.dni }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Apellidos</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.apellidos }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.apellidos }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Nombres</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.nombres }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.nombres }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Edad / Sexo</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.edad }} años / {{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.edad }} años / {{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Celular</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.celular }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.celular }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Email</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.email or 'No registrado' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.email or 'No registrado' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Colegio</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.institucion.nombre if alumno.institucion else '' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.institucion.nombre if alumno.institucion else '' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Distrito</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.institucion.distrito if alumno.institucion else '' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.institucion.distrito if alumno.institucion else '' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Carrera de Interés</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ alumno.carrera.nombre if alumno.carrera else 'No especificada' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ alumno.carrera.nombre if alumno.carrera else 'No especificada' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:13px;color:#888;">Desea Estudiar</td>
-                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#333;font-weight:600;">{{ 'Sí' if alumno.desea_estudiar else 'No' }}</td>
+                                    <td style="padding:8px 0;border-bottom:1px solid #e0f0e0;font-size:14px;color:#1F2937;font-weight:600;">{{ 'Sí' if alumno.desea_estudiar else 'No' }}</td>
                                 </tr>
                                 <tr>
                                     <td style="padding:8px 0;font-size:13px;color:#888;">Promotor</td>
-                                    <td style="padding:8px 0;font-size:14px;color:#333;font-weight:600;">{{ visita.promotor.nombres }} {{ visita.promotor.apellidos }}</td>
+                                    <td style="padding:8px 0;font-size:14px;color:#1F2937;font-weight:600;">{{ visita.promotor.nombres }} {{ visita.promotor.apellidos }}</td>
                                 </tr>
                             </table>
 
-                            <div style="background:linear-gradient(135deg,#f8fff8,#e8f5e8);border-radius:12px;padding:16px 20px;margin-bottom:25px;border-left:4px solid #507050;">
-                                <p style="margin:0;color:#333;font-size:13px;"><strong style="color:#105030;">Observaciones:</strong><br>{{ visita.observaciones or 'Ninguna' }}</p>
+                            <div style="background:linear-gradient(135deg,#f0f7ff,#EAF3FF);border-radius:12px;padding:16px 20px;margin-bottom:25px;border-left:4px solid #2F80ED;">
+                                <p style="margin:0;color:#1F2937;font-size:13px;"><strong style="color:#16264A;">Observaciones:</strong><br>{{ visita.observaciones or 'Ninguna' }}</p>
                             </div>
 
                             <div style="text-align:center;margin-top:25px;padding-top:20px;border-top:1px solid #e0f0e0;">

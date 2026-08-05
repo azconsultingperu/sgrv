@@ -3,57 +3,71 @@
         <picture>
             <source srcset="{{ url_for('static', filename='img/logo.avif') }}" type="image/avif">
             <source srcset="{{ url_for('static', filename='img/logo.webp') }}" type="image/webp">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="img-fluid" style="max-height: 50px;">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="img-fluid sidebar-logo">
         </picture>
         <h6 class="mt-2 mb-0">SGRV</h6>
-        <small class="text-muted">IESTP Paiján</small>
-        <small class="text-muted d-block" style="font-size:0.6rem;">R.M. N° 498-87-ED</small>
+        <small class="sidebar-subtitle">IESTP Paiján · R.M. N° 498-87-ED</small>
     </div>
-    <hr class="my-1">
+
+    <div class="sidebar-section">Menú</div>
     <ul class="nav nav-pills flex-column mb-auto px-2">
         <li class="nav-item">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+                <span class="nav-label">Dashboard</span>
             </a>
         </li>
         {% if current_user.rol_id != 4 %}
         <li class="nav-item">
             <a href="{{ url_for('registro.registrar') }}" class="nav-link {% if request.endpoint and 'registro' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-plus-circle me-2"></i> Registrar
+                <span class="nav-icon"><i class="bi bi-plus-circle"></i></span>
+                <span class="nav-label">Registrar</span>
             </a>
         </li>
         {% endif %}
         <li class="nav-item">
             <a href="{{ url_for('consulta.index') }}" class="nav-link {% if request.endpoint and 'consulta' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-search me-2"></i> Consultar
+                <span class="nav-icon"><i class="bi bi-search"></i></span>
+                <span class="nav-label">Consultar</span>
             </a>
         </li>
         {% if current_user.rol_id <= 2 or current_user.rol_id == 4 %}
         <li class="nav-item">
             <a href="{{ url_for('reportes.index') }}" class="nav-link {% if request.endpoint and 'reportes' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-file-earmark-bar-graph me-2"></i> Reportes
+                <span class="nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
+                <span class="nav-label">Reportes</span>
             </a>
         </li>
         {% endif %}
         {% if current_user.rol_id == 1 %}
         <li class="nav-item">
             <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if request.endpoint and 'usuarios' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-people me-2"></i> Usuarios
+                <span class="nav-icon"><i class="bi bi-people"></i></span>
+                <span class="nav-label">Usuarios</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ url_for('auditoria.index') }}" class="nav-link {% if request.endpoint and 'auditoria' in request.endpoint %}active{% endif %}">
-                <i class="bi bi-journal-check me-2"></i> Auditoría
+                <span class="nav-icon"><i class="bi bi-journal-check"></i></span>
+                <span class="nav-label">Auditoría</span>
             </a>
         </li>
         {% endif %}
     </ul>
-    <hr class="my-1">
-    <ul class="nav nav-pills flex-column px-2 mb-2">
-        <li class="nav-item">
-            <a href="{{ url_for('auth.logout') }}" class="nav-link text-danger">
-                <i class="bi bi-box-arrow-left me-2"></i> Cerrar Sesión
-            </a>
-        </li>
-    </ul>
+
+    <div class="sidebar-user">
+        <a href="{{ url_for('perfil.index') }}" class="sidebar-user-link">
+            <img src="{{ current_user.avatar_url(True) }}" alt="Foto de perfil"
+                 class="rounded-circle sidebar-user-avatar"
+                 data-avatar data-avatar-user="{{ current_user.id }}">
+            <div class="sidebar-user-info">
+                <strong class="sidebar-user-name">{{ current_user.nombres.split()[0] if current_user.nombres else current_user.username }}</strong>
+                <small class="sidebar-user-rol">{{ current_user.rol.nombre if current_user.rol else '' }}</small>
+            </div>
+            <i class="bi bi-chevron-right sidebar-user-chevron"></i>
+        </a>
+        <a href="{{ url_for('auth.logout') }}" class="sidebar-logout" title="Cerrar Sesión">
+            <i class="bi bi-box-arrow-left"></i>
+        </a>
+    </div>
 </nav>

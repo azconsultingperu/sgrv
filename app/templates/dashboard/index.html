@@ -1,54 +1,64 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="page-header">
     <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
-    <small class="text-muted"><i class="bi bi-check-circle-fill text-success me-1"></i>Últimos datos actualizados</small>
+    <small class="status-pill"><i class="bi bi-check-circle-fill"></i>Últimos datos actualizados</small>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 col-lg">
-        <div class="card border-0 shadow-sm stat-card">
-            <div class="card-body text-center">
-                <i class="bi bi-journal-text fs-2 text-primary"></i>
-                <h5 class="mt-2 mb-0">{{ totales.total_registros }}</h5>
-                <small class="text-muted">Total Registros</small>
+        <div class="card border-0 shadow-sm stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-primary"><i class="bi bi-journal-text"></i></div>
+                <div class="text-start">
+                    <h5 class="stat-value mb-0">{{ totales.total_registros }}</h5>
+                    <small class="stat-label text-muted">Total Registros</small>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg">
-        <div class="card border-0 shadow-sm stat-card">
-            <div class="card-body text-center">
-                <i class="bi bi-building fs-2 text-success"></i>
-                <h5 class="mt-2 mb-0">{{ totales.total_colegios }}</h5>
-                <small class="text-muted">Colegios Visitados</small>
+        <div class="card border-0 shadow-sm stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-success"><i class="bi bi-building"></i></div>
+                <div class="text-start">
+                    <h5 class="stat-value mb-0">{{ totales.total_colegios }}</h5>
+                    <small class="stat-label text-muted">Colegios Visitados</small>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg">
-        <div class="card border-0 shadow-sm stat-card">
-            <div class="card-body text-center">
-                <i class="bi bi-people fs-2 text-info"></i>
-                <h5 class="mt-2 mb-0">{{ totales.total_promotores }}</h5>
-                <small class="text-muted">Promotores</small>
+        <div class="card border-0 shadow-sm stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-info"><i class="bi bi-people"></i></div>
+                <div class="text-start">
+                    <h5 class="stat-value mb-0">{{ totales.total_promotores }}</h5>
+                    <small class="stat-label text-muted">Promotores</small>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg">
-        <div class="card border-0 shadow-sm stat-card">
-            <div class="card-body text-center">
-                <i class="bi bi-person-vcard fs-2 text-warning"></i>
-                <h5 class="mt-2 mb-0">{{ totales.total_alumnos }}</h5>
-                <small class="text-muted">Alumnos Registrados</small>
+        <div class="card border-0 shadow-sm stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-warning"><i class="bi bi-person-vcard"></i></div>
+                <div class="text-start">
+                    <h5 class="stat-value mb-0">{{ totales.total_alumnos }}</h5>
+                    <small class="stat-label text-muted">Alumnos Registrados</small>
+                </div>
             </div>
         </div>
     </div>
     <div class="col-6 col-md-4 col-lg">
-        <div class="card border-0 shadow-sm stat-card">
-            <div class="card-body text-center">
-                <i class="bi bi-person-gear fs-2 text-danger"></i>
-                <h5 class="mt-2 mb-0">{{ totales.total_usuarios }}</h5>
-                <small class="text-muted">Usuarios</small>
+        <div class="card border-0 shadow-sm stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-danger"><i class="bi bi-person-gear"></i></div>
+                <div class="text-start">
+                    <h5 class="stat-value mb-0">{{ totales.total_usuarios }}</h5>
+                    <small class="stat-label text-muted">Usuarios</small>
+                </div>
             </div>
         </div>
     </div>
@@ -56,7 +66,7 @@
 
 <div class="row g-3 mb-4">
     <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm bg-primary text-white">
+        <div class="card kpi-band kpi-band-primary h-100">
             <div class="card-body text-center">
                 <i class="bi bi-calendar-day fs-3"></i>
                 <h3 class="mb-0">{{ registros_dia }}</h3>
@@ -65,7 +75,7 @@
         </div>
     </div>
     <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm bg-success text-white">
+        <div class="card kpi-band kpi-band-success h-100">
             <div class="card-body text-center">
                 <i class="bi bi-calendar-week fs-3"></i>
                 <h3 class="mb-0">{{ registros_semana }}</h3>
@@ -74,7 +84,7 @@
         </div>
     </div>
     <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm bg-info text-white">
+        <div class="card kpi-band kpi-band-info h-100">
             <div class="card-body text-center">
                 <i class="bi bi-calendar-month fs-3"></i>
                 <h3 class="mb-0">{{ registros_mes }}</h3>
@@ -91,7 +101,7 @@
                 <h6 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Registros por Mes</h6>
             </div>
             <div class="card-body">
-                <div style="position:relative; height:300px;">
+                <div class="chart-frame">
                     <canvas id="chartRegistrosMes"></canvas>
                 </div>
             </div>
@@ -103,9 +113,9 @@
                 <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Alumnos por Sexo</h6>
             </div>
             <div class="card-body">
-                <div style="position:relative; height:300px;">
+                <div class="chart-frame">
                     <canvas id="chartSexo"></canvas>
-                    <div id="sinDatosSexo" class="text-center text-muted py-4" style="display:none; position:absolute; top:0; left:0; right:0; bottom:0; display:none; align-items:center; justify-content:center; flex-direction:column;">
+                    <div id="sinDatosSexo" class="no-data-overlay text-center py-4">
                         <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
                     </div>
                 </div>
@@ -121,7 +131,7 @@
                 <h6 class="mb-0"><i class="bi bi-building me-2"></i>Alumnos por Colegio</h6>
             </div>
             <div class="card-body">
-                <div style="position:relative; height:300px;">
+                <div class="chart-frame">
                     <canvas id="chartColegios"></canvas>
                 </div>
             </div>
@@ -133,7 +143,7 @@
                 <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Alumnos por Distrito</h6>
             </div>
             <div class="card-body">
-                <div style="position:relative; height:300px;">
+                <div class="chart-frame">
                     <canvas id="chartDistritos"></canvas>
                 </div>
             </div>
@@ -164,8 +174,12 @@
                             {% endfor %}
                             {% else %}
                             <tr>
-                                <td colspan="3" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin registros aún
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon"><i class="bi bi-trophy"></i></div>
+                                        <p class="empty-state-title">Sin visitas aún</p>
+                                        <p class="empty-state-text">El ranking se completará cuando se registren visitas a colegios.</p>
+                                    </div>
                                 </td>
                             </tr>
                             {% endif %}
@@ -197,7 +211,7 @@
                 </div>
                 <div class="mt-3">
                     <p class="mb-1">Tasa de Conversión: <strong>{{ proyeccion.tasa_conversion }}%</strong></p>
-                    <div class="progress" style="height: 10px;">
+                    <div class="progress">
                         <div class="progress-bar bg-success" style="width: {{ proyeccion.tasa_conversion }}%"></div>
                     </div>
                 </div>
@@ -209,13 +223,46 @@
 {% block extra_js %}
 <script>
 const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function chartColores() {
+    const dark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const styles = getComputedStyle(document.documentElement);
+    return {
+        grid:  dark ? 'rgba(148,163,184,0.18)' : 'rgba(100,116,139,0.16)',
+        ticks: styles.getPropertyValue('--text-secondary').trim(),
+        axis:  styles.getPropertyValue('--border-color').trim(),
+        primary: styles.getPropertyValue('--primary-color').trim(),
+        success: styles.getPropertyValue('--success-color').trim(),
+        info: styles.getPropertyValue('--info-color').trim(),
+        primarySoft: dark ? 'rgba(96,165,250,0.18)' : 'rgba(37,99,235,0.10)'
+    };
+}
+
+function aplicarTemaCharts() {
+    const col = chartColores();
+    [chartRegistrosMes, chartSexoObj, chartColegios, chartDistritos].forEach(function (c) {
+        if (!c) return;
+        const scales = c.options.scales || {};
+        ['x', 'y'].forEach(function (k) {
+            const s = scales[k];
+            if (!s) return;
+            if (s.grid) s.grid.color = col.grid;
+            if (s.ticks) s.ticks.color = col.ticks;
+            if (s.border) s.border.color = col.axis;
+        });
+        c.update();
+    });
+}
+
 const registrosPorMes = {{ registros_por_mes | tojson | safe }};
 const labelsMes = registrosPorMes.map(r => meses[r.mes - 1] + ' ' + r.anio);
 const dataMes = registrosPorMes.map(r => r.total);
 const chartRegistrosMes = new Chart(document.getElementById('chartRegistrosMes'), {
     type: 'line',
-    data: { labels: labelsMes, datasets: [{ label: 'Registros', data: dataMes, borderColor: '#0d6efd', tension: 0.3, fill: true, backgroundColor: 'rgba(13,110,253,0.1)' }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    data: { labels: labelsMes, datasets: [{ label: 'Registros', data: dataMes, borderColor: chartColores().primary, tension: 0.3, fill: true, backgroundColor: chartColores().primarySoft }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
+                  y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
 
 const sexos = {{ alumnos_por_sexo | tojson | safe }};
@@ -227,24 +274,31 @@ if (!sexos || sexos.length === 0) {
 } else {
     chartSexoObj = new Chart(chartSexo, {
         type: 'doughnut',
-        data: { labels: sexos.map(s => s.sexo == 'M' ? 'Masculino' : s.sexo == 'F' ? 'Femenino' : 'Otros'), datasets: [{ data: sexos.map(s => s.total), backgroundColor: ['#0d6efd', '#dc3545', '#6f42c1'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: { labels: sexos.map(s => s.sexo == 'M' ? 'Masculino' : s.sexo == 'F' ? 'Femenino' : 'Otros'), datasets: [{ data: sexos.map(s => s.total), backgroundColor: [chartColores().primary, chartColores().success, chartColores().info] }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: chartColores().ticks } } } }
     });
 }
 
 const colegios = {{ alumnos_por_colegio | tojson | safe }};
 const chartColegios = new Chart(document.getElementById('chartColegios'), {
     type: 'bar',
-    data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: '#0d6efd' }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: chartColores().primary }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
+                  y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
 
 const distritos = {{ alumnos_por_distrito | tojson | safe }};
 const chartDistritos = new Chart(document.getElementById('chartDistritos'), {
     type: 'bar',
-    data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: '#198754' }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: chartColores().success }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+        scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
+                  y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
+
+document.addEventListener('sgrv:themechange', aplicarTemaCharts);
 
 let resizeTimer;
 window.addEventListener('resize', function() {

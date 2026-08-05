@@ -1,12 +1,18 @@
+# -*- coding: utf-8 -*-
 from app import db, login_manager
 from flask_login import UserMixin
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import url_for
+import hashlib
 from app.utils.time_utils import peru_now
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Usuario.query.get(int(user_id))
+    u = Usuario.query.get(int(user_id))
+    if u and u.estado and not u.is_bloqueado() and not u.eliminado:
+        return u
+    return None
 
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
@@ -26,14 +32,40 @@ class Usuario(db.Model, UserMixin):
     creado_en = db.Column(db.DateTime, default=peru_now)
     actualizado_en = db.Column(db.DateTime, default=peru_now, onupdate=peru_now)
     debe_cambiar_password = db.Column(db.Boolean, default=False)
+    avatar = db.Column(db.String(255), nullable=True)
+    eliminado = db.Column(db.Boolean, default=False)
 
     rol = db.relationship('Rol', backref='usuarios')
     auditorias = db.relationship('Auditoria', backref='usuario', lazy='dynamic')
+
+    AVATAR_COLORS = ['#2d8a4e', '#1a6d8a', '#8a5a1a', '#8a1a2a', '#5a1a8a', '#1a4a8a']
+    DEFAULT_AVATAR = 'img/avatar-default.svg'
 
     def has_permission(self, permiso):
         if self.rol_id == 1:
             return True
         return False
+
+    def iniciales(self):
+        nombres = (self.nombres or '').split()
+        apellidos = (self.apellidos or '').split()
+        letras = (nombres[0][0] if nombres else '') + (apellidos[0][0] if apellidos else '')
+        return letras.upper() or self.username[:2].upper()
+
+    def avatar_color(self):
+        base = f'{self.nombres} {self.apellidos} {self.username}'.strip() or self.username
+        idx = int(hashlib.md5(base.encode()).hexdigest(), 16) % len(self.AVATAR_COLORS)
+        return self.AVATAR_COLORS[idx]
+
+    def tiene_avatar(self):
+        return bool(self.avatar)
+
+    def avatar_url(self, thumb=False):
+        if self.avatar:
+            if thumb:
+                return url_for('perfil.servir_avatar', usuario_id=self.id, t=1)
+            return url_for('perfil.servir_avatar', usuario_id=self.id)
+        return url_for('static', filename=self.DEFAULT_AVATAR)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

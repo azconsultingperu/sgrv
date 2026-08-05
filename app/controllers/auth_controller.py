@@ -10,7 +10,7 @@ from app.utils.time_utils import peru_now
 from app.utils.helpers import validar_fortaleza_password, generar_password_segura, sanitizar_input
 import secrets
 from datetime import timedelta
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -33,7 +33,7 @@ def login():
             flash('Usuario o contraseña incorrectos.', 'danger')
             return render_template('auth/login.html')
 
-        if not usuario.estado:
+        if not usuario.estado or usuario.eliminado:
             flash('Su cuenta está desactivada. Contacte al administrador.', 'danger')
             return render_template('auth/login.html')
 
@@ -44,6 +44,7 @@ def login():
         if usuario.check_password(password):
             usuario.resetear_intentos()
             usuario.ultimo_acceso = peru_now()
+            session.clear()
             session.permanent = True if recordar else False
             login_user(usuario, remember=bool(recordar))
 
@@ -81,7 +82,6 @@ def logout():
         sesion_activa.fin = peru_now()
         db.session.commit()
     logout_user()
-    flash('Sesión cerrada correctamente.', 'info')
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/recuperar', methods=['GET', 'POST'])
@@ -89,7 +89,7 @@ def recuperar():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         email = request.form.get('email', '').strip()
-        usuario = Usuario.query.filter_by(username=username, email=email).first()
+        usuario = Usuario.query.filter_by(username=username, email=email, eliminado=False).first()
 
         if usuario:
             serializer = get_serializer()
@@ -111,7 +111,7 @@ def reset_password(token):
     try:
         serializer = get_serializer()
         usuario_id = serializer.loads(token, max_age=3600)
-    except:
+    except (BadSignature, SignatureExpired):
         flash('El enlace de recuperación es inválido o ha expirado.', 'danger')
         return redirect(url_for('auth.login'))
 

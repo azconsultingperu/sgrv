@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.models.auditoria import Auditoria
 from app.models.usuario import Usuario
@@ -12,7 +12,7 @@ auditoria_bp = Blueprint('auditoria', __name__, url_prefix='/auditoria')
 @login_required
 @admin_required
 def index():
-    query = Auditoria.query
+    query = Auditoria.query.options(db.joinedload(Auditoria.usuario))
 
     usuario_id = request.args.get('usuario_id', type=int)
     accion = request.args.get('accion', '').strip()
@@ -27,10 +27,16 @@ def index():
         query = query.filter(Auditoria.accion.like(f'%{accion}%'))
     if modulo:
         query = query.filter(Auditoria.modulo == modulo)
-    if fecha_desde:
-        query = query.filter(Auditoria.creado_en >= datetime.strptime(fecha_desde + ' 00:00:00', '%Y-%m-%d %H:%M:%S'))
-    if fecha_hasta:
-        query = query.filter(Auditoria.creado_en <= datetime.strptime(fecha_hasta + ' 23:59:59', '%Y-%m-%d %H:%M:%S'))
+    try:
+        f_desde = datetime.strptime(fecha_desde + ' 00:00:00', '%Y-%m-%d %H:%M:%S') if fecha_desde else None
+        f_hasta = datetime.strptime(fecha_hasta + ' 23:59:59', '%Y-%m-%d %H:%M:%S') if fecha_hasta else None
+    except ValueError:
+        flash('Rango de fechas inválido. Use el formato AAAA-MM-DD.', 'danger')
+        return redirect(url_for('auditoria.index'))
+    if f_desde:
+        query = query.filter(Auditoria.creado_en >= f_desde)
+    if f_hasta:
+        query = query.filter(Auditoria.creado_en <= f_hasta)
 
     query = query.order_by(Auditoria.creado_en.desc())
     pagination = query.paginate(page=page, per_page=30, error_out=False)

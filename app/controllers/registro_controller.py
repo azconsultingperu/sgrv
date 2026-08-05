@@ -46,19 +46,6 @@ def validar_celular(celular):
 def validar_email(email):
     return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) if email else True
 
-def calcular_edad(fecha_nac):
-    hoy = peru_today()
-    return hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
-
-def validar_dni(dni):
-    return re.match(r'^\d{8}$', dni)
-
-def validar_celular(celular):
-    return re.match(r'^\d{9}$', celular)
-
-def validar_email(email):
-    return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) if email else True
-
 @registro_bp.route('/', methods=['GET', 'POST'])
 @login_required
 @admin_or_supervisor_required
@@ -92,7 +79,7 @@ def registrar():
             errores.append('Debe seleccionar una institución educativa.')
         if not validar_dni(dni):
             errores.append('El DNI debe tener 8 dígitos.')
-        if Alumno.query.filter_by(dni=dni).first():
+        if Alumno.query.filter_by(dni=dni, eliminado=False).first():
             errores.append('El DNI ya está registrado.')
         if not validar_celular(celular):
             errores.append('El celular debe tener 9 dígitos.')
@@ -110,6 +97,10 @@ def registrar():
         try:
             fecha_nac_date = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
             edad = calcular_edad(fecha_nac_date)
+        except ValueError:
+            flash('La fecha de nacimiento tiene un formato inválido o está vacía.', 'danger')
+            return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+                form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
             alumno = Alumno(
                 apellidos=apellidos,
@@ -131,8 +122,14 @@ def registrar():
             db.session.add(alumno)
             db.session.flush()
 
-            fv = datetime.strptime(fecha_visita, '%Y-%m-%d').date() if fecha_visita else peru_today()
-            hv = datetime.strptime(hora_visita, '%H:%M').time() if hora_visita else peru_now().time()
+            try:
+                fv = datetime.strptime(fecha_visita, '%Y-%m-%d').date() if fecha_visita else peru_today()
+                hv = datetime.strptime(hora_visita, '%H:%M').time() if hora_visita else peru_now().time()
+            except ValueError:
+                db.session.rollback()
+                flash('La fecha u hora de visita tienen un formato inválido.', 'danger')
+                return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+                    form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
             visita = Visita(
                 alumno_id=alumno.id,
@@ -172,6 +169,23 @@ def editar(id):
     carreras = Carrera.query.filter_by(activo=True).all()
 
     if request.method == 'POST':
+        dni = request.form.get('dni', '').strip()
+        if dni:
+            alumno.dni = dni
+        
+        fecha_nac = request.form.get('fecha_nacimiento', '')
+        if fecha_nac:
+            try:
+                alumno.fecha_nacimiento = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
+                alumno.edad = calcular_edad(alumno.fecha_nacimiento)
+            except ValueError:
+                flash('La fecha de nacimiento tiene un formato inválido.', 'danger')
+                return redirect(url_for('registro.editar', id=id))
+                
+        sexo = request.form.get('sexo', '').upper()
+        if sexo:
+            alumno.sexo = sexo
+
         alumno.apellidos = request.form.get('apellidos', '').strip().upper()
         alumno.nombres = request.form.get('nombres', '').strip().upper()
         alumno.celular = request.form.get('celular', '').strip()
@@ -188,11 +202,17 @@ def editar(id):
             visita.promotor_id = request.form.get('promotor_id', type=int)
             visita.observaciones = request.form.get('observaciones', '')
 
-        db.session.commit()
-        registrar_auditoria(current_user.id, 'Edición de registro', 'Registro',
-            f'Registro editado: Alumno {alumno.dni}')
-        flash('Registro actualizado exitosamente.', 'success')
-        return redirect(url_for('consulta.index'))
+        try:
+            from sqlalchemy.exc import IntegrityError
+            db.session.commit()
+            registrar_auditoria(current_user.id, 'Edición de registro', 'Registro',
+                f'Registro editado: Alumno {alumno.dni}')
+            flash('Registro actualizado exitosamente.', 'success')
+            return redirect(url_for('consulta.index'))
+        except IntegrityError:
+            db.session.rollback()
+            flash('Error al actualizar el registro. Es posible que el DNI ya esté en uso.', 'danger')
+            return redirect(url_for('registro.editar', id=id))
 
     form = {
         'apellidos': alumno.apellidos,
@@ -219,7 +239,7 @@ def editar(id):
         alumno=alumno, visita=visita, colegios=colegios,
         promotores=promotores, carreras=carreras, form=form)
 
-@registro_bp.route('/eliminar/<int:id>')
+@registro_bp.route('/eliminar/<int:id>', methods=['POST'])
 @login_required
 @solo_admin_required
 def eliminar(id):

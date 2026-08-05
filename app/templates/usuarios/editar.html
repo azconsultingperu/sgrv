@@ -1,52 +1,86 @@
 {% extends "base.html" %}
 {% block title %}Editar Usuario{% endblock %}
+{% block extra_css %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-iniciales" content="{{ usuario.iniciales() }}">
+<meta name="user-color" content="{{ usuario.avatar_color() }}">
+<meta name="avatar-user-id" content="{{ usuario.id }}">
+<meta name="avatar-url" content="{{ url_for('perfil.subir_avatar_admin', usuario_id=usuario.id) }}">
+{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Usuario: {{ usuario.username }}</h4>
 </div>
-<div class="card border-0 shadow-sm">
-    <div class="card-body p-4">
-        <form method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label" for="nombres">Nombres</label>
-                    <input type="text" class="form-control" name="nombres" id="nombres" value="{{ usuario.nombres }}" required>
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body p-4">
+                <div class="mx-auto mb-3" id="avatarPreviewWrap">
+                    <img id="avatarImg" src="{{ usuario.avatar_url() }}" alt="Foto de perfil">
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label" for="apellidos">Apellidos</label>
-                    <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ usuario.apellidos }}" required>
+                <h5 class="mb-0">{{ usuario.nombres }} {{ usuario.apellidos }}</h5>
+                <p class="text-muted mb-3"><i class="bi bi-person-badge me-1"></i>DNI {{ usuario.dni }}</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="btnCambiarFoto">
+                        <i class="bi bi-camera me-1"></i>Cambiar Foto
+                    </button>
+                    <input type="file" id="fileAvatar" accept=".png,.jpg,.jpeg,.webp,.gif" style="display:none;">
+                    <button type="button" class="btn btn-outline-danger" id="btnBorrarFoto" {% if not usuario.tiene_avatar() %}style="display:none;"{% endif %}>
+                        <i class="bi bi-trash me-1"></i>Eliminar Foto
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label" for="email">Email</label>
-                    <input type="email" class="form-control" name="email" id="email" value="{{ usuario.email }}" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label" for="rol_id">Rol</label>
-                    <select class="form-select" name="rol_id" id="rol_id">
-                        {% for r in roles %}
-                        <option value="{{ r.id }}" {% if usuario.rol_id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label" for="password">Nueva Contraseña (dejar vacío para mantener)</label>
-                    <input type="password" class="form-control" name="password" id="password" oninput="checkPasswordStrength(this.value)">
-                    <div class="password-strength" id="passwordStrength"></div>
-                    <div class="password-requirements" id="passwordLabel">Mínimo 8 caracteres.</div>
-                </div>
-                <div class="col-md-4 d-flex align-items-center">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="estado" id="estado" {% if usuario.estado %}checked{% endif %}>
-                        <label class="form-check-label" for="estado">Activo</label>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Actualizar</button>
-                    <a href="{{ url_for('usuarios.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+                <div class="text-muted mt-3 small">
+                    <i class="bi bi-info-circle me-1"></i>JPG, PNG, WebP o GIF &middot; máx. 2 MB &middot; 1000x1000 px
                 </div>
             </div>
-        </form>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label" for="nombres">Nombres</label>
+                            <input type="text" class="form-control" name="nombres" id="nombres" value="{{ usuario.nombres }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="apellidos">Apellidos</label>
+                            <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ usuario.apellidos }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="email">Email</label>
+                            <input type="email" class="form-control" name="email" id="email" value="{{ usuario.email }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="rol_id">Rol</label>
+                            <select class="form-select" name="rol_id" id="rol_id">
+                                {% for r in roles %}
+                                <option value="{{ r.id }}" {% if usuario.rol_id == r.id %}selected{% endif %}>{{ r.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label" for="password">Nueva Contraseña (dejar vacío para mantener)</label>
+                            <input type="password" class="form-control" name="password" id="password" oninput="checkPasswordStrength(this.value)">
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <div class="password-requirements" id="passwordLabel">Mínimo 8 caracteres, puede usar letras y números.</div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" name="estado" id="estado" {% if usuario.estado %}checked{% endif %}>
+                                <label class="form-check-label" for="estado">Activo</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Actualizar</button>
+                            <a href="{{ url_for('usuarios.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
@@ -57,7 +91,7 @@ function checkPasswordStrength(password) {
     var label = document.getElementById('passwordLabel');
     bar.className = 'password-strength';
     if (password.length === 0) {
-        label.textContent = 'Mínimo 8 caracteres.';
+        label.textContent = 'Mínimo 8 caracteres, puede usar letras y números.';
         label.style.color = '#666';
         return;
     }
@@ -76,4 +110,5 @@ function checkPasswordStrength(password) {
     }
 }
 </script>
+<script src="{{ url_for('static', filename='js/perfil.js') }}?v=8"></script>
 {% endblock %}

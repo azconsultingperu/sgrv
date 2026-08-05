@@ -1,15 +1,17 @@
-from flask import Blueprint, render_template, request, send_file, flash, Response
+from flask import Blueprint, render_template, request, send_file, flash, Response, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from app.services.reporte_service import generar_reporte_csv, generar_reporte_excel
 from app.services.auditoria_service import registrar_auditoria
-from app.models.reporte import Reporte
-from app import db
-from datetime import datetime
-import io
-import csv
 from functools import wraps
 
 reportes_bp = Blueprint('reportes', __name__, url_prefix='/reportes')
+
+TITULOS = {
+    'alumnos': 'Lista de alumnos',
+    'visitas': 'Registro de visitas',
+    'colegios': 'Instituciones educativas',
+    'carreras': 'Carreras y postulantes',
+}
 
 def supervisor_required(f):
     @wraps(f)
@@ -24,12 +26,33 @@ def supervisor_required(f):
 @login_required
 @supervisor_required
 def index():
-    reportes = Reporte.query.order_by(Reporte.creado_en.desc()).limit(20).all()
-    return render_template('reportes/index.html', reportes=reportes)
+    return render_template('reportes/index.html')
+
+
+@reportes_bp.route('/registrar', methods=['POST'])
+@login_required
+@supervisor_required
+def registrar():
+    """Registra la exportación en auditoría, solo tras descargar el archivo."""
+    tipo = request.form.get('tipo', '')
+    formato = request.form.get('formato', '').upper()
+    if tipo not in TITULOS or formato not in ('CSV', 'EXCEL'):
+        return jsonify({'ok': False}), 400
+    registrar_auditoria(
+        current_user.id,
+        f'Exportación {formato}',
+        'Reportes',
+        f'Exportado {tipo}'
+    )
+    return jsonify({'ok': True})
+
 
 def exportar_csv(tipo, filename):
-    data = generar_reporte_csv(tipo, request.args)
-    registrar_auditoria(current_user.id, 'Exportación CSV', 'Reportes', f'Exportado {tipo}')
+    try:
+        data = generar_reporte_csv(tipo, request.args)
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return redirect(url_for('reportes.index'))
     return Response(
         data,
         mimetype='text/csv',
@@ -37,8 +60,11 @@ def exportar_csv(tipo, filename):
     )
 
 def exportar_excel(tipo, filename):
-    output = generar_reporte_excel(tipo, request.args)
-    registrar_auditoria(current_user.id, 'Exportación Excel', 'Reportes', f'Exportado {tipo}')
+    try:
+        output = generar_reporte_excel(tipo, request.args)
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return redirect(url_for('reportes.index'))
     return send_file(
         output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

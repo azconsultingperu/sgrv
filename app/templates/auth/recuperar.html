@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=2">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=8">
 {% endblock %}
 {% block auth_content %}
 <div class="login-bg">
     <div class="col-11 col-sm-9 col-md-6 col-lg-5 col-xl-5 col-xxl-5 px-3">
         <div class="login-card">
             <div class="card-body p-4 p-md-5">
-                <div class="text-center mb-4">
-                    <div style="width:70px;height:70px;margin:0 auto;background:linear-gradient(135deg,#f57f17,#ffb74d);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 25px rgba(245,127,23,0.25);">
-                        <i class="bi bi-key" style="font-size:30px;color:#fff;"></i>
+                <div class="auth-brand mb-4">
+                    <div class="auth-icon warning">
+                        <picture>
+                            <source srcset="{{ url_for('static', filename='img/recuperar.avif') }}" type="image/avif">
+                            <source srcset="{{ url_for('static', filename='img/recuperar.webp') }}" type="image/webp">
+                            <img src="{{ url_for('static', filename='img/recuperar.png') }}" alt="Recuperar contraseña" class="auth-icon-img">
+                        </picture>
                     </div>
-                    <h4 class="mt-3 fw-bold" style="color:#105030;">Recuperar Contraseña</h4>
-                    <p style="color:#666;font-size:0.85rem;">Ingrese sus datos para recuperar el acceso</p>
+                    <h4 class="auth-title">Recuperar Contraseña</h4>
+                    <p class="auth-subtitle">Ingrese sus datos para recuperar el acceso</p>
                 </div>
                 <form method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -27,7 +31,7 @@
                     <button type="submit" class="btn btn-primary w-100 mb-2 login-btn">
                         <i class="bi bi-send me-2"></i>Enviar Instrucciones
                     </button>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100" style="border-radius:10px;padding:12px;font-weight:500;">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100">
                         <i class="bi bi-arrow-left me-2"></i>Volver al Login
                     </a>
                 </form>

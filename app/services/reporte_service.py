@@ -19,10 +19,15 @@ def generar_reporte_csv(tipo, params=None):
     elif tipo == 'visitas':
         writer.writerow(['Fecha', 'Hora', 'Alumno', 'DNI', 'Colegio', 'Promotor'])
         query = Visita.query.join(Alumno).join(Promotor).filter(Alumno.eliminado == False)
-        if params and params.get('fecha_desde'):
-            query = query.filter(Visita.fecha_visita >= datetime.strptime(params['fecha_desde'], '%Y-%m-%d').date())
-        if params and params.get('fecha_hasta'):
-            query = query.filter(Visita.fecha_visita <= datetime.strptime(params['fecha_hasta'], '%Y-%m-%d').date())
+        try:
+            f_desde = datetime.strptime(params['fecha_desde'], '%Y-%m-%d').date() if params and params.get('fecha_desde') else None
+            f_hasta = datetime.strptime(params['fecha_hasta'], '%Y-%m-%d').date() if params and params.get('fecha_hasta') else None
+        except (ValueError, TypeError):
+            raise ValueError('Rango de fechas inválido')
+        if f_desde:
+            query = query.filter(Visita.fecha_visita >= f_desde)
+        if f_hasta:
+            query = query.filter(Visita.fecha_visita <= f_hasta)
         for v in query:
             writer.writerow([v.fecha_visita, v.hora_visita, f'{v.alumno.nombres} {v.alumno.apellidos}', v.alumno.dni, v.alumno.institucion.nombre, f'{v.promotor.nombres} {v.promotor.apellidos}'])
     elif tipo == 'colegios':

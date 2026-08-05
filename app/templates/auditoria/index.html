@@ -62,14 +62,32 @@
                     {% for a in auditorias %}
                     <tr>
                         <td><small>{{ a.creado_en.strftime('%d/%m/%Y %H:%M:%S') }}</small></td>
-                        <td><small>{{ a.usuario.username }}</small></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                {% if a.usuario %}
+                                    <img src="{{ a.avatar_url(True) }}" alt="Foto" class="rounded-circle"
+                                         style="width:24px;height:24px;object-fit:cover;">
+                                    <small>{{ a.usuario.username }}</small>
+                                {% else %}
+                                    <small class="text-muted">Usuario eliminado</small>
+                                {% endif %}
+                            </div>
+                        </td>
                         <td><span class="badge bg-secondary">{{ a.accion }}</span></td>
                         <td><small>{{ a.modulo }}</small></td>
                         <td><small>{{ a.detalle or '' }}</small></td>
                         <td><small>{{ a.ip_address or '' }}</small></td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="6" class="text-center py-4 text-muted">No se encontraron registros de auditoría</td></tr>
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
+                                <p class="empty-state-title">Sin registros de auditoría</p>
+                                <p class="empty-state-text">No se encontraron eventos que coincidan con los filtros aplicados.</p>
+                            </div>
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -77,15 +95,8 @@
     </div>
     {% if pagination.pages > 1 %}
     <div class="card-footer bg-white">
-        <nav>
-            <ul class="pagination pagination-sm justify-content-center mb-0">
-                {% for p in range(1, pagination.pages + 1) %}
-                <li class="page-item {% if p == pagination.page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('auditoria.index', page=p, **search_params_without_page) }}">{{ p }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-        </nav>
+        {% set endpoint = 'auditoria.index' %}
+        {% include 'partials/paginacion.html' %}
     </div>
     {% endif %}
 </div>

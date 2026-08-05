@@ -6,17 +6,27 @@ Sistema web para registrar y gestionar las visitas realizadas por promotores ins
 
 ---
 
+## Vista previa
+
+![Vista previa del SGRV — Dashboard principal](app/static/img/exampleSGRV.png)
+
+_Vista del sistema en producción: dashboard con métricas, gráficos estadísticos y menú lateral._
+
+---
+
 ## Características
 
 - **Dashboard interactivo** con gráficos estadísticos y métricas en tiempo real
 - **Registro de visitas** con formulario inteligente y validaciones
-- **Búsqueda avanzada** con filtros múltiples
+- **Búsqueda avanzada** con filtros múltiples y paginación inteligente
 - **Gestión de usuarios** con 3 roles (Administrador, Supervisor, Operador)
 - **Auditoría completa** de todas las acciones del sistema
 - **Reportes exportables** en CSV y Excel
 - **Modo oscuro/claro** con persistencia de preferencia
 - **Diseño responsive** adaptado a dispositivos móviles
 - **Seguridad**: contraseñas hasheadas, sesiones protegidas, CSRF, validación de intentos fallidos
+- **Mi Perfil**: gestión de foto de perfil con upload, vista previa en tiempo real y eliminación
+- **Soft delete**: eliminación lógica de usuarios y registros (no se borran datos de la base)
 
 ---
 
@@ -53,31 +63,41 @@ Sistema web para registrar y gestionar las visitas realizadas por promotores ins
 ```
 sgrv/
 ├── app/
-│   ├── controllers/     # Controladores (blueprints)
-│   ├── models/          # Modelos SQLAlchemy
-│   ├── templates/       # Plantillas HTML
-│   │   ├── auth/        # Login, recuperar contraseña
+│   ├── controllers/     # Controladores (blueprints = rutas HTTP)
+│   ├── models/          # Modelos SQLAlchemy (ORM)
+│   ├── templates/       # Plantillas HTML (Jinja2)
+│   │   ├── auth/        # Login, recuperar contraseña, reset password
 │   │   ├── dashboard/   # Dashboard principal
 │   │   ├── registro/    # Registro y edición de visitas
-│   │   ├── consulta/    # Búsqueda y detalle
+│   │   ├── consulta/    # Búsqueda y detalle de alumnos
 │   │   ├── usuarios/    # Gestión de usuarios
 │   │   ├── auditoria/   # Registro de auditoría
 │   │   ├── reportes/    # Generación de reportes
-│   │   ├── errors/      # Páginas de error
-│   │   └── partials/    # Componentes reutilizables
+│   │   ├── perfil/      # "Mi Perfil" (avatar y datos del usuario)
+│   │   ├── email/       # Plantillas de correo (nuevo usuario, registro, recuperación)
+│   │   ├── errors/      # Páginas de error (403, 404, 500)
+│   │   └── partials/    # Componentes reutilizables (navbar, sidebar, paginación)
 │   ├── static/
-│   │   ├── css/         # Estilos personalizados
-│   │   ├── js/          # Scripts del frontend
-│   │   └── img/         # Imágenes
-│   ├── services/        # Lógica de negocio
-│   ├── utils/           # Utilidades y seed data
+│   │   ├── css/         # Hojas de estilo (style.css, auth.css)
+│   │   ├── js/          # Scripts del frontend (main.js, perfil.js)
+│   │   ├── img/         # Logos, frontis, avatar por defecto
+│   │   ├── fonts/       # Tipografías (Inter)
+│   │   └── uploads/     # Avatares subidos por usuarios (no versionado)
+│   ├── services/        # Lógica de negocio (auditoria, email, estadística, reporte)
+│   ├── utils/           # Utilidades (helpers, decorators, time_utils, seed)
 │   └── config.py        # Configuración de la aplicación
-├── migrations/          # Migraciones de base de datos
-├── logs/                # URL temporal del túnel (logs/tunel.txt)
+├── instance/
+│   └── database/
+│       └── gestion_visitas.db   # Base de datos SQLite ACTIVA (uso en runtime)
+├── database/
+│   └── gestion_visitas.db.bak   # Backup de BD obsoleta (preservado, no se usa)
+├── migrations/          # Migraciones de base de datos (Flask-Migrate / Alembic)
+├── logs/                # Logs de server (server.log) y URL del túnel (tunel.txt)
 ├── requirements.txt     # Dependencias del proyecto
-├── run.py               # Punto de entrada
-├── .env.example         # Plantilla de variables de entorno
+├── run.py               # Punto de entrada (arranque Flask + túnel Cloudflare)
+├── .env / .env.example  # Variables de entorno reales / plantilla
 ├── .gitignore           # Archivos ignorados por Git
+├── .devcontainer/       # Configuración de VS Code Dev Containers
 ├── CHANGELOG.md         # Registro de cambios
 └── README.md            # Este archivo
 ```
@@ -321,7 +341,7 @@ python run.py
 ### 4. Consultar
 - Búsqueda por múltiples criterios
 - Filtros combinados
-- Paginación de resultados
+- Paginación inteligente de resultados (1 … N con elipsis clicable)
 - Ver detalle, editar, eliminar
 
 ### 5. Usuarios
@@ -330,11 +350,16 @@ python run.py
 - Control de estado (activo/inactivo)
 - Indicador visual de fortaleza de contraseña al crear/editar
 - Cambio de contraseña obligatorio en el primer inicio (según política)
+- Foto de perfil con upload, vista previa y eliminación
+- Avatar por defecto con iniciales generadas automáticamente
+- Snapshots históricos de foto de perfil en auditoría
 
 ### 6. Auditoría
 - Registro automático de acciones
 - Filtros por usuario, acción, módulo, fecha
 - Seguimiento de IP y user-agent
+- Paginación inteligente (1 … N con elipsis clicable)
+- Snapshot de la foto de perfil del usuario en el momento de cada acción
 
 ### 7. Reportes
 - Exportación a CSV

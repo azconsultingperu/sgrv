@@ -15,7 +15,7 @@ usuarios_bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 @login_required
 @admin_required
 def index():
-    usuarios = Usuario.query.all()
+    usuarios = Usuario.query.options(db.joinedload(Usuario.rol)).filter_by(eliminado=False).all()
     roles = Rol.query.all()
     return render_template('usuarios/index.html', usuarios=usuarios, roles=roles)
 
@@ -118,7 +118,7 @@ def editar(id):
 
     return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
 
-@usuarios_bp.route('/eliminar/<int:id>', methods=['GET', 'POST'])
+@usuarios_bp.route('/eliminar/<int:id>', methods=['POST'])
 @login_required
 @admin_required
 def eliminar(id):
@@ -126,12 +126,25 @@ def eliminar(id):
     if usuario.id == current_user.id:
         flash('No puede eliminarse a sí mismo.', 'danger')
         return redirect(url_for('usuarios.index'))
+
+    # Soft Delete
     nombre_completo = f'{usuario.nombres} {usuario.apellidos}'
     username = usuario.username
-    db.session.delete(usuario)
+    
+    usuario.eliminado = True
+    usuario.estado = False
+    
+    # Invalidate active sessions
+    from app.models.sesion import Sesion
+    from app.utils.time_utils import peru_now
+    sesiones_activas = Sesion.query.filter_by(usuario_id=usuario.id, activa=True).all()
+    for s in sesiones_activas:
+        s.activa = False
+        s.fin = peru_now()
+
     db.session.commit()
     registrar_auditoria(current_user.id, 'Eliminación de usuario', 'Usuarios',
-        f'Usuario eliminado: {username}')
+        f'Usuario eliminado (soft delete): {username}')
     flash(f'Usuario "{nombre_completo}" eliminado correctamente.', 'success')
     return redirect(url_for('usuarios.index'))
 

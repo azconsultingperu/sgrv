@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil{% endblock %}
+{% block extra_css %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-iniciales" content="{{ current_user.iniciales() }}">
+<meta name="user-color" content="{{ current_user.avatar_color() }}">
+<meta name="avatar-user-id" content="{{ current_user.id }}">
+<meta name="avatar-url" content="{{ url_for('perfil.subir_avatar') }}">
+{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Mi Perfil</h4>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-center">
+            <div class="card-body p-4">
+                <div class="mx-auto mb-3" id="avatarPreviewWrap">
+                    <img id="avatarImg" src="{{ current_user.avatar_url() }}" alt="Foto de perfil">
+                </div>
+                <h5 class="mb-0">{{ current_user.nombres }} {{ current_user.apellidos }}</h5>
+                <p class="text-muted mb-3"><i class="bi bi-person-badge me-1"></i>DNI {{ current_user.dni }}</p>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" id="btnCambiarFoto">
+                        <i class="bi bi-camera me-1"></i>Cambiar Foto
+                    </button>
+                    <input type="file" id="fileAvatar" accept=".png,.jpg,.jpeg,.webp,.gif" style="display:none;">
+                    <button type="button" class="btn btn-outline-danger" id="btnBorrarFoto" {% if not current_user.tiene_avatar() %}style="display:none;"{% endif %}>
+                        <i class="bi bi-trash me-1"></i>Eliminar Foto
+                    </button>
+                </div>
+                <div class="text-muted mt-3 small">
+                    <i class="bi bi-info-circle me-1"></i>JPG, PNG, WebP o GIF &middot; máx. 2 MB &middot; 1000x1000 px
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="text-primary mb-3"><i class="bi bi-person-lines-fill me-2"></i>Datos de la Cuenta</h5>
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="text-muted" style="width:180px;">Usuario</th>
+                            <td>{{ current_user.username }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Correo</th>
+                            <td>{{ current_user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Rol</th>
+                            <td>{{ current_user.rol.nombre if current_user.rol else '—' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Último acceso</th>
+                            <td>{{ current_user.ultimo_acceso.strftime('%d/%m/%Y %H:%M') if current_user.ultimo_acceso else '—' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-muted">Miembro desde</th>
+                            <td>{{ current_user.creado_en.strftime('%d/%m/%Y') if current_user.creado_en else '—' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/perfil.js') }}?v=8"></script>
+{% endblock %}
