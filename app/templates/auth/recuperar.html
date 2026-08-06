@@ -5,7 +5,7 @@
 {% block auth_content %}
 <div class="login-bg">
     <div class="col-11 col-sm-9 col-md-6 col-lg-5 col-xl-5 col-xxl-5 px-3">
-        <div class="login-card">
+        <div class="login-card auth-recuperar">
             <div class="card-body p-4 p-md-5">
                 <div class="auth-brand mb-4">
                     <div class="auth-icon warning">
@@ -16,24 +16,26 @@
                         </picture>
                     </div>
                     <h4 class="auth-title">Recuperar Contraseña</h4>
-                    <p class="auth-subtitle">Ingrese sus datos para recuperar el acceso</p>
+                    <p class="auth-subtitle">Ingrese sus credenciales para recuperar el acceso</p>
                 </div>
-                <form method="POST">
+                <form method="POST" class="d-flex flex-column h-100">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
-                        <input type="text" class="form-control login-input" name="username" placeholder="Ingrese su DNI" required>
+                        <label for="recuperar-username" class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
+                        <input type="text" id="recuperar-username" class="form-control login-input" name="username" placeholder="Ingrese su DNI" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="login-label"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
-                        <input type="email" class="form-control login-input" name="email" placeholder="Ingrese su correo" required>
+                    <div class="mb-4">
+                        <label for="recuperar-email" class="login-label"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
+                        <input type="email" id="recuperar-email" class="form-control login-input" name="email" placeholder="Ingrese su correo" required>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-2 login-btn">
-                        <i class="bi bi-send me-2"></i>Enviar Instrucciones
-                    </button>
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100">
-                        <i class="bi bi-arrow-left me-2"></i>Volver al Login
-                    </a>
+                    <div class="mt-auto pt-3">
+                        <button type="submit" class="btn btn-primary w-100 mb-2 login-btn">
+                            <i class="bi bi-send me-2"></i>Enviar Instrucciones
+                        </button>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-arrow-left me-2"></i>Volver al Login
+                        </a>
+                    </div>
                 </form>
             </div>
         </div>

@@ -203,8 +203,18 @@
 }
 
 .login-card .card-body {
-    padding-top: 2.5rem !important;
+    padding-top: 2rem !important;
+    padding-bottom: 0.7rem !important;
+}
+
+.login-card.auth-recuperar .card-body {
+    display: flex;
+    flex-direction: column;
     padding-bottom: 4rem !important;
+}
+
+.login-card.auth-recuperar .card-body > form {
+    flex: 1 1 auto;
 }
 
 .auth-motto {

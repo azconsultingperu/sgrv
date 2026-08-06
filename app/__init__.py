@@ -22,6 +22,7 @@ def create_app():
     migrate.init_app(app, db)
 
     login_manager.login_view = 'auth.login'
+    login_manager.login_message = None
 
     from app.controllers.auth_controller import auth_bp
     from app.controllers.dashboard_controller import dashboard_bp

@@ -2,6 +2,26 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-06] — UX/Accesibilidad: vinculación de inputs con labels en pantallas auth
+
+### Agregado
+- **Inputs vinculados con labels (`for`/`id`)** en las 3 vistas de autenticación: `templates/auth/login.html`, `templates/auth/recuperar.html` y `templates/auth/reset_password.html`. Antes los `<label>` no tenían atributo `for`, y los inputs carecían de `id`, por lo que el lector de pantalla y el clic en el label no enfocaban el input. Ahora cada label está vinculado a su input mediante `for="login-username"`, `for="login-password"`, `for="recuperar-username"`, `for="recuperar-email"`, `for="reset-password"` y `for="reset-confirm"` (con `id` correspondiente en cada input). El checkbox "Recordar usuario" ya estaba vinculado correctamente.
+- **Card de "Recuperar Contraseña" diferenciada**: añadida la clase `auth-recuperar` al `<div class="login-card">` de la vista de recuperar, y reglas `.login-card.auth-recuperar .card-body { display: flex; flex-direction: column; padding-bottom: 4rem }` + `> form { flex: 1 1 auto }` en `auth.css`. Permite mover los botones "Enviar Instrucciones" / "Volver al Login" usando `mt-auto` (aprovechando el padding inferior existente) **sin** agrandar el card.
+
+### Cambiado
+- **`app/templates/auth/login.html`**: el `<form>` interior ahora es `d-flex flex-column h-100`, y los botones están envueltos en `<div class="mt-auto pt-3">` para empujarlos al fondo del card usando el padding-bottom existente (no se añade padding nuevo).
+- **`app/templates/auth/recuperar.html`**: idem patrón `mt-auto` en el contenedor de botones. Subtítulo cambiado de "Ingrese sus datos para recuperar el acceso" a "Ingrese sus credenciales para recuperar el acceso".
+- **`app/templates/auth/reset_password.html`**: el input "Nueva Contraseña" cambió de `id="password"` a `id="reset-password"` (más descriptivo y único). El JS `checkPasswordStrength()` ya no depende del `id` del input sino que lo recibe por parámetro, así se mantuvo funcional.
+
+### Eliminado
+- **`app/templates/auth/login.html`**: eliminada la línea `<p class="auth-tagline">Sistema de Registro de Visitas</p>` del card. La card de login queda más limpia: SGRV → IESTP "Paiján" → descripción → R.M.
+
+### Beneficios
+- **Accesibilidad**: clic en el label o Según por teclado ahora enfoca el input correspondiente; lectores de pantalla asocian ambos elementos.
+- **Card de recuperar más equilibrada**: botones ya no pegados a los inputs, sin necesidad de padding extra (no crece el card).
+
+---
+
 ## [2026-08-05] — UI: centrado de iconos, layout responsive y limpieza de notificaciones redundantes
 
 ### Corregido
