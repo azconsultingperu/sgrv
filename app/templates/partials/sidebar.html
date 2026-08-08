@@ -17,7 +17,7 @@
                 <span class="nav-label">Dashboard</span>
             </a>
         </li>
-        {% if current_user.rol_id != 4 %}
+        {% if current_user.rol_id <= 2 %}
         <li class="nav-item">
             <a href="{{ url_for('registro.registrar') }}" class="nav-link {% if request.endpoint and 'registro' in request.endpoint %}active{% endif %}">
                 <span class="nav-icon"><i class="bi bi-plus-circle"></i></span>

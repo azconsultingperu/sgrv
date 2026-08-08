@@ -2,6 +2,23 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-08] — Optimización de imágenes y auditoría visual multi-pantalla
+
+### Agregado
+- **Imágenes en AVIF/WebP**: `logo.png`, `recuperar.png` y `frontis.jpg` convertidos a AVIF/WebP (`app/static/img/`), con ahorro total de ~89% (frontis -87%, logo -86%, recuperar -98%). Los `<picture>` e `image-set()` de las plantillas y `auth.css` ya apuntaban a estos formatos; quedaron operativos. `frontis.avif` re-codificado a `-q 60` (RMSE 0.017 < 0.02). Originales conservados como fallback.
+- **Permisos visibles por rol en la UI**: la barra lateral muestra "Registrar" solo a Administrador/Supervisor (antes lo veía también el Operador), y los botones "Nuevo Registro"/"Editar" (consulta y detalle) se ocultan a roles que el backend no autoriza. Antes rol 3/4 veían acciones que fallaban al usarlas.
+- **Estados vacíos diferenciados** en consulta y auditoría: "No hay registros todavía" (con CTA "Registrar la primera visita" cuando hay permiso) vs "Sin resultados para los filtros aplicados".
+- **Charts del dashboard con datos vacíos**: registros por mes, alumnos por colegio y por distrito muestran overlay "Sin datos registrados" en vez de un gráfico en blanco.
+- **Clases de avatar reutilizables** `.avatar-xs` (24px) y `.avatar-sm` (32px) en `style.css`; eliminados los estilos inline de `object-fit` en tablas de usuarios y auditoría. Clase `.profile-table` para el ancho fijo de la columna en "Mi Perfil".
+
+### Cambiado
+- `style.css` versionado `?v=40` → `?v=41`.
+
+### Documentado
+- **README.md compactado**: se eliminaron explicaciones genéricas (venv, instalación por SO, tutorial multi-OS) y se conservó solo lo específico del proyecto: variables de entorno, gotchas reales (Python 3.13+ con pandas, `DATABASE_URL` heredada, permisos de cloudflared), estructura de carpetas, usuarios por defecto y despliegue. Ahora sigue el estilo de referencia terse (una línea por comando, sin narrar herramientas estándar).
+
+---
+
 ## [2026-08-06] — UX/Accesibilidad: vinculación de inputs con labels en pantallas auth
 
 ### Agregado

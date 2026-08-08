@@ -28,8 +28,7 @@
                     {% for u in usuarios %}
                     <tr>
                         <td class="align-middle">
-                            <img src="{{ u.avatar_url(True) }}" alt="Foto" class="rounded-circle"
-                                 style="width:32px;height:32px;object-fit:cover;"
+                            <img src="{{ u.avatar_url(True) }}" alt="Foto" class="rounded-circle avatar-sm"
                                  data-avatar data-avatar-user="{{ u.id }}">
                         </td>
                         <td>{{ u.dni }}</td>

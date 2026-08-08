@@ -65,8 +65,7 @@
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 {% if a.usuario %}
-                                    <img src="{{ a.avatar_url(True) }}" alt="Foto" class="rounded-circle"
-                                         style="width:24px;height:24px;object-fit:cover;">
+                                    <img src="{{ a.avatar_url(True) }}" alt="Foto" class="rounded-circle avatar-xs">
                                     <small>{{ a.usuario.username }}</small>
                                 {% else %}
                                     <small class="text-muted">Usuario eliminado</small>
@@ -81,11 +80,23 @@
                     {% else %}
                     <tr>
                         <td colspan="6">
+                            {% set ns = namespace(filtros=false) %}
+                            {% for k, v in search_params.items() if k != 'page' %}
+                                {% if v %}{% set ns.filtros = true %}{% endif %}
+                            {% endfor %}
+                            {% if ns.filtros %}
                             <div class="empty-state">
-                                <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
-                                <p class="empty-state-title">Sin registros de auditoría</p>
+                                <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+                                <p class="empty-state-title">Sin resultados</p>
                                 <p class="empty-state-text">No se encontraron eventos que coincidan con los filtros aplicados.</p>
                             </div>
+                            {% else %}
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
+                                <p class="empty-state-title">Sin eventos registrados</p>
+                                <p class="empty-state-text">La auditoría se completará automáticamente con las acciones de los usuarios en el sistema.</p>
+                            </div>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}

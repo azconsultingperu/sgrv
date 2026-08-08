@@ -103,6 +103,9 @@
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartRegistrosMes"></canvas>
+                    <div id="sinDatosRegistrosMes" class="no-data-overlay text-center py-4">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,6 +136,9 @@
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartColegios"></canvas>
+                    <div id="sinDatosColegios" class="no-data-overlay text-center py-4">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                    </div>
                 </div>
             </div>
         </div>
@@ -145,6 +151,9 @@
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartDistritos"></canvas>
+                    <div id="sinDatosDistritos" class="no-data-overlay text-center py-4">
+                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,16 +263,27 @@ function aplicarTemaCharts() {
     });
 }
 
+function mostrarVacioOSiDatos(canvas, overlayId, hayDatos) {
+    if (hayDatos) return true;
+    if (canvas) canvas.style.display = 'none';
+    const ov = document.getElementById(overlayId);
+    if (ov) ov.style.display = 'flex';
+    return false;
+}
+
 const registrosPorMes = {{ registros_por_mes | tojson | safe }};
 const labelsMes = registrosPorMes.map(r => meses[r.mes - 1] + ' ' + r.anio);
 const dataMes = registrosPorMes.map(r => r.total);
-const chartRegistrosMes = new Chart(document.getElementById('chartRegistrosMes'), {
+let chartRegistrosMes = null;
+if (mostrarVacioOSiDatos(document.getElementById('chartRegistrosMes'), 'sinDatosRegistrosMes', registrosPorMes.length > 0)) {
+chartRegistrosMes = new Chart(document.getElementById('chartRegistrosMes'), {
     type: 'line',
     data: { labels: labelsMes, datasets: [{ label: 'Registros', data: dataMes, borderColor: chartColores().primary, tension: 0.3, fill: true, backgroundColor: chartColores().primarySoft }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
                   y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
+}
 
 const sexos = {{ alumnos_por_sexo | tojson | safe }};
 const chartSexo = document.getElementById('chartSexo');
@@ -281,22 +301,28 @@ if (!sexos || sexos.length === 0) {
 }
 
 const colegios = {{ alumnos_por_colegio | tojson | safe }};
-const chartColegios = new Chart(document.getElementById('chartColegios'), {
+let chartColegios = null;
+if (mostrarVacioOSiDatos(document.getElementById('chartColegios'), 'sinDatosColegios', colegios.length > 0)) {
+chartColegios = new Chart(document.getElementById('chartColegios'), {
     type: 'bar',
     data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: chartColores().primary }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
                   y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
+}
 
 const distritos = {{ alumnos_por_distrito | tojson | safe }};
-const chartDistritos = new Chart(document.getElementById('chartDistritos'), {
+let chartDistritos = null;
+if (mostrarVacioOSiDatos(document.getElementById('chartDistritos'), 'sinDatosDistritos', distritos.length > 0)) {
+chartDistritos = new Chart(document.getElementById('chartDistritos'), {
     type: 'bar',
     data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: chartColores().success }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
         scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
                   y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } } } }
 });
+}
 
 document.addEventListener('sgrv:themechange', aplicarTemaCharts);
 

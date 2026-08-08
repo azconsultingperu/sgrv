@@ -505,11 +505,23 @@ button,
 }
 
 .sidebar-user-avatar,
-.avatar-thumb {
+.avatar-thumb,
+.avatar-xs,
+.avatar-sm {
     flex-shrink: 0;
     object-fit: cover;
     background: var(--surface-3);
     border: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
 }
 
 .sidebar-user-avatar {
@@ -1245,6 +1257,10 @@ a:focus-visible,
 
 .table th {
     font-weight: var(--font-weight-semibold);
+}
+
+.profile-table th:first-child {
+    width: 180px;
 }
 
 .progress {
