@@ -281,11 +281,13 @@ python run.py
 | Usuario (DNI) | Contraseña | Rol            |
 |---------------|-----------|----------------|
 | 12345678      | admin123  | Administrador  |
+| 71184654      | (creada por el administrador) | Administrador (Juan D. R. Huancas) |
 | 87654321      | super123  | Supervisor     |
 | 11112222      | opera123  | Operador       |
-| 99998888      | consul123 | Consultas      |
 
 > **Nota**: El usuario de acceso es el **DNI**. Cambie estas credenciales inmediatamente después del primer inicio de sesión.
+>
+> La tabla anterior refleja los usuarios presentes en la base de datos activa (`instance/database/gestion_visitas.db`). El seed de fábrica (`app/utils/seed.py`) además prevé un usuario de consultas (`99998888` / `consul123`) que solo aplica al recrear la BD desde cero.
 
 ---
 

@@ -2,6 +2,12 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-08] — Corrección de usuarios por defecto contra la BD real
+
+### Fixed
+
+- **Tabla de usuarios por defecto corregida contra la base de datos activa**: se agregó `71184654` (JUAN DAVID RIVERA HUANCAS, Administrador) que sí está registrado en `instance/database/gestion_visitas.db` y faltaba en el README. Se quitó de la tabla el usuario `99998888` (Consultas) que no existe en la BD activa — solo existe en el seed de fábrica (`app/utils/seed.py`), por lo que quedó documentado como nota al pie.
+
 ## [2026-08-08] — Optimización de imágenes y auditoría visual multi-pantalla
 
 ### Agregado
