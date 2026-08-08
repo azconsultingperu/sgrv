@@ -15,7 +15,7 @@ Todas las mejoras y correcciones del proyecto SGRV.
 - `style.css` versionado `?v=40` → `?v=41`.
 
 ### Documentado
-- **README.md compactado**: se eliminaron explicaciones genéricas (venv, instalación por SO, tutorial multi-OS) y se conservó solo lo específico del proyecto: variables de entorno, gotchas reales (Python 3.13+ con pandas, `DATABASE_URL` heredada, permisos de cloudflared), estructura de carpetas, usuarios por defecto y despliegue. Ahora sigue el estilo de referencia terse (una línea por comando, sin narrar herramientas estándar).
+- **README.md restaurado a la versión completa** (465 líneas, formato tutorial con secciones de Codespaces, instalación por OS, multi-OS colaborativo, roles, módulos, BD, ML y despliegue). Se revirtió el compactado previo al estilo "terse reference", conservando solo lo específico del proyecto.
 
 ---
 
