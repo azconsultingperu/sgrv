@@ -60,47 +60,15 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 
 ## Estructura del Proyecto
 
-```
-sgrv/
-├── app/
-│   ├── controllers/     # Controladores (blueprints = rutas HTTP)
-│   ├── models/          # Modelos SQLAlchemy (ORM)
-│   ├── templates/       # Plantillas HTML (Jinja2)
-│   │   ├── auth/        # Login, recuperar contraseña, reset password
-│   │   ├── dashboard/   # Dashboard principal
-│   │   ├── registro/    # Registro y edición de visitas
-│   │   ├── consulta/    # Búsqueda y detalle de alumnos
-│   │   ├── usuarios/    # Gestión de usuarios
-│   │   ├── auditoria/   # Registro de auditoría
-│   │   ├── reportes/    # Generación de reportes
-│   │   ├── perfil/      # "Mi Perfil" (avatar y datos del usuario)
-│   │   ├── email/       # Plantillas de correo (nuevo usuario, registro, recuperación)
-│   │   ├── errors/      # Páginas de error (403, 404, 500)
-│   │   └── partials/    # Componentes reutilizables (navbar, sidebar, paginación)
-│   ├── static/
-│   │   ├── css/         # Hojas de estilo (style.css, auth.css)
-│   │   ├── js/          # Scripts del frontend (main.js, perfil.js)
-│   │   ├── img/         # Logos, frontis, avatar por defecto
-│   │   ├── fonts/       # Tipografías (Inter)
-│   │   └── uploads/     # Avatares subidos por usuarios (no versionado)
-│   ├── services/        # Lógica de negocio (auditoria, email, estadística, reporte)
-│   ├── utils/           # Utilidades (helpers, decorators, time_utils, seed)
-│   └── config.py        # Configuración de la aplicación
-├── instance/
-│   └── database/
-│       └── gestion_visitas.db   # Base de datos SQLite ACTIVA (uso en runtime)
-├── database/
-│   └── gestion_visitas.db.bak   # Backup de BD obsoleta (preservado, no se usa)
-├── migrations/          # Migraciones de base de datos (Flask-Migrate / Alembic)
-├── logs/                # Logs de server (server.log) y URL del túnel (tunel.txt)
-├── requirements.txt     # Dependencias del proyecto
-├── run.py               # Punto de entrada (arranque Flask + túnel Cloudflare)
-├── .env / .env.example  # Variables de entorno reales / plantilla
-├── .gitignore           # Archivos ignorados por Git
-├── .devcontainer/       # Configuración de VS Code Dev Containers
-├── CHANGELOG.md         # Registro de cambios
-└── README.md            # Este archivo
-```
+El mapa completo del repositorio (árbol de carpetas, dónde se edita cada cosa y recursos) vive en [STRUCTURE.md](STRUCTURE.md). Resumen de los directorios clave:
+
+- `app/controllers/` — rutas HTTP (blueprints)
+- `app/models/` — modelos SQLAlchemy
+- `app/templates/` — plantillas Jinja2
+- `app/services/` — lógica de negocio (auditoría, email, estadística, reporte)
+- `app/utils/` — helpers, decorators, seed
+- `instance/database/` — BD SQLite activa (runtime)
+- `migrations/` — migraciones Alembic (Flask-Migrate)
 
 ---
 

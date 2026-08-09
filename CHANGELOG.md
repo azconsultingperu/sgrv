@@ -2,6 +2,13 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-09]
+
+### Documentado
+
+- **`STRUCTURE.md` creado**: mapa del repositorio (árbol de carpetas verificado, dónde se edita cada parte y recursos) separado del README.
+- **README**: sección «Estructura del Proyecto» reducida a los directorios clave con enlace a `STRUCTURE.md`.
+
 ## [2026-08-08] — Corrección de usuarios por defecto contra la BD real
 
 ### Fixed
