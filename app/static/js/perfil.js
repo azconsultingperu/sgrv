@@ -58,8 +58,8 @@
             var archivo = fileInput.files[0];
             if (!archivo) return;
 
-            if (archivo.size > 2 * 1024 * 1024) {
-                notificar('danger', 'La imagen supera los 2 MB de tamaño máximo.');
+            if (archivo.size > 10 * 1024 * 1024) {
+                notificar('danger', 'La imagen supera los 10 MB de tamaño máximo.');
                 fileInput.value = '';
                 return;
             }

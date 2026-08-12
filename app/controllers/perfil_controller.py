@@ -145,26 +145,22 @@ def _procesar_avatar(usuario, request):
         return jsonify({'ok': False, 'error': 'Formato no permitido. Use JPG, PNG, WebP o GIF.'}), 400
 
     from PIL import Image, ImageOps
-    max_dim = current_app.config['PERFIL_AVATAR_MAX_DIM']
     try:
         datos = archivo.read(current_app.config['PERFIL_AVATAR_MAX_SIZE'] + 1)
     except Exception:
         return jsonify({'ok': False, 'error': 'Error al leer el archivo.'}), 400
 
     if len(datos) > current_app.config['PERFIL_AVATAR_MAX_SIZE']:
-        return jsonify({'ok': False, 'error': 'La imagen supera los 2 MB de tamaño máximo.'}), 413
+        return jsonify({'ok': False, 'error': 'La imagen supera los 10 MB de tamaño máximo.'}), 413
 
     try:
         img = Image.open(BytesIO(datos))
-        ancho, alto = img.size
-        if ancho > max_dim or alto > max_dim or (ancho * alto) > 50_000_000:
-            return jsonify({'ok': False, 'error': f'Resolución máxima permitida: {max_dim}x{max_dim} px.'}), 400
         img.verify()
         img = Image.open(BytesIO(datos))
         img = ImageOps.exif_transpose(img)
         ancho, alto = img.size
-        if ancho > max_dim or alto > max_dim or (ancho * alto) > 50_000_000:
-            return jsonify({'ok': False, 'error': f'Resolución máxima permitida: {max_dim}x{max_dim} px.'}), 400
+        if (ancho * alto) > 50_000_000:
+            return jsonify({'ok': False, 'error': 'La imagen es demasiado grande.'}), 400
     except Exception:
         return jsonify({'ok': False, 'error': 'El archivo no es una imagen válida.'}), 400
 

@@ -17,7 +17,7 @@ class Config:
     UPLOAD_FOLDER = os.path.join(os.path.dirname(basedir), 'app', 'static', 'uploads')
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf'}
     PERFIL_AVATAR_DIR = os.path.join(os.path.dirname(basedir), 'app', 'static', 'uploads', 'perfil')
-    PERFIL_AVATAR_MAX_SIZE = 2 * 1024 * 1024
+    PERFIL_AVATAR_MAX_SIZE = 10 * 1024 * 1024
     PERFIL_AVATAR_MAX_DIM = 1000
     PERFIL_AVATAR_FULL_DIM = 600
     PERFIL_AVATAR_THUMB_DIM = 90
