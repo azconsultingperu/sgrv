@@ -1,6 +1,6 @@
 # SISTEMA DE GESTIÓN DE REGISTRO DE VISITAS (SGRV)
 
-## IESTP "Paiján"
+## IESTP "Paiján" 
 
 Sistema web para registrar y gestionar las visitas realizadas por promotores institucionales a colegios de 5to de secundaria, con el objetivo de generar una base de datos para analizar, segmentar y predecir potenciales estudiantes interesados en estudiar en el Instituto de Educación Superior Tecnológico Público "Paiján".
 
@@ -14,7 +14,7 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 
 ---
 
-## Características
+## Características!
 
 - **Dashboard interactivo** con gráficos estadísticos y métricas en tiempo real
 - **Registro de visitas** con formulario inteligente y validaciones
