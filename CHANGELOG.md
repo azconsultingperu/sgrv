@@ -2,6 +2,94 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-20] — Fase 1: cimientos (tests, migraciones, arranque sin efectos)
+
+### Agregado
+
+- **Suite de tests de regresión (pytest)**: 22 tests sobre los flujos críticos — auth (login, credenciales inválidas, lockout por intentos), registro de alumnos (exitoso, sin promotor, DNI duplicado/inválido, fecha inválida), consulta (lista, detalle 200/404, verificar-dni), usuarios (DNI duplicado, soft-delete oculto en lista) y reportes (CSV/Excel, permisos por rol). Los bugs críticos de agosto quedan congelados como tests.
+- **Migración Alembic `c7e1a92f4b30`**: `visitas.promotor_id` pasa a nullable (una visita puede registrarse sin promotor y asignarse después).
+- **Comando `flask init-db`**: inicialización explícita de BD para entornos nuevos.
+
+### Cambiado
+
+- **El arranque ya no muta la base de datos en producción** (`INIT_DB_ON_START=False` vía `ProductionConfig` con `FLASK_ENV=production`). `create_all` + seed + parches legacy solo corren en desarrollo o vía `flask init-db`. Reiniciar la app en cPanel deja de ser un evento con efectos sobre la BD.
+- Selección de configuración por entorno (`FLASK_ENV`): ProductionConfig / DevelopmentConfig / TestingConfig.
+- README: documentados el flujo de migraciones y la suite de tests.
+
+### Corregido (con reproducción y test de regresión)
+
+- **"Observar" un alumno lanzaba error 500 siempre**: `Alumno.query.filter_by(eliminado=False).get_or_404(id)` es inválido en SQLAlchemy 2.x (`Query.get() with existing criterion`). Fix: `first_or_404()` con filtro incluido.
+- **Registro silenciosamente fallido sin promotor**: `visitas.promotor_id NOT NULL` + formulario opcional → IntegrityError con rollback total y mensaje invisible. Fix: columna nullable + template None-safe ("No asignado").
+- Detalle del alumno tolera visita sin promotor.
+
+---
+
+## [2026-08-17] — Despliegue en producción (cPanel + MySQL)
+
+### Desplegado
+
+- **SGRV en producción**: https://sgrv.azconsultingperu.com — hosting cPanel de FranTech Solutions (PONYNET), servidor `c6`, IP `198.251.89.30`, con Python App + Passenger (Python 3.12).
+- **Motor de BD en producción**: MySQL (el hosting no tiene PostgreSQL). Tablas creadas automáticamente por `create_all` al primer arranque con el `.env` configurado; driver `pymysql` añadido al venv del servidor.
+- **Datos migrados**: los 507 registros (roles, usuarios, colegios, carreras, promotores, 305 auditorías, 172 sesiones, 10 reportes) exportados desde PostgreSQL local como `datos.sql` (INSERTs con IDs preservados, fechas sin microsegundos, `SET FOREIGN_KEY_CHECKS=0`) e importados en `azconsultingperu_sgrv_visitas`.
+- **Acceso al panel**: https://cpanel.azconsultingperu.com (el dominio principal `azconsultingperu.com` sigue en GitHub Pages; los subdominios `cpanel`, `webmail` y `sgrv` apuntan al hosting).
+
+### Configurado en el servidor
+
+- **`.env`** de producción: `DATABASE_URL=mysql+pymysql://...` (contraseña con caracteres especiales URL-encoded), `CLOUDFLARE_TUNNEL=0`, `FLASK_ENV=production`. No se sube al repositorio.
+- `passenger_wsgi.py` como punto de arranque de Passenger.
+
+### Verificado
+
+- Login, dashboard y métricas funcionando contra MySQL desde la URL pública.
+
+### Notas de seguridad (a completar por el operador)
+
+- Cambiar `SECRET_KEY` del `.env` por una generada (`secrets.token_hex(32)`).
+- Cambiar la contraseña del usuario administrador de fábrica (`12345678`).
+- Eliminar `datos.sql` del servidor tras el import (expuesto en la carpeta web).
+
+---
+
+## [2026-08-17] — Preparación para despliegue en cPanel
+
+### Agregado
+
+- **`passenger_wsgi.py`**: punto de arranque para cPanel (Python App + Passenger). Carga `.env`, crea la app Flask en la variable `application` y expone el blueprint de arranque que espera Passenger. Verificado localmente (HTTP 200 contra PostgreSQL).
+
+### Documentado
+
+- **README.md**: nueva subsección «Despliegue en cPanel (Python App + Passenger)» con el paso a paso completo (requisitos del plan, subida excluyendo carpetas locales, creación de BD PostgreSQL, instalación de dependencias, uso de `passenger_wsgi.py` y migración de datos).
+
+---
+
+## [2026-08-17] — Migración de base de datos a PostgreSQL
+
+### Cambiado
+
+- **Motor de base de datos: SQLite → PostgreSQL**. La BD activa del sistema ahora es PostgreSQL (`gestion_visitas`, usuario `sgrv`), definida en `DATABASE_URL` del `.env`. SQLite queda solo como fallback de desarrollo sin servidor.
+- **`requirements.txt`**: `psycopg2-binary==2.9.9` ya estaba declarado; instalado y verificado en el entorno.
+- **Entorno virtual recreado**: el `venv/` existente estaba roto (apuntaba a la ruta anterior `/home/juan/sgrv` y no era compatible con Python 3.14 del sistema). Recreado con Python 3.12 vía `uv` (`uv venv --python 3.12 venv`) e instaladas todas las dependencias de `requirements.txt`.
+
+### Agregado
+
+- **Base de datos PostgreSQL local** (`gestion_visitas`, owner `sgrv`), con el esquema creado y el versionado Alembic marcado en la revisión `53ea819ab516` (`flask db stamp`), de modo que las migraciones futuras se apliquen sin conflicto.
+
+### Migrado
+
+- **505 filas migradas de SQLite a PostgreSQL** con integridad referencial e IDs originales preservados (crítico para los nombres de archivo de las fotos de perfil y los snapshots de auditoría): 4 roles, 4 usuarios, 6 instituciones educativas, 3 carreras, 3 promotores, 304 auditorías, 171 sesiones, 10 reportes. Verificado: los conteos coinciden 1:1 entre ambos motores y el login de los usuarios seed funciona contra PostgreSQL.
+
+### Documentado
+
+- **README.md**: sección «Base de Datos» reescrita (PostgreSQL como motor principal, pasos para crear usuario/BD, nota de primer arranque con `create_all`, y comando `flask db stamp` para BD nuevas); tabla de solución de problemas con errores comunes de PostgreSQL (`connection refused`, `database does not exist`); estructura del proyecto y tecnologías actualizadas.
+- **`.env` / `.env.example`**: `DATABASE_URL` apunta a PostgreSQL, con el formato de conexión documentado y la alternativa SQLite comentada.
+- **STRUCTURE.md**: `instance/database/` marcado como backup de la BD original; tabla «Dónde se edita cada cosa» actualizada con la BD activa en PostgreSQL.
+
+### Preservado
+
+- **La BD SQLite original se conserva intacta** en `instance/database/gestion_visitas.db` como respaldo (`instance/` está en `.gitignore`).
+
+---
+
 ## [2026-08-09]
 
 ### Documentado

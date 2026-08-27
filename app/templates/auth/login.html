@@ -1,8 +1,17 @@
 {% extends "base.html" %}
+{% block title %}Iniciar Sesión · SGRV — IESTP Paiján{% endblock %}
+{% block robots %}index, follow{% endblock %}
+{% block extra_meta %}
+<meta name="description" content="Sistema de Gestión y Registro de Visitas del IESTP Paiján (La Libertad). Inicie sesión con su usuario institucional para registrar y consultar visitas de estudiantes.">
+<meta property="og:title" content="SGRV — Sistema de Gestión y Registro de Visitas | IESTP Paiján">
+<meta property="og:description" content="Acceso al sistema institucional de registro de visitas del IESTP Paiján.">
+<meta property="og:type" content="website">
+{% endblock %}
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=13">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=16">
 {% endblock %}
 {% block auth_content %}
+{% set _ = get_flashed_messages(with_categories=true) %}
 <div class="login-bg">
     <div class="col-11 col-sm-9 col-md-6 col-lg-5 col-xl-5 col-xxl-5 px-3">
         <div class="login-card">
@@ -15,15 +24,13 @@
                     </picture>
                     <h4 class="auth-title">SGRV</h4>
                     <p class="auth-subtitle">IESTP "Paiján"</p>
-                    <p class="auth-desc">Plataforma oficial del <strong>IESTP "Paiján"</strong> — Instituto de Educación Superior Tecnológico Público, La Libertad.</p>
-                    <p class="auth-caption">R.M. N° 498-87-ED</p>
+                    <p class="auth-desc">IESTP Paiján · R.M. N° 498-87-ED</p>
                 </div>
                 <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                    <label for="login-username" class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
-                    <input type="text" id="login-username" class="form-control login-input" name="username" placeholder="Ingrese su DNI (8 dígitos)" maxlength="8" pattern="[0-9]{8}" inputmode="numeric" autocomplete="username" oninput="this.value=this.value.replace(/\D/g,'')" required>
-                    <div class="password-requirements">Su usuario es su DNI: solo números.</div>
+                    <label for="login-username" class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario</label>
+                    <input type="text" id="login-username" class="form-control login-input" name="username" placeholder="Ingrese su usuario" autocomplete="username" required>
                     </div>
                     <div class="mb-3">
                         <label for="login-password" class="login-label"><i class="bi bi-lock me-1"></i>Contraseña</label>
@@ -34,7 +41,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex login-options flex-wrap justify-content-between align-items-center gap-2 mb-4">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" name="recordar" id="recordar">
                             <label class="form-check-label small" for="recordar">Recordar usuario</label>

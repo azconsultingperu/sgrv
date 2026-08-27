@@ -21,3 +21,6 @@ gunicorn==21.2.0
 psycopg2-binary==2.9.9
 pycloudflared==0.3.0
 Pillow==10.2.0
+pytest==9.1.1
+import-linter==2.13
+grimp==3.15

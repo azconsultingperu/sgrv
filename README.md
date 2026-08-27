@@ -49,8 +49,8 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 - Bootstrap Icons
 
 ### Base de Datos
-- SQLite (desarrollo)
-- PostgreSQL (producción)
+- **PostgreSQL** (producción y desarrollo local)
+- SQLite (fallback de desarrollo sin servidor)
 
 ### Control de Versiones
 - Git
@@ -62,13 +62,16 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 
 El mapa completo del repositorio (árbol de carpetas, dónde se edita cada cosa y recursos) vive en [STRUCTURE.md](STRUCTURE.md). Resumen de los directorios clave:
 
-- `app/controllers/` — rutas HTTP (blueprints)
-- `app/models/` — modelos SQLAlchemy
+- `app/shared/` — kernel compartido (db, bus de eventos, UoW, time_utils)
+- `app/modules/` — monolito modular estricto (identidad, registro, consulta, dashboard, auditoria, reportes) con `domain/application/infrastructure/presentation` + `public.py`
+- `app/controllers/` — [legacy shims] re-exportan desde `app/modules/*/presentation`
+- `app/models/` — [legacy shims] re-exportan desde `app/modules/*/domain`
 - `app/templates/` — plantillas Jinja2
-- `app/services/` — lógica de negocio (auditoría, email, estadística, reporte)
+- `app/services/` — [legacy] auditoría/email/estadística (shims, migrado a handlers)
 - `app/utils/` — helpers, decorators, seed
-- `instance/database/` — BD SQLite activa (runtime)
+- `instance/database/` — backup SQLite de la BD original (runtime ya migrado)
 - `migrations/` — migraciones Alembic (Flask-Migrate)
+- `setup.cfg` + `Makefile` — contratos de fronteras (`lint-imports`) y CI
 
 ---
 
@@ -145,7 +148,7 @@ cp .env.example .env
 
 > **Nota:** Si `SECRET_KEY` se deja vacía, la aplicación genera una automáticamente en cada inicio (solo para desarrollo).
 >
-> **No necesitas crear nada manualmente:** la aplicación crea automáticamente la carpeta `database/` y el archivo de la base de datos en el primer arranque (funciona igual en Windows, Linux y macOS).
+> **Base de datos:** el `.env.example` trae `DATABASE_URL` apuntando a PostgreSQL. Si aún no tienes PostgreSQL configurado, crea la base de datos siguiendo la sección [Configuración de PostgreSQL](#configuración-de-postgresql), o comenta la línea de PostgreSQL y descomenta la de SQLite para desarrollo sin servidor (la app crea la carpeta y el archivo automáticamente en el primer arranque).
 
 ### 5. Instalar dependencias
 
@@ -192,6 +195,8 @@ La aplicación se iniciará en:
 | `[Errno 13] Permission denied: '…/cloudflared-linux-amd64'` | El binario de Cloudflare no tiene permiso de ejecución (solo ocurre en Linux) | `chmod +x venv/lib/python3.12/site-packages/pycloudflared/cloudflared-linux-amd64` |
 | `sqlite3.OperationalError: unable to open database file` | Estás usando una versión antigua del proyecto (las versiones nuevas crean la carpeta `database/` automáticamente) | Actualiza el proyecto: `git pull` |
 | El error anterior persiste | Hay una variable `DATABASE_URL` con ruta inválida en la terminal (si antes pegaste un comando `DATABASE_URL=...`) | Ejecuta `unset DATABASE_URL` (Linux/macOS) o cierra y vuelve a abrir la terminal (Windows), y vuelve a arrancar |
+| `psycopg2.OperationalError: connection refused` | El servicio PostgreSQL no está corriendo | `sudo systemctl start postgresql` (Linux) o inicia el servicio en tu sistema |
+| `psycopg2.OperationalError: FATAL: database "gestion_visitas" does not exist` | La base de datos no fue creada | Sigue la sección [Configuración de PostgreSQL](#configuración-de-postgresql) |
 
 ---
 
@@ -340,6 +345,36 @@ python run.py
 
 ## Base de Datos
 
+El sistema usa **PostgreSQL** como motor principal (definido en `DATABASE_URL` del `.env`). SQLite queda como fallback de desarrollo sin servidor. En producción (cPanel) se usa **MySQL** vía `mysql+pymysql`.
+
+### Migraciones (Alembic / Flask-Migrate)
+
+El esquema cambia EXCLUSIVAMENTE con migraciones. La app NO crea ni modifica tablas al arrancar en producción (`INIT_DB_ON_START=False`).
+
+```bash
+# 1) Cambia un modelo en app/models/...
+# 2) Genera la migración y revísala antes de aplicar:
+flask --app run.py db migrate -m "descripcion del cambio"
+# 3) Aplica localmente:
+flask --app run.py db upgrade
+# 4) En el servidor (Terminal cPanel, venv activado):
+FLASK_APP=passenger_wsgi.py flask db stamp <revision_actual>   # solo la primera vez
+FLASK_APP=passenger_wsgi.py flask db upgrade
+```
+
+Para inicializar una BD vacía (solo desarrollo o instalación nueva): `flask --app run.py init-db`.
+
+### Tests de regresión
+
+Suite con pytest que congela los flujos críticos (login, registro, detalle, reportes, permisos):
+
+```bash
+pip install -r requirements.txt
+FLASK_ENV=testing venv/bin/python -m pytest tests/ -v
+```
+
+Cada bug corregido debe dejar un test que lo reproduzca.
+
 ### Tablas principales
 
 - `usuarios` - Usuarios del sistema
@@ -354,15 +389,39 @@ python run.py
 - `reportes` - Reportes generados
 - `dashboard_estadisticas` - Estadísticas del dashboard
 
+### Configuración de PostgreSQL
+
+1. Instalar PostgreSQL y arrancar el servicio:
+   ```bash
+   sudo systemctl start postgresql
+   ```
+2. Crear el usuario y la base de datos:
+   ```bash
+   sudo -u postgres psql
+   CREATE USER sgrv WITH PASSWORD 'tu_contrasena';
+   CREATE DATABASE gestion_visitas OWNER sgrv;
+   ```
+3. Configurar `DATABASE_URL` en el `.env`:
+   ```
+   DATABASE_URL=postgresql://sgrv:tu_contrasena@localhost:5432/gestion_visitas
+   ```
+
+> **Primer arranque:** la aplicación crea el esquema automáticamente (`create_all` + seed de usuarios iniciales). No es necesario ejecutar migraciones para arrancar.
+
 ### Migraciones
 
-El proyecto usa Alembic (Flask-Migrate). Para aplicar migraciones:
+El proyecto usa Alembic (Flask-Migrate). Al modificar un modelo:
 
 ```bash
+python -m flask db migrate -m "descripcion del cambio"
 python -m flask db upgrade
 ```
 
-> **Nota:** la base de datos usa SQLite por defecto (`database/gestion_visitas.db`); no requiere servidor externo.
+> **BD nueva (sin `alembic_version`):** tras el primer arranque (que crea el esquema), marca el versionado con:
+> ```bash
+> python -m flask db stamp 53ea819ab516
+> ```
+> Así Alembic queda sincronizado y las migraciones futuras se aplican sin conflicto.
 
 ---
 
@@ -419,6 +478,22 @@ gunicorn -w 4 -b 0.0.0.0:8000 run:app
 > pip install waitress
 > waitress-serve --port=8000 run:app
 > ```
+
+### Despliegue en cPanel (Python App + Passenger)
+
+Requisito: el plan debe ofrecer **Setup Python App** y **PostgreSQL** (o usar un PostgreSQL externo, p. ej. Neon o Supabase).
+
+1. En cPanel → *Setup Python App* → crear la aplicación (Python 3.10–3.12, *Application root* `sgrv`).
+2. Subir el código (zip por *File Manager* o git), **excluyendo** `venv/`, `.env`, `instance/`, `logs/`, `database/`, `.git/`.
+3. Crear la base de datos en *PostgreSQL Databases* (BD `gestion_visitas` + usuario) y configurar `.env` con su `DATABASE_URL` y `CLOUDFLARE_TUNNEL=0`.
+4. Instalar dependencias (Terminal/SSH):
+   ```bash
+   cd sgrv && python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+5. El arranque se hace con `passenger_wsgi.py` (ya incluido en el repo): cPanel detecta la variable `application` y sirve la app. La primera vez, *Setup Python App* crea el `passenger_wsgi.py` por defecto — se reemplaza con el del repo o se edita en *Edit Application*.
+6. Migrar los datos: `pg_dump` local → restaurar en la BD de cPanel (la app además crea el esquema sola al primer arranque).
 
 ---
 

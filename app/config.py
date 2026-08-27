@@ -8,6 +8,11 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///database/gestion_visitas.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+    }
+    INIT_DB_ON_START = True
     WTF_CSRF_ENABLED = True
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_HTTPONLY = True
@@ -35,10 +40,13 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://usuario:password@localhost:5432/gestion_visitas'
     SESSION_COOKIE_SECURE = True
+    INIT_DB_ON_START = False
 
 class DevelopmentConfig(Config):
     DEBUG = True
 
 class TestingConfig(Config):
     TESTING = True
+    INIT_DB_ON_START = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False

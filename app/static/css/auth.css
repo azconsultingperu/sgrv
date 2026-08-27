@@ -84,7 +84,7 @@
     margin-top: 0.45rem;
     margin-bottom: 0;
     color: #6b7a8d;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     line-height: 1.45;
 }
 
@@ -142,13 +142,13 @@
 }
 
 .login-input {
-    min-height: 44px;
-    padding: 0.58rem 0.78rem;
+    min-height: 48px;
+    padding: 0.7rem 0.85rem;
     color: #172033;
     background: #ffffff;
     border: 1px solid #d9e2ee;
     border-radius: var(--radius-md);
-    font-size: 0.94rem;
+    font-size: 1rem;
     transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -231,21 +231,60 @@
 
 @media (max-width: 575.98px) {
     .login-bg {
-        padding: 1rem 0;
+        padding: 0.75rem 0;
         overflow-x: hidden;
         overflow-y: auto;
     }
 
     .login-card .card-body {
-        padding: 1.2rem 1.4rem !important;
+        padding: 1.5rem 1.5rem 0.9rem !important;
     }
 
     .login-card {
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 1.25rem;
     }
 
+    .auth-brand {
+        margin-bottom: 1.25rem;
+    }
+
+    .auth-logo {
+        max-height: 48px;
+    }
+
+    .auth-title {
+        font-size: 1.1rem;
+    }
+
+    .login-label {
+        font-size: 0.88rem;
+    }
+
+    .login-input,
+    .login-card .input-group .btn {
+        min-height: 50px;
+    }
+
+    .login-card .input-group .btn {
+        font-size: 1.1rem;
+    }
+
+    .login-btn {
+        min-height: 52px;
+        font-size: 1rem;
+        border-radius: var(--radius-md);
+    }
+
+    .login-card .form-check-label,
     .login-card .login-link {
-        margin-left: auto;
-        text-align: right;
+        font-size: 0.85rem;
+    }
+
+    .login-options {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        row-gap: 0.35rem !important;
     }
 }

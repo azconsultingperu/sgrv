@@ -1,0 +1,7 @@
+# SGRV - IESTP Paijan
+# Solo la pagina de login es publica; todo lo demas requiere sesion.
+User-agent: *
+Allow: /auth/login
+Disallow: /
+
+Sitemap: https://sgrv.azconsultingperu.com/sitemap.xml
