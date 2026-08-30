@@ -4,7 +4,7 @@
 
 ## 2. Corrección del toast de login
 
-- [x] 2.1 Quitar `{% set _ = get_flashed_messages(with_categories=true) %}` de `app/templates/auth/login.html:14` y verificar que tras `POST /auth/login` con credenciales inválidas el HTML contiene `#flashData` con `danger` y `main.js` genera 1 `mc-toast danger` visible
+- [x] 2.1 Quitar `{% raw %}{% set _ = get_flashed_messages(with_categories=true) %}{% endraw %}` de `app/templates/auth/login.html:14` y verificar que tras `POST /auth/login` con credenciales inválidas el HTML contiene `#flashData` con `danger` y `main.js` genera 1 `mc-toast danger` visible
 
 ## 3. Hook de audio en notificaciones
 

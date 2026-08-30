@@ -18,7 +18,7 @@ Los mensajes `flash` generados por `auth/login` con `danger` SHALL llegar a `bas
 
 ### Requirement: No consumo prematuro en login.html
 
-`app/templates/auth/login.html` SHALL no hacer `{% set _ = get_flashed_messages(...) %}` que vacíe la cola antes de `base.html`.
+`app/templates/auth/login.html` SHALL no hacer `{% raw %}{% set _ = get_flashed_messages(...) %}{% endraw %}` que vacíe la cola antes de `base.html`.
 
 #### Scenario: Plantilla sin consumo
 - **WHEN** se inspecciona `login.html` tras el cambio

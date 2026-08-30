@@ -1,6 +1,6 @@
 ## Context
 
-Ver `proposal.md - Why`. Estado actual: `login.html:14` hace `{% set _ = get_flashed_messages(...) %}` que vacía la cola antes de `base.html:44`, por eso el `mc-toast` nunca aparece en login inválido. El sonido `vadim...mp3` está en `~/Descargas` (33KB) sin ruta estática; no hay `app/static/sounds/`. `main.js:347` ya gestiona `mc-toast` danger pero sin audio.
+Ver `proposal.md - Why`. Estado actual: `login.html:14` hace `{% raw %}{% set _ = get_flashed_messages(...) %}{% endraw %}` que vacía la cola antes de `base.html:44`, por eso el `mc-toast` nunca aparece en login inválido. El sonido `vadim...mp3` está en `~/Descargas` (33KB) sin ruta estática; no hay `app/static/sounds/`. `main.js:347` ya gestiona `mc-toast` danger pero sin audio.
 
 ## Goals / Non-Goals
 
@@ -15,7 +15,7 @@ Ver `proposal.md - Why`. Estado actual: `login.html:14` hace `{% set _ = get_fla
 ## Decisions
 
 ### 1. Quitar consumo prematuro en login.html
-- **Decisión:** Eliminar `{% set _ = get_flashed_messages(...) %}` de `login.html` (línea 14) y dejar que `base.html` lo lea. Si login necesita mostrar algo inline, usar `#flashData` como hace el resto de la app.
+- **Decisión:** Eliminar `{% raw %}{% set _ = get_flashed_messages(...) %}{% endraw %}` de `login.html` (línea 14) y dejar que `base.html` lo lea. Si login necesita mostrar algo inline, usar `#flashData` como hace el resto de la app.
 - **Rationale:** `base.html` es el único lector canónico; duplicar lectura genera condición de carrera.
 - **Alternativa:** Dejar el `set` y duplicar lectura en base — rechazada: consume dos veces.
 
