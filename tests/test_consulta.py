@@ -1,5 +1,5 @@
 """Tests de consulta: lista y detalle (el bug del 'observar' 500 queda congelado aqui)."""
-from app.models.alumno import Alumno
+from app.modules.registro.domain.alumno import Alumno
 from app import db
 from app.utils.time_utils import peru_now
 
@@ -12,7 +12,7 @@ def _crear_alumno(app, dni, promotor_id=1):
                    institucion_id=1, carrera_id=1)
         db.session.add(a)
         db.session.flush()
-        from app.models.visita import Visita
+        from app.modules.registro.domain.visita import Visita
         v = Visita(alumno_id=a.id, promotor_id=promotor_id, usuario_id=1,
                    fecha_visita=peru_now().date(), hora_visita=peru_now().time(),
                    observaciones='test')

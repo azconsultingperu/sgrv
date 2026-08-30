@@ -1,7 +1,7 @@
 """Tests de autenticacion: login, credenciales y bloqueo por intentos."""
 from datetime import timedelta
 from app import db
-from app.models.usuario import Usuario
+from app.modules.identidad.domain.usuario import Usuario
 from app.utils.time_utils import peru_now
 
 

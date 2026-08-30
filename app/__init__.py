@@ -30,6 +30,17 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.login_message = None
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        from app.modules.identidad.domain.usuario import Usuario
+        try:
+            u = Usuario.query.get(int(user_id))
+        except Exception:
+            return None
+        if u and u.estado and not u.is_bloqueado() and not u.eliminado:
+            return u
+        return None
+
     from app.modules.identidad.presentation.auth_controller import auth_bp
     from app.modules.dashboard.presentation.dashboard_controller import dashboard_bp
     from app.modules.registro.presentation.registro_controller import registro_bp
@@ -146,7 +157,12 @@ def _inicializar_bd():
 
     En produccion el esquema cambia EXCLUSIVAMENTE con migraciones (`flask db upgrade`).
     """
-    from app.models import usuario, rol, alumno, institucion_educativa, visita, promotor, auditoria, sesion, carrera, reporte, dashboard_estadistica
+    # Importar dominios para registrar modelos en SQLAlchemy (antes vía app.models shims)
+    from app.modules.identidad.domain import usuario, rol, sesion  # noqa: F401
+    from app.modules.registro.domain import alumno, institucion_educativa, visita, promotor, carrera  # noqa: F401
+    from app.modules.auditoria.domain import auditoria  # noqa: F401
+    from app.modules.reportes.domain import reporte  # noqa: F401
+    from app.modules.dashboard.domain import dashboard_estadistica  # noqa: F401
     db.create_all()
 
     from sqlalchemy import inspect, text

@@ -13,6 +13,7 @@
                     <label class="form-label" for="dni">DNI <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" name="dni" id="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" required autocomplete="off">
                     <div id="dniFeedback" class="invalid-feedback"></div>
+                    <div class="password-requirements">Este DNI será el usuario con el que la persona iniciará sesión</div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="nombres">Nombres <span class="text-danger">*</span></label>

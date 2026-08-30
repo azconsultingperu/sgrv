@@ -24,7 +24,9 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 - **Reportes exportables** en CSV y Excel
 - **Modo oscuro/claro** con persistencia de preferencia
 - **Diseño responsive** adaptado a dispositivos móviles
-- **Seguridad**: contraseñas hasheadas, sesiones protegidas, CSRF, validación de intentos fallidos
+- **Seguridad**: contraseñas hasheadas, sesiones protegidas, CSRF, validación de intentos fallidos y mensajes genéricos en recuperar para no filtrar existencia
+- **Validación inline**: bordes rojos + badge `!` + shake/vibración, sin tooltips nativos, reutilizable en login y recuperar
+- **Feedback sonoro**: `success.mp3` y `error.mp3` en toasts `danger`/`success`
 - **Mi Perfil**: gestión de foto de perfil con upload, vista previa en tiempo real y eliminación
 - **Soft delete**: eliminación lógica de usuarios y registros (no se borran datos de la base)
 
@@ -63,15 +65,14 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 El mapa completo del repositorio (árbol de carpetas, dónde se edita cada cosa y recursos) vive en [STRUCTURE.md](STRUCTURE.md). Resumen de los directorios clave:
 
 - `app/shared/` — kernel compartido (db, bus de eventos, UoW, time_utils)
-- `app/modules/` — monolito modular estricto (identidad, registro, consulta, dashboard, auditoria, reportes) con `domain/application/infrastructure/presentation` + `public.py`
-- `app/controllers/` — [legacy shims] re-exportan desde `app/modules/*/presentation`
-- `app/models/` — [legacy shims] re-exportan desde `app/modules/*/domain`
+- `app/modules/` — monolito modular estricto (identidad, registro, consulta, dashboard, auditoria, reportes, notifications) con `domain/application/infrastructure/presentation` + `public.py`
 - `app/templates/` — plantillas Jinja2
-- `app/services/` — [legacy] auditoría/email/estadística (shims, migrado a handlers)
+- `app/static/` — `css/auth.css`, `js/auth-validation.js`, `sounds/error.mp3` y `success.mp3`, `img/` (AVIF/WebP)
 - `app/utils/` — helpers, decorators, seed
 - `instance/database/` — backup SQLite de la BD original (runtime ya migrado)
 - `migrations/` — migraciones Alembic (Flask-Migrate)
 - `setup.cfg` + `Makefile` — contratos de fronteras (`lint-imports`) y CI
+- `openspec/` — specs y changes archivados (domain-events, modular-boundaries, login-layout, dashboard-barcharts, recover-password, etc.)
 
 ---
 
@@ -291,27 +292,22 @@ python run.py
 ## Módulos del Sistema
 
 ### 1. Login
-- Autenticación por DNI y contraseña
-- Mostrar/ocultar contraseña
-- Recordar sesión
-- Recuperación de contraseña
-- Bloqueo por intentos fallidos
+- Autenticación por DNI y contraseña (usuario = DNI)
+- Mostrar/ocultar contraseña con ojo fijo y validación inline (`!Este campo es requerido` + borde rojo + shake/vibración, sin tooltips nativos)
+- Recordar sesión y recuperación de contraseña con feedback de carga y mensajes genéricos por seguridad
+- Bloqueo por intentos fallidos y toasts alineados con la card + sonidos de éxito/error
+- Tarjeta compacta `max-width: 480px` con link "Olvidó" centrado debajo del botón
 
 ### 2. Dashboard
 - Métricas principales (totales)
-- Gráficos interactivos (Chart.js)
-- Alumnos por colegio, distrito, sexo
-- Edad promedio
-- Registros del día, semana, mes
-- Ranking de colegios visitados
-- Proyección de postulantes
+- Gráficos interactivos (Chart.js) con barras delgadas (`barPercentage 0.35` + `maxBarThickness 70`) y tooltips burbuja con caret y `suggestedMax` para no recortar
+- Alumnos por colegio, distrito, sexo y toasts alineados con la card
+- Edad promedio, registros del día/semana/mes, ranking y proyección
 
 ### 3. Registrar
-- Formulario completo de registro
-- Validación de DNI único
-- Cálculo automático de edad
-- Fecha y hora automática
-- Verificación de duplicados
+- Formulario completo con validación inline y 1 solo toast genérico cuando faltan varios datos (antes 3)
+- Validación de DNI único y hint "Este DNI será el usuario" en crear usuario
+- Cálculo automático de edad, fecha/hora automáticas y verificación de duplicados
 
 ### 4. Consultar
 - Búsqueda por múltiples criterios

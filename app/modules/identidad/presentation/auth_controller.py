@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from app.models.usuario import Usuario
-from app.models.sesion import Sesion
-from app.services.auditoria_service import registrar_auditoria
-from app.services.email_service import enviar_correo_recuperacion
+from app.modules.identidad.domain.usuario import Usuario
+from app.modules.identidad.domain.sesion import Sesion
+from app.modules.notifications.infrastructure.email_adapter import enviar_correo_recuperacion
 from app import db
 from app.utils.time_utils import peru_now
 from app.utils.helpers import validar_fortaleza_password, generar_password_segura, sanitizar_input
@@ -13,6 +12,21 @@ from datetime import timedelta
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+def _auditar(usuario_id, accion, modulo, detalle=None):
+    """Helper local para auditoría sin importar app.services (evita ciclo)."""
+    try:
+        from app.modules.auditoria.domain.auditoria import Auditoria
+        aud = Auditoria(usuario_id=usuario_id, accion=accion, modulo=modulo, detalle=detalle, ip_address=request.remote_addr if request else None, user_agent=request.user_agent.string if request and getattr(request, 'user_agent', None) else None)
+        db.session.add(aud)
+        db.session.commit()
+        return aud
+    except Exception:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        return None
 
 def get_serializer():
     return URLSafeTimedSerializer(current_app.config['SECRET_KEY'], salt='password-reset')
@@ -58,7 +72,7 @@ def login():
             db.session.add(sesion)
             db.session.commit()
 
-            registrar_auditoria(usuario.id, 'Inicio de sesión', 'Auth', f'Inicio de sesión exitoso desde {request.remote_addr}')
+            _auditar(usuario.id, 'Inicio de sesión', 'Auth', f'Inicio de sesión exitoso desde {request.remote_addr}')
             flash(f'Bienvenido {usuario.nombres} {usuario.apellidos}', 'success')
             return redirect(url_for('dashboard.index'))
         else:
@@ -75,7 +89,7 @@ def login():
 @auth_bp.route('/logout')
 @login_required
 def logout():
-    registrar_auditoria(current_user.id, 'Cierre de sesión', 'Auth', 'Cierre de sesión')
+    _auditar(current_user.id, 'Cierre de sesión', 'Auth', 'Cierre de sesión')
     sesion_activa = Sesion.query.filter_by(usuario_id=current_user.id, activa=True).first()
     if sesion_activa:
         sesion_activa.activa = False
@@ -96,7 +110,7 @@ def recuperar():
             token = serializer.dumps(usuario.id)
             reset_url = url_for('auth.reset_password', token=token, _external=True)
             if enviar_correo_recuperacion(usuario, reset_url):
-                registrar_auditoria(usuario.id, 'Solicitud de recuperación', 'Auth',
+                _auditar(usuario.id, 'Solicitud de recuperación', 'Auth',
                     f'Correo de recuperación enviado a {email}')
                 flash('Se han enviado las instrucciones a su correo electrónico.', 'success')
             else:
@@ -137,7 +151,7 @@ def reset_password(token):
         usuario.set_password(password)
         usuario.debe_cambiar_password = False
         db.session.commit()
-        registrar_auditoria(usuario.id, 'Cambio de contraseña', 'Auth',
+        _auditar(usuario.id, 'Cambio de contraseña', 'Auth',
             'Contraseña restablecida mediante recuperación')
         flash('Contraseña restablecida exitosamente. Ya puedes iniciar sesión.', 'success')
         return redirect(url_for('auth.login'))

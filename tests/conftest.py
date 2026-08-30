@@ -56,9 +56,9 @@ def _limpiar_datos_de_prueba(app):
     """Borra los registros que crean los tests para no contaminar la sesion."""
     yield
     with app.app_context():
-        from app.models.alumno import Alumno
-        from app.models.usuario import Usuario
-        from app.models.visita import Visita
+        from app.modules.registro.domain.alumno import Alumno
+        from app.modules.identidad.domain.usuario import Usuario
+        from app.modules.registro.domain.visita import Visita
         dnis_alumno = [f'71234{n:03d}' for n in range(0, 10)] + ['71344001', '71344002', '71344003', '71344004']
         alumnos = Alumno.query.filter(Alumno.dni.in_(dnis_alumno)).all()
         for a in alumnos:

@@ -1,8 +1,8 @@
-from app.models.rol import Rol
-from app.models.usuario import Usuario
-from app.models.promotor import Promotor
-from app.models.carrera import Carrera
-from app.models.institucion_educativa import InstitucionEducativa
+from app.modules.identidad.domain.rol import Rol
+from app.modules.identidad.domain.usuario import Usuario
+from app.modules.registro.domain.promotor import Promotor
+from app.modules.registro.domain.carrera import Carrera
+from app.modules.registro.domain.institucion_educativa import InstitucionEducativa
 from app import db
 from datetime import datetime
 

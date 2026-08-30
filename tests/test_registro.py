@@ -1,5 +1,5 @@
 """Tests del flujo de registro de alumnos (los bugs criticos de agosto 2026 quedan congelados aqui)."""
-from app.models.alumno import Alumno
+from app.modules.registro.domain.alumno import Alumno
 
 
 def _dni_unico(n=0):

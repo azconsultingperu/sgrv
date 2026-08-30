@@ -9,7 +9,7 @@ def on_alumno_registrado(event: AlumnoRegistrado):
         # Lazy import to avoid circular
         from app.modules.registro.domain.alumno import Alumno
         from app.modules.registro.domain.visita import Visita
-        from app.services.email_service import notificar_nuevo_registro
+        from app.modules.notifications.infrastructure.email_adapter import notificar_nuevo_registro
         alumno = Alumno.query.get(event.alumno_id)
         if not alumno:
             return
@@ -21,7 +21,7 @@ def on_alumno_registrado(event: AlumnoRegistrado):
 def on_usuario_creado(event: UsuarioCreado):
     try:
         from app.modules.identidad.domain.usuario import Usuario
-        from app.services.email_service import notificar_nuevo_usuario
+        from app.modules.notifications.infrastructure.email_adapter import notificar_nuevo_usuario
         usuario = Usuario.query.get(event.usuario_id)
         if not usuario:
             return

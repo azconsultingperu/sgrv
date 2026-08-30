@@ -4,7 +4,7 @@ from app.shared.events import AvatarActualizado, AvatarEliminado
 from app.shared.db import db
 
 def _registrar_auditoria(usuario_id, accion, modulo, detalle=None, avatar=None):
-    from app.models.auditoria import Auditoria
+    from app.modules.auditoria.domain.auditoria import Auditoria
     # Import here to avoid circular
     # Use request info if available
     try:

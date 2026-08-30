@@ -7,6 +7,7 @@ from app.modules.registro.domain.promotor import Promotor
 from app.modules.registro.domain.carrera import Carrera
 from app.shared.db import db
 from app.shared.time_utils import peru_now, peru_today
+from app.shared.events import publish, AlumnoActualizado, AlumnoEliminado
 from datetime import datetime
 from functools import wraps
 import re
@@ -87,8 +88,10 @@ def registrar():
             errores.append('Nombres y apellidos son obligatorios.')
 
         if errores:
-            for e in errores:
-                flash(e, 'danger')
+            if len(errores) == 1:
+                flash(errores[0], 'danger')
+            else:
+                flash('Faltan datos por completar. Revisa los campos marcados.', 'danger')
             return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
                 form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
@@ -188,8 +191,7 @@ def editar(id):
         try:
             from sqlalchemy.exc import IntegrityError
             db.session.commit()
-            registrar_auditoria(current_user.id, 'Edición de registro', 'Registro',
-                f'Registro editado: Alumno {alumno.dni}')
+            publish(AlumnoActualizado(alumno_id=alumno.id, dni=alumno.dni, actor_id=current_user.id))
             flash('Registro actualizado exitosamente.', 'success')
             return redirect(url_for('consulta.index'))
         except IntegrityError:
@@ -229,11 +231,11 @@ def eliminar(id):
     alumno = Alumno.query.get_or_404(id)
     Visita.query.filter_by(alumno_id=alumno.id).delete()
     dni = alumno.dni
+    alumno_id = alumno.id
     alumno.eliminado = True
     alumno.fecha_eliminacion = peru_now()
     db.session.commit()
-    registrar_auditoria(current_user.id, 'Eliminación de registro', 'Registro',
-        f'Registro eliminado (soft delete): Alumno {dni}')
+    publish(AlumnoEliminado(alumno_id=alumno_id, dni=dni, actor_id=current_user.id))
     flash('Registro eliminado correctamente.', 'success')
     return redirect(url_for('consulta.index'))
 

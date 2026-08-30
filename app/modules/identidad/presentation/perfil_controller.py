@@ -4,8 +4,8 @@ import uuid
 from io import BytesIO
 from flask import Blueprint, render_template, request, jsonify, current_app, abort, send_file
 from flask_login import login_required, current_user
-from app.models.usuario import Usuario
-from app.services.auditoria_service import registrar_auditoria
+from app.modules.identidad.domain.usuario import Usuario
+from app.shared.events import publish, AvatarActualizado, AvatarEliminado
 from app import db
 from app.utils.time_utils import peru_now
 
@@ -30,7 +30,7 @@ def _drop_avatar_files(usuario):
     los referencie como snapshot histórico."""
     if not usuario.avatar:
         return
-    from app.models.auditoria import Auditoria
+    from app.modules.auditoria.domain.auditoria import Auditoria
     for sufijo in ('', '_min'):
         nombre = usuario.avatar[:-5] + sufijo + usuario.avatar[-5:]
         if Auditoria.query.filter_by(avatar=nombre).first():
@@ -50,7 +50,7 @@ def servir_avatar_archivo(nombre):
     """Sirve un archivo de avatar por nombre (snapshots históricos de auditoría).
     Si el archivo no existe (foto eliminada), devuelve el default.
     Si el thumb no existe, sirve la versión completa (fallback)."""
-    from app.models.usuario import Usuario
+    from app.modules.identidad.domain.usuario import Usuario
     def ruta_segura(n):
         try:
             return _path_seguro(n)
@@ -116,8 +116,7 @@ def subir_avatar_admin(usuario_id):
 def borrar_avatar():
     _drop_avatar_files(current_user)
     db.session.commit()
-    registrar_auditoria(current_user.id, 'Actualización de perfil', 'Perfil',
-        'Foto de perfil eliminada', avatar='')
+    publish(AvatarEliminado(usuario_id=current_user.id, actor_id=current_user.id))
     return jsonify({'ok': True})
 
 
@@ -129,8 +128,7 @@ def borrar_avatar_admin(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
     _drop_avatar_files(usuario)
     db.session.commit()
-    registrar_auditoria(current_user.id, 'Actualización de perfil', 'Perfil',
-        f'Foto de perfil eliminada (usuario {usuario.username})', avatar='')
+    publish(AvatarEliminado(usuario_id=usuario.id, actor_id=current_user.id))
     return jsonify({'ok': True})
 
 
@@ -194,10 +192,5 @@ def _procesar_avatar(usuario, request):
     usuario.avatar = nombre_full
     db.session.commit()
 
-    if usuario.id == current_user.id:
-        registrar_auditoria(current_user.id, 'Actualización de perfil', 'Perfil',
-            'Foto de perfil actualizada', avatar=usuario.avatar)
-    else:
-        registrar_auditoria(current_user.id, 'Actualización de perfil', 'Perfil',
-            f'Foto de perfil actualizada (usuario {usuario.username})', avatar=usuario.avatar)
+    publish(AvatarActualizado(usuario_id=usuario.id, avatar=usuario.avatar, actor_id=current_user.id))
     return jsonify({'ok': True, 'src': usuario.avatar_url(), 'thumbSrc': usuario.avatar_url(True)})

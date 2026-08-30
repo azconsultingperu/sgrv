@@ -27,7 +27,7 @@ def test_excel_alumnos_vacio_no_explota(auth_client):
 
 def test_reportes_requieren_rol(client, auth_client, app):
     """Un operador (rol 3) no debe poder exportar."""
-    from app.models.usuario import Usuario
+    from app.modules.identidad.domain.usuario import Usuario
     from app import db
     with app.app_context():
         u = Usuario.query.filter_by(dni='11112222').first()

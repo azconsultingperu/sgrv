@@ -44,7 +44,10 @@ def dashboard_get_totales():
     from app.modules.registro.domain.visita import Visita as _Visita
     from app.modules.registro.domain.institucion_educativa import InstitucionEducativa as _IE
     from app.modules.registro.domain.promotor import Promotor as _Prom
-    from app.modules.identidad.public import count_usuarios as _count_usuarios
+    # Excepción controlada public→public: registro necesita conteo de usuarios para dashboard.
+    # Está permitido por diseño (public→public no está prohibido en setup.cfg); si el linter
+    # lo bloqueara, mover la agregación a dashboard/application/estadistica_service.py.
+    from app.modules.identidad.public import count_usuarios as _count_usuarios  # noqa: F401 - excepción public→public controlada
     return {
         'total_registros': _Visita.query.count(),
         'total_colegios': _IE.query.count(),

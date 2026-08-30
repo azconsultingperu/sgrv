@@ -2,6 +2,31 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-29] — UX Auth y Dashboard (login, recuperar, usuarios, registrar, notificaciones)
+
+### Agregado
+
+- **Login compacto**: tarjeta `max-width: 480px` centrada (antes ~540px), footer `¡Crea, Innova e Inspira!` y reorden `checkbox solo → botón → link olvidó centrado` con espaciado 8-12px.
+- **Sonidos de feedback**: `app/static/sounds/success.mp3` (arnav 28KB) para procesos exitosos (login OK, borrar foto, crear usuario, recuperar enviado) y `error.mp3` (vadim 33KB) para errores (login inválido, datos faltantes en registrar, DNI/correo no coincidente), ambos con `volume 0.30/0.35` y `play().catch` respetando `prefers-reduced-motion`.
+- **Microcopy en recuperar**: subtítulo con "Te enviaremos un enlace..." y hint bajo correo "Usamos ambos datos para verificar tu identidad".
+- **Validación inline reutilizable** `app/static/js/auth-validation.js` (badge circular rojo + `!`, borde rojo, empuja layout sin overlay, timing `blur`/`submit` → `input` limpia, reutilizable en login con `novalidate`).
+- **Hint DNI como usuario** en `usuarios/crear.html` ("Este DNI será el usuario...") con estilo `password-requirements`.
+- **Shine del dashboard**: gráficos `Alumnos por Colegio/Distrito` con `barPercentage: 0.35`, `categoryPercentage: 0.5`, `maxBarThickness: 70` y tooltip burbuja (`caretSize 7`, `caretPadding 9`, `yAlign bottom`, `suggestedMax *1.12` y `layout.padding.top 14`).
+
+### Cambiado
+
+- **Recuperar alineado con login**: footer, ícono 55px (antes 68px) y `padding-bottom` unificado vía `--auth-card-padding-bottom: 0.7rem` (antes `4rem` hardcodeado en recuperar).
+- **Registrar: 3 toasts → 1** (`registro_controller.py:90` colapsa `for flash` a un solo `flash` genérico cuando hay ≥2 errores).
+- **Toasts alineados con la card** (`main.js` `alinearToastConCard()` con `ResizeObserver`, `top = card.top+12px`) en vez de `top:78px` fijo.
+
+### Corregido
+
+- **Login no mostraba cartel de error**: `base.html` excluía `#flashData` en `auth.login` (`{% if endpoint != 'auth.login' %}`) y `login.html:14` consumía `get_flashed_messages` antes que `base` — el error se veía en la siguiente página (recuperar) con sonido sin cartel. Fix: `#flashData` siempre presente.
+- **Botón "Procesando..." con formulario inválido**: `main.js:168` y `auth-validation.js` ahora validan primero (`validateAll()` síncrono antes de tocar el DOM) y hacen `return` con `shake` + `vibrate(40)` si hay errores; el spinner solo aparece si todo es válido. Añadido `console.log` de orden.
+- **Card crecía al mostrar errores**: `.invalid-feedback` pasó de `position:absolute` con `min-height` reservado siempre a `position:static` con `has-error` + `max-height` y `transition`, sin aire extra cuando no hay error.
+- **Ojo desplazado/tapado**: `input-group` con `position:relative`, input `padding-right:44px` (75px con alerta), ojo `position:absolute; right:1px; z-index:10`, alerta `right:50px; z-index:11`; se anula `background-image` nativo de Bootstrap en `.is-invalid` y se evita `z-index:4` de Bootstrap tapando iconos (`z-index:1` en input).
+- **Bordes sin redondeo en contraseña**: `input-group` ahora tiene `border-radius` + `overflow:hidden` y el foco se pinta en wrapper `password-field-wrap:focus-within` con `outline` (no recortado por `overflow:hidden`).
+
 ## [2026-08-20] — Fase 1: cimientos (tests, migraciones, arranque sin efectos)
 
 ### Agregado

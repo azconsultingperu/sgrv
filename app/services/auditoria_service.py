@@ -1,4 +1,4 @@
-from app.models.auditoria import Auditoria
+from app.modules.auditoria.domain.auditoria import Auditoria
 from app import db
 from flask import request
 

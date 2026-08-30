@@ -1,8 +1,22 @@
 from flask import Blueprint, render_template, request, send_file, flash, Response, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from app.modules.reportes.application.reporte_service import generar_reporte_csv, generar_reporte_excel
-from app.services.auditoria_service import registrar_auditoria
 from functools import wraps
+from app import db
+
+def _auditar(usuario_id, accion, modulo, detalle=None):
+    try:
+        from app.modules.auditoria.domain.auditoria import Auditoria
+        aud = Auditoria(usuario_id=usuario_id, accion=accion, modulo=modulo, detalle=detalle, ip_address=request.remote_addr if request else None, user_agent=request.user_agent.string if request and getattr(request, 'user_agent', None) else None)
+        db.session.add(aud)
+        db.session.commit()
+        return aud
+    except Exception:
+        try:
+            db.session.rollback()
+        except Exception:
+            pass
+        return None
 
 reportes_bp = Blueprint('reportes', __name__, url_prefix='/reportes')
 
@@ -38,7 +52,7 @@ def registrar():
     formato = request.form.get('formato', '').upper()
     if tipo not in TITULOS or formato not in ('CSV', 'EXCEL'):
         return jsonify({'ok': False}), 400
-    registrar_auditoria(
+    _auditar(
         current_user.id,
         f'Exportación {formato}',
         'Reportes',

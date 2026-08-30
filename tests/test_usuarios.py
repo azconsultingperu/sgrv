@@ -1,6 +1,6 @@
 """Tests de usuarios: unicidad de DNI y soft-delete."""
 from app import db
-from app.models.usuario import Usuario
+from app.modules.identidad.domain.usuario import Usuario
 
 
 def test_crear_usuario_dni_duplicado_rechazado(auth_client, app):

@@ -698,6 +698,7 @@ button,
 }
 
 .stat-card {
+    border-radius: calc(var(--radius-md) + 2px);
     transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
@@ -721,7 +722,7 @@ button,
     justify-content: center;
     color: var(--primary-color);
     background: var(--primary-soft);
-    border-radius: var(--radius-md);
+    border-radius: calc(var(--radius-md) + 2px);
     font-size: 1.22rem;
 }
 
@@ -750,6 +751,7 @@ button,
     color: var(--text-primary);
     background: var(--surface-1);
     border: 1px solid var(--border-color);
+    border-radius: calc(var(--radius-md) + 2px);
 }
 
 .kpi-band-primary { --kpi-color: var(--primary-color); --kpi-soft: var(--primary-soft); }
@@ -769,7 +771,7 @@ button,
     margin-bottom: 0.55rem;
     color: var(--kpi-color);
     background: var(--kpi-soft);
-    border-radius: var(--radius-md);
+    border-radius: calc(var(--radius-md) + 2px);
 }
 
 .kpi-band h3 {

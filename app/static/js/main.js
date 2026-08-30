@@ -164,18 +164,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* --- Spinner en submit de forms (excluye forms ocultos) - */
+    /* --- Spinner en submit de forms (excluye forms ocultos) - solo si el form es válido */
     document.querySelectorAll('form:not([style*="display:none"])').forEach(function (form) {
-        form.addEventListener('submit', function () {
+        form.addEventListener('submit', function (e) {
+            // Si hay validación inline activa y el form es inválido, no mostrar spinner
+            var hasInvalid = form.querySelector('.is-invalid');
+            // checkValidity es sincrónico y respeta required/pattern; si falla, no spinner
+            if (hasInvalid || (typeof form.checkValidity === 'function' && !form.checkValidity())) {
+                return;
+            }
             var btn = this.querySelector('button[type="submit"]');
             if (btn && !btn.disabled) {
-                var original = btn.innerHTML;
+                // Guardar HTML original solo si aún no está en estado procesando
+                if (btn.dataset.originalHtml === undefined) {
+                    btn.dataset.originalHtml = btn.innerHTML;
+                }
+                console.log('[SGRV] spinner: validación pasó, cambiando botón a Procesando...', form.id || form.action);
                 btn.disabled = true;
                 btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
                 setTimeout(function () {
                     if (btn.disabled) {
                         btn.disabled = false;
-                        btn.innerHTML = original;
+                        btn.innerHTML = btn.dataset.originalHtml || original;
+                        delete btn.dataset.originalHtml;
                     }
                 }, 15000);
             }
@@ -374,8 +385,38 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     document.body.classList.add(detectarDispositivoMovil() ? 'es-movil' : 'es-pc');
 
+    // Alinear toast con la card en páginas de auth (login/recuperar) para que compartan línea superior o centro
+    function alinearToastConCard() {
+        var card = document.querySelector('.login-card');
+        if (!card || !toastContainer) return;
+        // Solo en auth (cuando existe .login-card y estamos en esa página)
+        var rect = card.getBoundingClientRect();
+        // Alinear top del toast con top de la card, con pequeño offset, o centrar verticalmente si el toast es más pequeño
+        // Usamos top de la card + 12px de offset para que quede alineado visualmente
+        var top = Math.max(12, rect.top + 12);
+        // Si el toast es más pequeño que la card, centrar verticalmente puede verse mejor cuando la card es alta
+        // Pero para no complicar, alineamos top con card top + 12px
+        toastContainer.style.top = top + 'px';
+        // Para centrar, alternativa: toastContainer.style.top = (rect.top + rect.height/2 - 40) + 'px';
+    }
+    // Intentar alinear en carga y en resize, y antes de mostrar cada toast
+    if (document.querySelector('.login-card')) {
+        alinearToastConCard();
+        window.addEventListener('resize', alinearToastConCard);
+        // Observar cambios de tamaño de la card (cuando aparecen errores, la card cambia de altura)
+        try {
+            var ro = new ResizeObserver(alinearToastConCard);
+            var cardEl = document.querySelector('.login-card');
+            if (cardEl) ro.observe(cardEl);
+        } catch (e) {}
+    }
+
     function mostrarToast(tipo, titulo, descripcion, duracionMs) {
         if (!toastContainer || !document.body.contains(toastContainer)) return;
+        // Asegurar alineación con la card antes de mostrar
+        if (document.querySelector('.login-card')) {
+            try { alinearToastConCard(); } catch(e) {}
+        }
         tipo = MAPA_CATEGORIAS[tipo] || tipo;
         if (!TOAST_DURACION_POR_DEFECTO[tipo]) tipo = 'info';
         colaToasts.push({ tipo: tipo, titulo: titulo, descripcion: descripcion || '', duracionMs: duracionMs });
@@ -391,6 +432,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function crearToast(entry) {
         toastsVisiblesActuales++;
+        // Sonido según tipo: error para danger/error, éxito para success
+        if (entry.tipo === 'error' || entry.tipo === 'success') {
+            try {
+                var soundFile = entry.tipo === 'success' ? '/static/sounds/success.mp3' : '/static/sounds/error.mp3';
+                var audio = new Audio(soundFile);
+                audio.volume = entry.tipo === 'success' ? 0.30 : 0.35;
+                audio.preload = 'auto';
+                if (!window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    audio.play().catch(function() {});
+                }
+            } catch (e) {}
+        }
         var duracionTotal = entry.duracionMs || TOAST_DURACION_POR_DEFECTO[entry.tipo] || 5000;
 
         var toast = document.createElement('div');

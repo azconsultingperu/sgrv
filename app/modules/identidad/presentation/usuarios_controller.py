@@ -1,10 +1,9 @@
 import re
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from app.models.usuario import Usuario
-from app.models.rol import Rol
-from app.services.auditoria_service import registrar_auditoria
-from app.services.email_service import notificar_nuevo_usuario
+from app.modules.identidad.domain.usuario import Usuario
+from app.modules.identidad.domain.rol import Rol
+from app.shared.events import publish, UsuarioCreado, UsuarioEliminado
 from app import db
 from app.utils.decorators import admin_required
 from app.utils.helpers import validar_fortaleza_password, sanitizar_input
@@ -66,12 +65,7 @@ def crear():
         db.session.add(usuario)
         db.session.commit()
 
-        registrar_auditoria(current_user.id, 'Creación de usuario', 'Usuarios',
-            f'Usuario creado: {username} ({dni})')
-        try:
-            notificar_nuevo_usuario(usuario, password)
-        except Exception as e:
-            print(f'Error al enviar notificación: {e}')
+        publish(UsuarioCreado(usuario_id=usuario.id, username=usuario.username, dni=usuario.dni, actor_id=current_user.id))
         flash('Usuario creado exitosamente.', 'success')
         return redirect(url_for('usuarios.index'))
 
@@ -107,12 +101,32 @@ def editar(id):
                     flash(e, 'danger')
                 return render_template('usuarios/editar.html', usuario=usuario, roles=roles)
             usuario.set_password(password)
-            registrar_auditoria(current_user.id, 'Cambio de contraseña', 'Usuarios',
-                f'Contraseña cambiada para: {usuario.username}')
+            # auditoría de cambio de contraseña vía evento si se desea; por ahora directa vía handler de avatar no aplica
+            from app.modules.auditoria.domain.auditoria import Auditoria
+            from flask import request as _req
+            try:
+                ip = _req.remote_addr if _req else None
+                ua = _req.user_agent.string if _req and _req.user_agent else None
+            except RuntimeError:
+                ip = None
+                ua = None
+            db.session.flush()
+            aud = Auditoria(usuario_id=current_user.id, accion='Cambio de contraseña', modulo='Usuarios', detalle=f'Contraseña cambiada para: {usuario.username}', ip_address=ip, user_agent=ua)
+            db.session.add(aud)
 
         db.session.commit()
-        registrar_auditoria(current_user.id, 'Edición de usuario', 'Usuarios',
-            f'Usuario editado: {usuario.username}')
+        # auditoría de edición - directa vía dominio (identidad puede importar auditoria sin violar registro→auditoria)
+        from app.modules.auditoria.domain.auditoria import Auditoria as _Aud
+        from flask import request as _rq
+        try:
+            ip2 = _rq.remote_addr if _rq else None
+            ua2 = _rq.user_agent.string if _rq and _rq.user_agent else None
+        except RuntimeError:
+            ip2 = None
+            ua2 = None
+        aud2 = _Aud(usuario_id=current_user.id, accion='Edición de usuario', modulo='Usuarios', detalle=f'Usuario editado: {usuario.username}', ip_address=ip2, user_agent=ua2)
+        db.session.add(aud2)
+        db.session.commit()
         flash('Usuario actualizado exitosamente.', 'success')
         return redirect(url_for('usuarios.index'))
 
@@ -130,12 +144,13 @@ def eliminar(id):
     # Soft Delete
     nombre_completo = f'{usuario.nombres} {usuario.apellidos}'
     username = usuario.username
-    
+    usuario_id = usuario.id
+
     usuario.eliminado = True
     usuario.estado = False
-    
+
     # Invalidate active sessions
-    from app.models.sesion import Sesion
+    from app.modules.identidad.domain.sesion import Sesion
     from app.utils.time_utils import peru_now
     sesiones_activas = Sesion.query.filter_by(usuario_id=usuario.id, activa=True).all()
     for s in sesiones_activas:
@@ -143,8 +158,7 @@ def eliminar(id):
         s.fin = peru_now()
 
     db.session.commit()
-    registrar_auditoria(current_user.id, 'Eliminación de usuario', 'Usuarios',
-        f'Usuario eliminado (soft delete): {username}')
+    publish(UsuarioEliminado(usuario_id=usuario_id, username=username, actor_id=current_user.id))
     flash(f'Usuario "{nombre_completo}" eliminado correctamente.', 'success')
     return redirect(url_for('usuarios.index'))
 

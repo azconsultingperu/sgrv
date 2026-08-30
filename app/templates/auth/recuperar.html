@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=8">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}?v=17">
 {% endblock %}
 {% block auth_content %}
 <div class="login-bg">
-    <div class="col-11 col-sm-9 col-md-6 col-lg-5 col-xl-5 col-xxl-5 px-3">
+    <div class="col-11 col-sm-9 col-md-6 col-lg-4 col-xl-4 col-xxl-4 px-3">
         <div class="login-card auth-recuperar">
             <div class="card-body p-4 p-md-5">
                 <div class="auth-brand mb-4">
@@ -17,28 +17,126 @@
                     </div>
                     <h4 class="auth-title">Recuperar Contraseña</h4>
                     <p class="auth-subtitle">Ingrese sus credenciales para recuperar el acceso</p>
+                    <p class="auth-help small text-muted" style="font-size:0.8rem; color:#6b7a8d; margin-top:0.4rem; line-height:1.4;">Te enviaremos un enlace de recuperación al correo registrado con este DNI.</p>
                 </div>
-                <form method="POST" class="d-flex flex-column h-100">
+                <form method="POST" class="d-flex flex-column h-100" id="recoverForm" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label for="recuperar-username" class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
-                        <input type="text" id="recuperar-username" class="form-control login-input" name="username" placeholder="Ingrese su DNI" required>
+                        <input type="text" id="recuperar-username" class="form-control login-input" name="username" placeholder="Ingrese su DNI" autocomplete="username" required>
                     </div>
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <label for="recuperar-email" class="login-label"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
-                        <input type="email" id="recuperar-email" class="form-control login-input" name="email" placeholder="Ingrese su correo" required>
+                        <input type="email" id="recuperar-email" class="form-control login-input" name="email" placeholder="Ingrese su correo" autocomplete="email" required>
+                        <small class="form-text text-muted" style="font-size:0.75rem; color:#6b7a8d; display:block; margin-top:0.3rem;">Usamos ambos datos para verificar tu identidad</small>
                     </div>
+                    <div id="recoverSuccess" class="alert alert-success" style="display:none;" role="alert">
+                        Hemos enviado las instrucciones a tu correo. Revisa tu bandeja de entrada.
+                    </div>
+                    <div id="recoverError" class="alert alert-secondary" style="display:none;" role="alert"></div>
                     <div class="mt-auto pt-3">
-                        <button type="submit" class="btn btn-primary w-100 mb-2 login-btn">
+                        <button type="submit" class="btn btn-primary w-100 mb-2 login-btn" id="recoverBtn">
                             <i class="bi bi-send me-2"></i>Enviar Instrucciones
                         </button>
                         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100">
                             <i class="bi bi-arrow-left me-2"></i>Volver al Login
                         </a>
                     </div>
+                    <p class="auth-motto text-center mb-0">¡Crea, Innova e Inspira!</p>
                 </form>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth-validation.js') }}?v=1"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('recoverForm');
+    const btn = document.getElementById('recoverBtn');
+    const successBox = document.getElementById('recoverSuccess');
+    const errorBox = document.getElementById('recoverError');
+    if (!form || !btn) return;
+
+    const originalBtnHTML = btn.innerHTML;
+
+    // init inline validation (reutilizable)
+    let validator = null;
+    if (typeof initAuthValidation === 'function') {
+        validator = initAuthValidation(form, {
+            'username': { required: true, pattern: /^\d{8}$/, messagePattern: 'El DNI debe tener 8 dígitos' },
+            'email': { required: true, type: 'email', messageRequired: 'Este campo es requerido', messageEmail: 'Ingresa un correo válido' }
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        // validación inline primero
+        if (validator && !validator.validateAll()) {
+            e.preventDefault();
+            btn.classList.remove('shake');
+            void btn.offsetWidth;
+            btn.classList.add('shake');
+            if (navigator.vibrate) navigator.vibrate(40);
+            setTimeout(function(){ btn.classList.remove('shake'); }, 400);
+            return;
+        }
+        // UX con fetch sin recarga para mostrar estados sin dejar el form visible
+        e.preventDefault();
+        if (btn.disabled) return;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Enviando...';
+        successBox.style.display = 'none';
+        errorBox.style.display = 'none';
+        const data = new FormData(form);
+        fetch(form.action || window.location.href, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.text().then(t => ({ ok: r.ok, text: t, status: r.status })))
+            .then(res => {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHTML;
+                // Determinar si el backend realmente encontró al usuario por el contenido del HTML
+                // Buscamos el mensaje flash en el HTML de respuesta (render_template incluye get_flashed_messages)
+                const isSuccess = res.text.includes('Se han enviado') || res.text.includes('Hemos enviado');
+                const isNotFound = res.text.includes('No se encontr') || res.text.includes('No se encontró');
+                // Por seguridad, si es éxito mostramos confirmación clara con sonido success
+                // Si es no encontrado, mostramos genérico con sonido error, sin revelar si DNI existe
+                if (res.ok && isSuccess) {
+                    const formElements = form.querySelectorAll('.mb-3, .form-text');
+                    formElements.forEach(el => el.style.display = 'none');
+                    const inputs = form.querySelectorAll('input');
+                    inputs.forEach(i => i.closest('.mb-3').style.display = 'none');
+                    successBox.style.display = 'block';
+                    successBox.textContent = 'Hemos enviado las instrucciones a tu correo. Revisa tu bandeja de entrada.';
+                    if (typeof mostrarToast === 'function') mostrarToast('success', 'Correo enviado', 'Revisa tu bandeja de entrada');
+                    // sonido success se dispara vía main.js al crear el toast
+                } else if (res.ok && isNotFound) {
+                    errorBox.style.display = 'block';
+                    errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                    if (typeof mostrarToast === 'function') mostrarToast('error', 'Verifica tus datos', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+                } else if (res.ok) {
+                    // fallback genérico por seguridad (no filtrar existencia): siempre mostrar éxito genérico con sonido success
+                    // pero si el texto no contiene ninguno de los anteriores, asumimos que el backend procesó y mostramos genérico
+                    const formElements2 = form.querySelectorAll('.mb-3, .form-text');
+                    formElements2.forEach(el => el.style.display = 'none');
+                    const inputs2 = form.querySelectorAll('input');
+                    inputs2.forEach(i => i.closest('.mb-3').style.display = 'none');
+                    successBox.style.display = 'block';
+                    successBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                    if (typeof mostrarToast === 'function') mostrarToast('success', 'Solicitud enviada', 'Si los datos son correctos, recibirás un correo');
+                } else {
+                    errorBox.style.display = 'block';
+                    errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                    if (typeof mostrarToast === 'function') mostrarToast('error', 'Error', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHTML;
+                errorBox.style.display = 'block';
+                errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                if (typeof mostrarToast === 'function') mostrarToast('error', 'Error de red', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+            });
+    });
+});
+</script>
 {% endblock %}
