@@ -21,7 +21,7 @@ Todas las mejoras y correcciones del proyecto SGRV.
 
 ### Corregido
 
-- **Login no mostraba cartel de error**: `base.html` excluía `#flashData` en `auth.login` (`{% if endpoint != 'auth.login' %}`) y `login.html:14` consumía `get_flashed_messages` antes que `base` — el error se veía en la siguiente página (recuperar) con sonido sin cartel. Fix: `#flashData` siempre presente.
+- **Login no mostraba cartel de error**: `base.html` excluía `#flashData` en `auth.login` (`{% raw %}{% if endpoint != 'auth.login' %}{% endraw %}`) y `login.html:14` consumía `get_flashed_messages` antes que `base` — el error se veía en la siguiente página (recuperar) con sonido sin cartel. Fix: `#flashData` siempre presente.
 - **Botón "Procesando..." con formulario inválido**: `main.js:168` y `auth-validation.js` ahora validan primero (`validateAll()` síncrono antes de tocar el DOM) y hacen `return` con `shake` + `vibrate(40)` si hay errores; el spinner solo aparece si todo es válido. Añadido `console.log` de orden.
 - **Card crecía al mostrar errores**: `.invalid-feedback` pasó de `position:absolute` con `min-height` reservado siempre a `position:static` con `has-error` + `max-height` y `transition`, sin aire extra cuando no hay error.
 - **Ojo desplazado/tapado**: `input-group` con `position:relative`, input `padding-right:44px` (75px con alerta), ojo `position:absolute; right:1px; z-index:10`, alerta `right:50px; z-index:11`; se anula `background-image` nativo de Bootstrap en `.is-invalid` y se evita `z-index:4` de Bootstrap tapando iconos (`z-index:1` en input).
