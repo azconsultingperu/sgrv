@@ -3,19 +3,19 @@
 {% block content %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-file-earmark-bar-graph me-2"></i>Reportes del Sistema</h4>
+    <h4 class="mb-0"><i data-lucide="bar-chart-3" class="me-2"></i>Reportes del Sistema</h4>
 </div>
 
 <div class="row g-4">
     <div class="col-md-6 col-lg-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center">
-                <i class="bi bi-people fs-1 text-primary"></i>
+                <i data-lucide="users" class="fs-1 text-primary"></i>
                 <h5 class="mt-2">Alumnos</h5>
                 <p class="text-muted small">Exportar lista completa de alumnos registrados</p>
                 <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ url_for('reportes.alumnos_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
-                    <a href="{{ url_for('reportes.alumnos_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                    <a href="{{ url_for('reportes.alumnos_csv') }}" class="btn btn-sm btn-outline-success"><i data-lucide="file-spreadsheet" class="me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.alumnos_excel') }}" class="btn btn-sm btn-outline-primary"><i data-lucide="file-spreadsheet" class="me-1"></i>Excel</a>
                 </div>
             </div>
         </div>
@@ -23,12 +23,12 @@
     <div class="col-md-6 col-lg-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-check fs-1 text-success"></i>
+                <i data-lucide="calendar-check-2" class="fs-1 text-success"></i>
                 <h5 class="mt-2">Visitas</h5>
                 <p class="text-muted small">Exportar registro de visitas realizadas</p>
                 <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ url_for('reportes.visitas_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
-                    <a href="{{ url_for('reportes.visitas_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                    <a href="{{ url_for('reportes.visitas_csv') }}" class="btn btn-sm btn-outline-success"><i data-lucide="file-spreadsheet" class="me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.visitas_excel') }}" class="btn btn-sm btn-outline-primary"><i data-lucide="file-spreadsheet" class="me-1"></i>Excel</a>
                 </div>
             </div>
         </div>
@@ -36,12 +36,12 @@
     <div class="col-md-6 col-lg-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center">
-                <i class="bi bi-building fs-1 text-warning"></i>
+                <i data-lucide="school" class="fs-1 text-warning"></i>
                 <h5 class="mt-2">Colegios</h5>
                 <p class="text-muted small">Reporte de instituciones educativas visitadas</p>
                 <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ url_for('reportes.colegios_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
-                    <a href="{{ url_for('reportes.colegios_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                    <a href="{{ url_for('reportes.colegios_csv') }}" class="btn btn-sm btn-outline-success"><i data-lucide="file-spreadsheet" class="me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.colegios_excel') }}" class="btn btn-sm btn-outline-primary"><i data-lucide="file-spreadsheet" class="me-1"></i>Excel</a>
                 </div>
             </div>
         </div>
@@ -49,12 +49,12 @@
     <div class="col-md-6 col-lg-3">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-body text-center">
-                <i class="bi bi-book fs-1 text-info"></i>
+                <i data-lucide="book-open" class="fs-1 text-info"></i>
                 <h5 class="mt-2">Carreras</h5>
                 <p class="text-muted small">Reporte de carreras y alumnos interesados</p>
                 <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ url_for('reportes.carreras_csv') }}" class="btn btn-sm btn-outline-success"><i class="bi bi-filetype-csv me-1"></i>CSV</a>
-                    <a href="{{ url_for('reportes.carreras_excel') }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-file-earmark-excel me-1"></i>Excel</a>
+                    <a href="{{ url_for('reportes.carreras_csv') }}" class="btn btn-sm btn-outline-success"><i data-lucide="file-spreadsheet" class="me-1"></i>CSV</a>
+                    <a href="{{ url_for('reportes.carreras_excel') }}" class="btn btn-sm btn-outline-primary"><i data-lucide="file-spreadsheet" class="me-1"></i>Excel</a>
                 </div>
             </div>
         </div>

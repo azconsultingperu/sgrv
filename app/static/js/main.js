@@ -27,16 +27,39 @@ document.addEventListener('DOMContentLoaded', function () {
     var esPaginaAuth = !themeToggle;
     var savedTheme  = esPaginaAuth ? 'light' : (localStorage.getItem('theme') || 'light');
     html.setAttribute('data-bs-theme', savedTheme);
-    if (themeIcon) {
-        themeIcon.className = savedTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    function updateThemeIcon(theme) {
+        var icon = document.getElementById('themeIcon');
+        // Lucide reemplaza <i> por <svg>, así que re-query cada vez y maneja ambos casos
+        if (!icon) {
+            // Si ya fue reemplazado por SVG, buscar el SVG dentro del botón
+            var btn = document.getElementById('themeToggle');
+            if (btn) icon = btn.querySelector('[data-lucide], svg.lucide');
+        }
+        var target = document.getElementById('themeIcon') || document.querySelector('#themeToggle [data-lucide], #themeToggle svg');
+        if (target) {
+            // Si es <i> con data-lucide, actualizar atributo; si es <svg>, reemplazar
+            if (target.tagName.toLowerCase() === 'i') {
+                target.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+            } else {
+                // SVG ya renderizado: reemplazar por nuevo <i> y re-crear
+                var newIcon = document.createElement('i');
+                newIcon.id = 'themeIcon';
+                newIcon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+                target.parentNode.replaceChild(newIcon, target);
+            }
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                try { lucide.createIcons(); } catch(e) {}
+            }
+        }
     }
+    updateThemeIcon(savedTheme);
     if (themeToggle) {
         themeToggle.addEventListener('click', function () {
             var cur = html.getAttribute('data-bs-theme');
             var nxt = cur === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-bs-theme', nxt);
             localStorage.setItem('theme', nxt);
-            if (themeIcon) themeIcon.className = nxt === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            updateThemeIcon(nxt);
             document.dispatchEvent(new CustomEvent('sgrv:themechange', { detail: { theme: nxt } }));
         });
     }
@@ -233,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
     overlay.innerHTML =
         '<div class="confirm-modal" id="confirmModal" role="dialog" aria-modal="true">' +
             '<div class="confirm-modal-header">' +
-                '<div class="confirm-modal-icon danger" id="cIcon"><i class="bi bi-exclamation-triangle-fill" id="cIconI"></i></div>' +
+                '<div class="confirm-modal-icon danger" id="cIcon"><i data-lucide="triangle-alert" id="cIconI"></i></div>' +
                 '<div>' +
                     '<p class="confirm-modal-title" id="cTitle">¿Confirmar acción?</p>' +
                     '<p class="confirm-modal-subtitle" id="cSubtitle">Esta acción requiere confirmación</p>' +
@@ -246,12 +269,13 @@ document.addEventListener('DOMContentLoaded', function () {
             '</div>' +
         '</div>';
     document.body.appendChild(overlay);
+    if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
 
     var ICONS = {
-        danger:  { i: 'bi-exclamation-triangle-fill', sub: 'Esta acción no se puede deshacer' },
-        warning: { i: 'bi-exclamation-circle-fill',   sub: 'Revisa antes de continuar' },
-        info:    { i: 'bi-info-circle-fill',           sub: 'Confirma para continuar' },
-        success: { i: 'bi-check-circle-fill',          sub: 'Se ejecutará de inmediato' }
+        danger:  { i: 'triangle-alert', sub: 'Esta acción no se puede deshacer' },
+        warning: { i: 'circle-alert',   sub: 'Revisa antes de continuar' },
+        info:    { i: 'info',           sub: 'Confirma para continuar' },
+        success: { i: 'circle-check',          sub: 'Se ejecutará de inmediato' }
     };
 
     /* Estado pendiente */
@@ -270,7 +294,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var type = opts.type || 'danger';
         var cfg  = ICONS[type] || ICONS.danger;
         document.getElementById('cIcon').className      = 'confirm-modal-icon ' + type;
-        document.getElementById('cIconI').className     = 'bi ' + cfg.i;
+        var iconEl = document.getElementById('cIconI');
+        iconEl.setAttribute('data-lucide', cfg.i);
+        if (typeof lucide !== 'undefined' && lucide.createIcons) lucide.createIcons();
         document.getElementById('cTitle').textContent   = opts.title   || '¿Confirmar acción?';
         document.getElementById('cSubtitle').textContent = cfg.sub;
         document.getElementById('cMessage').textContent = opts.message || '¿Estás seguro?';
@@ -365,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var toastContainer = document.getElementById('toastContainer');
     var flashData      = document.getElementById('flashData');
 
-    var TOAST_ICONOS = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+    var TOAST_ICONOS = { success: 'circle-check', error: 'circle-x', warning: 'triangle-alert', info: 'info' };
     var TOAST_TITULOS = { success: 'Éxito', error: 'Error', warning: 'Advertencia', info: 'Aviso' };
     var TOAST_DURACION_POR_DEFECTO = { warning: 15000, error: 9000, success: 7000, info: 7000 };
     var TOAST_MAX_VISIBLES = 3;
@@ -451,7 +477,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var icono = document.createElement('div');
         icono.className = 'mc-toast-icono';
-        icono.textContent = TOAST_ICONOS[entry.tipo] || 'ℹ️';
+        var iconoI = document.createElement('i');
+        iconoI.setAttribute('data-lucide', TOAST_ICONOS[entry.tipo] || 'info');
+        icono.appendChild(iconoI);
 
         var cuerpo = document.createElement('div');
         cuerpo.className = 'mc-toast-cuerpo';
@@ -541,6 +569,10 @@ document.addEventListener('DOMContentLoaded', function () {
         toast._reanudar = iniciarTemporizador;
 
         toastContainer.appendChild(toast);
+        // Renderizar ícono Lucide dentro del toast
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            try { lucide.createIcons({ nodes: [icono] }); } catch(e) { try { lucide.createIcons(); } catch(e2) {} }
+        }
         iniciarTemporizador();
     }
 
@@ -569,4 +601,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (t._reanudar) t._reanudar();
         });
     };
+
+    // Inicializar Lucide icons - asegurar que el DOM esté listo
+    function initLucide() {
+        if (typeof lucide !== 'undefined' && lucide.createIcons) {
+            try { lucide.createIcons(); } catch(e) {}
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initLucide);
+    } else {
+        initLucide();
+    }
+    // Re-crear al cambiar dinámicamente (htmx, etc.)
+    document.addEventListener('DOMContentLoaded', initLucide);
 })();

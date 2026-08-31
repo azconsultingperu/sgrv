@@ -9,7 +9,7 @@
 {% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Usuario: {{ usuario.username }}</h4>
+    <h4 class="mb-0"><i data-lucide="square-pen" class="me-2"></i>Editar Usuario: {{ usuario.username }}</h4>
 </div>
 <div class="row g-4">
     <div class="col-md-4">
@@ -19,18 +19,18 @@
                     <img id="avatarImg" src="{{ usuario.avatar_url() }}" alt="Foto de perfil">
                 </div>
                 <h5 class="mb-0">{{ usuario.nombres }} {{ usuario.apellidos }}</h5>
-                <p class="text-muted mb-3"><i class="bi bi-person-badge me-1"></i>DNI {{ usuario.dni }}</p>
+                <p class="text-muted mb-3"><i data-lucide="badge-check" class="me-1"></i>DNI {{ usuario.dni }}</p>
                 <div class="d-grid gap-2">
                     <button type="button" class="btn btn-primary" id="btnCambiarFoto">
-                        <i class="bi bi-camera me-1"></i>Cambiar Foto
+                        <i data-lucide="camera" class="me-1"></i>Cambiar Foto
                     </button>
                     <input type="file" id="fileAvatar" accept=".png,.jpg,.jpeg,.webp,.gif" style="display:none;">
                     <button type="button" class="btn btn-outline-danger" id="btnBorrarFoto" {% if not usuario.tiene_avatar() %}style="display:none;"{% endif %}>
-                        <i class="bi bi-trash me-1"></i>Eliminar Foto
+                        <i data-lucide="trash-2" class="me-1"></i>Eliminar Foto
                     </button>
                 </div>
                 <div class="text-muted mt-3 small">
-                    <i class="bi bi-info-circle me-1"></i>JPG, PNG, WebP o GIF &middot; máx. 2 MB &middot; 1000x1000 px
+                    <i data-lucide="info" class="me-1"></i>JPG, PNG, WebP o GIF &middot; máx. 2 MB &middot; 1000x1000 px
                 </div>
             </div>
         </div>
@@ -74,8 +74,8 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Actualizar</button>
-                            <a href="{{ url_for('usuarios.index') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-2"></i>Volver</a>
+                            <button type="submit" class="btn btn-primary"><i data-lucide="save" class="me-2"></i>Actualizar</button>
+                            <a href="{{ url_for('usuarios.index') }}" class="btn btn-outline-secondary"><i data-lucide="arrow-left" class="me-2"></i>Volver</a>
                         </div>
                     </div>
                 </form>

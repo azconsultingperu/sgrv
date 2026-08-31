@@ -22,11 +22,11 @@
                 <form method="POST" class="d-flex flex-column h-100" id="recoverForm" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label for="recuperar-username" class="login-label"><i class="bi bi-person-badge me-1"></i>Usuario (DNI)</label>
+                        <label for="recuperar-username" class="login-label"><i data-lucide="badge-check" class="me-1"></i>Usuario (DNI)</label>
                         <input type="text" id="recuperar-username" class="form-control login-input" name="username" placeholder="Ingrese su DNI" autocomplete="username" required>
                     </div>
                     <div class="mb-3">
-                        <label for="recuperar-email" class="login-label"><i class="bi bi-envelope me-1"></i>Correo Electrónico</label>
+                        <label for="recuperar-email" class="login-label"><i data-lucide="mail" class="me-1"></i>Correo Electrónico</label>
                         <input type="email" id="recuperar-email" class="form-control login-input" name="email" placeholder="Ingrese su correo" autocomplete="email" required>
                         <small class="form-text text-muted" style="font-size:0.75rem; color:#6b7a8d; display:block; margin-top:0.3rem;">Usamos ambos datos para verificar tu identidad</small>
                     </div>
@@ -36,10 +36,10 @@
                     <div id="recoverError" class="alert alert-secondary" style="display:none;" role="alert"></div>
                     <div class="mt-auto pt-3">
                         <button type="submit" class="btn btn-primary w-100 mb-2 login-btn" id="recoverBtn">
-                            <i class="bi bi-send me-2"></i>Enviar Instrucciones
+                            <i data-lucide="send" class="me-2"></i>Enviar Instrucciones
                         </button>
                         <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary w-100">
-                            <i class="bi bi-arrow-left me-2"></i>Volver al Login
+                            <i data-lucide="arrow-left" class="me-2"></i>Volver al Login
                         </a>
                     </div>
                     <p class="auth-motto text-center mb-0">¡Crea, Innova e Inspira!</p>

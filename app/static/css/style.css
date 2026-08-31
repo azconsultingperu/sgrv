@@ -16,6 +16,24 @@
     src: url('../fonts/inter-italic.woff2') format('woff2');
 }
 
+/* Lucide Icons - grosor aumentado para más presencia */
+[data-lucide], .lucide {
+    width: 1em;
+    height: 1em;
+    stroke-width: 2.4;
+    vertical-align: -0.125em;
+    flex-shrink: 0;
+}
+/* Íconos con más presencia en sidebar, topbar y acciones de tablas */
+.nav-icon [data-lucide], .nav-icon .lucide,
+.navbar [data-lucide], .navbar .lucide,
+.btn-group [data-lucide], .btn-group .lucide,
+.table .btn [data-lucide], .table .btn .lucide {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.4;
+}
+
 :root {
     color-scheme: light;
 
@@ -1514,6 +1532,10 @@ a:focus-visible,
     place-items: center;
     border-radius: var(--radius-md);
     font-size: 1rem;
+}
+.mc-toast-icono svg {
+    width: 18px;
+    height: 18px;
 }
 
 .mc-toast-cuerpo {

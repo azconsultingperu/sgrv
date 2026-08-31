@@ -2,6 +2,18 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-08-30] — Iconografía Lucide
+
+### Cambiado
+
+- **Bootstrap Icons → Lucide**: reemplazo completo `bi-*` → `data-lucide` en `base.html`, `partials/*`, `dashboard`, `registro`, `consulta`, `usuarios`, `auditoria`, `perfil` y `auth` (~113 íconos). CDN `https://unpkg.com/lucide@latest` + `lucide.createIcons()` en `main.js` (incluye toasts y `confirm` modal). Tamaños y colores preservados (`stat-icon`/`kpi-band` a 20px, `stroke-width: 2.4` global).
+- **Toasts y modales**: íconos de notificaciones (`mc-toast`) y confirmaciones ahora en Lucide (`circle-check`, `circle-x`, `triangle-alert`, `info`) en vez de emojis/`bi-*`.
+
+### Corregido
+
+- **Tema claro/oscuro**: el ícono de luna/sol ahora cambia al instante en el mismo click (antes solo al navegar), manejando el reemplazo de `<i>` por `<svg>` de Lucide.
+- **Ojo de contraseña**: estado inicial `eye-off` (oculta) y toggle `eye`/`eye-off` con `createIcons()` tras cada click, funciona en los 3 estados (normal/focus/error).
+
 ## [2026-08-29] — UX Auth y Dashboard (login, recuperar, usuarios, registrar, notificaciones)
 
 ### Agregado

@@ -2,15 +2,15 @@
 {% block title %}Consultar Registros{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-search me-2"></i>Consultar Registros</h4>
+    <h4 class="mb-0"><i data-lucide="search" class="me-2"></i>Consultar Registros</h4>
     {% if current_user.rol_id <= 2 %}
-    <a href="{{ url_for('registro.registrar') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-2"></i>Nuevo Registro</a>
+    <a href="{{ url_for('registro.registrar') }}" class="btn btn-primary"><i data-lucide="circle-plus" class="me-2"></i>Nuevo Registro</a>
     {% endif %}
 </div>
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white py-3">
-        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros de Búsqueda</h6>
+        <h6 class="mb-0"><i data-lucide="funnel" class="me-2"></i>Filtros de Búsqueda</h6>
     </div>
     <div class="card-body">
         <form method="GET" class="row g-2">
@@ -40,7 +40,7 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search me-1"></i>Buscar</button>
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i data-lucide="search" class="me-1"></i>Buscar</button>
             </div>
         </form>
     </div>
@@ -74,9 +74,9 @@
                         <td>{{ a.institucion.nombre[:25] if a.institucion else '' }}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <a href="{{ url_for('consulta.detalle', id=a.id) }}" class="btn btn-info" title="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a href="{{ url_for('consulta.detalle', id=a.id) }}" class="btn btn-info" title="Ver detalle"><i data-lucide="eye"></i></a>
                                 {% if current_user.rol_id <= 2 %}
-                                <a href="{{ url_for('registro.editar', id=a.id) }}" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <a href="{{ url_for('registro.editar', id=a.id) }}" class="btn btn-warning" title="Editar"><i data-lucide="pencil"></i></a>
                                 {% endif %}
                                 {% if current_user.rol_id == 1 %}
                                 <button type="button" class="btn btn-danger" title="Eliminar"
@@ -86,7 +86,7 @@
                                         data-confirm-message="¿Eliminar el registro de {{ a.nombres }} {{ a.apellidos }}? Esta acción no se puede deshacer."
                                         data-confirm-ok="Eliminar"
                                         data-confirm-form="formEliminar{{ a.id }}">
-                                    <i class="bi bi-trash"></i>
+                                    <i data-lucide="trash-2"></i>
                                 </button>
                                 <form id="formEliminar{{ a.id }}" method="POST" action="{{ url_for('registro.eliminar', id=a.id) }}" style="display:none;">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -104,17 +104,17 @@
                             {% endfor %}
                             {% if ns.filtros %}
                             <div class="empty-state">
-                                <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+                                <div class="empty-state-icon"><i data-lucide="search"></i></div>
                                 <p class="empty-state-title">Sin resultados</p>
                                 <p class="empty-state-text">No se encontraron registros con los filtros aplicados. Intenta con otros criterios.</p>
                             </div>
                             {% else %}
                             <div class="empty-state">
-                                <div class="empty-state-icon"><i class="bi bi-person-plus"></i></div>
+                                <div class="empty-state-icon"><i data-lucide="user-plus"></i></div>
                                 <p class="empty-state-title">No hay registros todavía</p>
                                 <p class="empty-state-text">Aún no se ha registrado ninguna visita. Los registros aparecerán aquí.</p>
                                 {% if current_user.rol_id <= 2 %}
-                                <a href="{{ url_for('registro.registrar') }}" class="btn btn-primary mt-2"><i class="bi bi-plus-circle me-2"></i>Registrar la primera visita</a>
+                                <a href="{{ url_for('registro.registrar') }}" class="btn btn-primary mt-2"><i data-lucide="circle-plus" class="me-2"></i>Registrar la primera visita</a>
                                 {% endif %}
                             </div>
                             {% endif %}

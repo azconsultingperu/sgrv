@@ -2,14 +2,14 @@
 {% block title %}Registrar Visita{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Registrar Nueva Visita</h4>
+    <h4 class="mb-0"><i data-lucide="circle-plus" class="me-2"></i>Registrar Nueva Visita</h4>
 </div>
 
 <div class="card border-0 shadow-sm">
     <div class="card-body p-4">
         <form method="POST" id="formRegistro" novalidate>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <h5 class="text-primary mb-3"><i class="bi bi-person-vcard me-2"></i>Datos Personales</h5>
+            <h5 class="text-primary mb-3"><i data-lucide="contact-2" class="me-2"></i>Datos Personales</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label" for="apellidos">Apellidos <span class="text-danger">*</span></label>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <h5 class="text-success mb-3"><i class="bi bi-telephone me-2"></i>Contacto</h5>
+            <h5 class="text-success mb-3"><i data-lucide="phone" class="me-2"></i>Contacto</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="celular">Celular <span class="text-danger">*</span></label>
@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            <h5 class="text-warning mb-3"><i class="bi bi-building me-2"></i>Colegio</h5>
+            <h5 class="text-warning mb-3"><i data-lucide="school" class="me-2"></i>Colegio</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label" for="institucion_id">Institución Educativa <span class="text-danger">*</span></label>
@@ -80,7 +80,7 @@
                 </div>
             </div>
 
-            <h5 class="text-info mb-3"><i class="bi bi-book me-2"></i>Datos Académicos</h5>
+            <h5 class="text-info mb-3"><i data-lucide="book-open" class="me-2"></i>Datos Académicos</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="carrera_id">Carrera de Interés</label>
@@ -121,7 +121,7 @@
                 </div>
             </div>
 
-            <h5 class="text-secondary mb-3"><i class="bi bi-clock-history me-2"></i>Datos de la Visita</h5>
+            <h5 class="text-secondary mb-3"><i data-lucide="history" class="me-2"></i>Datos de la Visita</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
                     <label class="form-label" for="fecha_visita">Fecha de Visita <span class="text-danger">*</span></label>
@@ -154,10 +154,10 @@
 
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary btn-lg">
-                    <i class="bi bi-save me-2"></i>Guardar Registro
+                    <i data-lucide="save" class="me-2"></i>Guardar Registro
                 </button>
                 <a href="{{ url_for('consulta.index') }}" class="btn btn-outline-secondary btn-lg">
-                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                    <i data-lucide="x-circle" class="me-2"></i>Cancelar
                 </a>
             </div>
         </form>

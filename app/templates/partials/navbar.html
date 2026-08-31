@@ -1,12 +1,9 @@
 <nav class="navbar navbar-expand border-bottom px-3">
     <div class="container-fluid d-flex align-items-center gap-2">
         <button class="btn btn-sm btn-outline-secondary flex-shrink-0 sidebarToggleBtn" id="sidebarToggle" type="button">
-            <i class="bi bi-list"></i>
+            <i data-lucide="menu"></i>
         </button>
-        <div class="navbar-title-wrap d-flex align-items-center gap-2">
-            <span class="navbar-logo d-none d-md-inline-flex">
-                <i class="bi bi-building"></i>
-            </span>
+        <div class="navbar-title-wrap d-flex align-items-center">
             <span class="navbar-brand mb-0 navbar-title">
                 Sistema de Gestión de Registro de Visitas
             </span>
@@ -14,7 +11,7 @@
         <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
             <span class="badge clock-badge px-3 py-2" id="relojNavbar">--:--:--</span>
             <button class="btn btn-sm btn-outline-secondary" id="themeToggle" type="button">
-                <i class="bi bi-moon-fill" id="themeIcon"></i>
+                <i data-lucide="moon" id="themeIcon"></i>
             </button>
             <div class="dropdown">
                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
@@ -26,8 +23,8 @@
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><span class="dropdown-item-text"><strong>{{ current_user.nombres }} {{ current_user.apellidos }}</strong><br><small class="text-muted">{{ current_user.rol.nombre if current_user.rol else '' }}</small></span></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{{ url_for('perfil.index') }}"><i class="bi bi-person-circle me-2"></i>Mi Perfil</a></li>
-                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('perfil.index') }}"><i data-lucide="circle-user" class="me-2"></i>Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i data-lucide="log-out" class="me-2"></i>Cerrar Sesión</a></li>
                 </ul>
             </div>
         </div>

@@ -2,12 +2,12 @@
 {% block title %}Auditoría del Sistema{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0"><i class="bi bi-journal-check me-2"></i>Auditoría del Sistema</h4>
+    <h4 class="mb-0"><i data-lucide="file-check-2" class="me-2"></i>Auditoría del Sistema</h4>
 </div>
 
 <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white py-3">
-        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros</h6>
+        <h6 class="mb-0"><i data-lucide="funnel" class="me-2"></i>Filtros</h6>
     </div>
     <div class="card-body">
         <form method="GET" class="row g-2">
@@ -38,7 +38,7 @@
                 <input type="date" class="form-control form-control-sm" name="fecha_hasta" value="{{ search_params.fecha_hasta or '' }}">
             </div>
             <div class="col-md-1">
-                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="bi bi-search"></i></button>
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i data-lucide="search"></i></button>
             </div>
         </form>
     </div>
@@ -86,13 +86,13 @@
                             {% endfor %}
                             {% if ns.filtros %}
                             <div class="empty-state">
-                                <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+                                <div class="empty-state-icon"><i data-lucide="search"></i></div>
                                 <p class="empty-state-title">Sin resultados</p>
                                 <p class="empty-state-text">No se encontraron eventos que coincidan con los filtros aplicados.</p>
                             </div>
                             {% else %}
                             <div class="empty-state">
-                                <div class="empty-state-icon"><i class="bi bi-journal-text"></i></div>
+                                <div class="empty-state-icon"><i data-lucide="file-text"></i></div>
                                 <p class="empty-state-title">Sin eventos registrados</p>
                                 <p class="empty-state-text">La auditoría se completará automáticamente con las acciones de los usuarios en el sistema.</p>
                             </div>

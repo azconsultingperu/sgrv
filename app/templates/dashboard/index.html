@@ -2,15 +2,15 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h4 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
-    <small class="status-pill"><i class="bi bi-check-circle-fill"></i>Últimos datos actualizados</small>
+    <h4 class="mb-0"><i data-lucide="gauge" class="me-2"></i>Dashboard</h4>
+    <small class="status-pill"><i data-lucide="circle-check-big"></i>Últimos datos actualizados</small>
 </div>
 
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4 col-lg">
         <div class="card border-0 shadow-sm stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon stat-icon-primary"><i class="bi bi-journal-text"></i></div>
+                <div class="stat-icon stat-icon-primary"><i data-lucide="file-text"></i></div>
                 <div class="text-start">
                     <h5 class="stat-value mb-0">{{ totales.total_registros }}</h5>
                     <small class="stat-label text-muted">Total Registros</small>
@@ -21,7 +21,7 @@
     <div class="col-6 col-md-4 col-lg">
         <div class="card border-0 shadow-sm stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon stat-icon-success"><i class="bi bi-building"></i></div>
+                <div class="stat-icon stat-icon-success"><i data-lucide="school"></i></div>
                 <div class="text-start">
                     <h5 class="stat-value mb-0">{{ totales.total_colegios }}</h5>
                     <small class="stat-label text-muted">Colegios Visitados</small>
@@ -32,7 +32,7 @@
     <div class="col-6 col-md-4 col-lg">
         <div class="card border-0 shadow-sm stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon stat-icon-info"><i class="bi bi-people"></i></div>
+                <div class="stat-icon stat-icon-info"><i data-lucide="users"></i></div>
                 <div class="text-start">
                     <h5 class="stat-value mb-0">{{ totales.total_promotores }}</h5>
                     <small class="stat-label text-muted">Promotores</small>
@@ -43,7 +43,7 @@
     <div class="col-6 col-md-4 col-lg">
         <div class="card border-0 shadow-sm stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon stat-icon-warning"><i class="bi bi-person-vcard"></i></div>
+                <div class="stat-icon stat-icon-warning"><i data-lucide="contact-2"></i></div>
                 <div class="text-start">
                     <h5 class="stat-value mb-0">{{ totales.total_alumnos }}</h5>
                     <small class="stat-label text-muted">Alumnos Registrados</small>
@@ -54,7 +54,7 @@
     <div class="col-6 col-md-4 col-lg">
         <div class="card border-0 shadow-sm stat-card h-100">
             <div class="card-body d-flex align-items-center gap-3">
-                <div class="stat-icon stat-icon-danger"><i class="bi bi-person-gear"></i></div>
+                <div class="stat-icon stat-icon-danger"><i data-lucide="settings-2"></i></div>
                 <div class="text-start">
                     <h5 class="stat-value mb-0">{{ totales.total_usuarios }}</h5>
                     <small class="stat-label text-muted">Usuarios</small>
@@ -68,7 +68,7 @@
     <div class="col-4 col-md-4">
         <div class="card kpi-band kpi-band-primary h-100">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-day fs-3"></i>
+                <i data-lucide="calendar" class="fs-3"></i>
                 <h3 class="mb-0">{{ registros_dia }}</h3>
                 <small>Registros del Día</small>
             </div>
@@ -77,7 +77,7 @@
     <div class="col-4 col-md-4">
         <div class="card kpi-band kpi-band-success h-100">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-week fs-3"></i>
+                <i data-lucide="calendar-range" class="fs-3"></i>
                 <h3 class="mb-0">{{ registros_semana }}</h3>
                 <small>Registros Semanales</small>
             </div>
@@ -86,7 +86,7 @@
     <div class="col-4 col-md-4">
         <div class="card kpi-band kpi-band-info h-100">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-month fs-3"></i>
+                <i data-lucide="calendar-days" class="fs-3"></i>
                 <h3 class="mb-0">{{ registros_mes }}</h3>
                 <small>Registros Mensuales</small>
             </div>
@@ -98,13 +98,13 @@
     <div class="col-md-8">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white">
-                <h6 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Registros por Mes</h6>
+                <h6 class="mb-0"><i data-lucide="bar-chart-2" class="me-2"></i>Registros por Mes</h6>
             </div>
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartRegistrosMes"></canvas>
                     <div id="sinDatosRegistrosMes" class="no-data-overlay text-center py-4">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                        <i data-lucide="inbox" class="fs-2 d-block mb-2"></i>Sin datos registrados
                     </div>
                 </div>
             </div>
@@ -113,13 +113,13 @@
     <div class="col-md-4">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white">
-                <h6 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Alumnos por Sexo</h6>
+                <h6 class="mb-0"><i data-lucide="pie-chart" class="me-2"></i>Alumnos por Sexo</h6>
             </div>
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartSexo"></canvas>
                     <div id="sinDatosSexo" class="no-data-overlay text-center py-4">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                        <i data-lucide="inbox" class="fs-2 d-block mb-2"></i>Sin datos registrados
                     </div>
                 </div>
             </div>
@@ -131,13 +131,13 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
-                <h6 class="mb-0"><i class="bi bi-building me-2"></i>Alumnos por Colegio</h6>
+                <h6 class="mb-0"><i data-lucide="school" class="me-2"></i>Alumnos por Colegio</h6>
             </div>
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartColegios"></canvas>
                     <div id="sinDatosColegios" class="no-data-overlay text-center py-4">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                        <i data-lucide="inbox" class="fs-2 d-block mb-2"></i>Sin datos registrados
                     </div>
                 </div>
             </div>
@@ -146,13 +146,13 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
-                <h6 class="mb-0"><i class="bi bi-geo-alt me-2"></i>Alumnos por Distrito</h6>
+                <h6 class="mb-0"><i data-lucide="map-pin" class="me-2"></i>Alumnos por Distrito</h6>
             </div>
             <div class="card-body">
                 <div class="chart-frame">
                     <canvas id="chartDistritos"></canvas>
                     <div id="sinDatosDistritos" class="no-data-overlay text-center py-4">
-                        <i class="bi bi-inbox fs-2 d-block mb-2"></i>Sin datos registrados
+                        <i data-lucide="inbox" class="fs-2 d-block mb-2"></i>Sin datos registrados
                     </div>
                 </div>
             </div>
@@ -164,7 +164,7 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-trophy me-2"></i>Ranking de Colegios Visitados</h6>
+                <h6 class="mb-0"><i data-lucide="trophy" class="me-2"></i>Ranking de Colegios Visitados</h6>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -185,7 +185,7 @@
                             <tr>
                                 <td colspan="3">
                                     <div class="empty-state">
-                                        <div class="empty-state-icon"><i class="bi bi-trophy"></i></div>
+                                        <div class="empty-state-icon"><i data-lucide="trophy"></i></div>
                                         <p class="empty-state-title">Sin visitas aún</p>
                                         <p class="empty-state-text">El ranking se completará cuando se registren visitas a colegios.</p>
                                     </div>
@@ -201,7 +201,7 @@
     <div class="col-md-6">
         <div class="card border-0 shadow-sm h-100">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Proyección de Postulantes</h6>
+                <h6 class="mb-0"><i data-lucide="trending-up" class="me-2"></i>Proyección de Postulantes</h6>
             </div>
             <div class="card-body d-flex flex-column justify-content-center">
                 <div class="row text-center">

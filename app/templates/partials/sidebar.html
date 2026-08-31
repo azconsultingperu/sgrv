@@ -13,28 +13,28 @@
     <ul class="nav nav-pills flex-column mb-auto px-2">
         <li class="nav-item">
             <a href="{{ url_for('dashboard.index') }}" class="nav-link {% if request.endpoint and 'dashboard' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
+                <span class="nav-icon"><i data-lucide="gauge"></i></span>
                 <span class="nav-label">Dashboard</span>
             </a>
         </li>
         {% if current_user.rol_id <= 2 %}
         <li class="nav-item">
             <a href="{{ url_for('registro.registrar') }}" class="nav-link {% if request.endpoint and 'registro' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-plus-circle"></i></span>
+                <span class="nav-icon"><i data-lucide="circle-plus"></i></span>
                 <span class="nav-label">Registrar</span>
             </a>
         </li>
         {% endif %}
         <li class="nav-item">
             <a href="{{ url_for('consulta.index') }}" class="nav-link {% if request.endpoint and 'consulta' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-search"></i></span>
+                <span class="nav-icon"><i data-lucide="search"></i></span>
                 <span class="nav-label">Consultar</span>
             </a>
         </li>
         {% if current_user.rol_id <= 2 or current_user.rol_id == 4 %}
         <li class="nav-item">
             <a href="{{ url_for('reportes.index') }}" class="nav-link {% if request.endpoint and 'reportes' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-file-earmark-bar-graph"></i></span>
+                <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span>
                 <span class="nav-label">Reportes</span>
             </a>
         </li>
@@ -42,13 +42,13 @@
         {% if current_user.rol_id == 1 %}
         <li class="nav-item">
             <a href="{{ url_for('usuarios.index') }}" class="nav-link {% if request.endpoint and 'usuarios' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-people"></i></span>
+                <span class="nav-icon"><i data-lucide="users"></i></span>
                 <span class="nav-label">Usuarios</span>
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ url_for('auditoria.index') }}" class="nav-link {% if request.endpoint and 'auditoria' in request.endpoint %}active{% endif %}">
-                <span class="nav-icon"><i class="bi bi-journal-check"></i></span>
+                <span class="nav-icon"><i data-lucide="file-check-2"></i></span>
                 <span class="nav-label">Auditoría</span>
             </a>
         </li>
@@ -64,10 +64,10 @@
                 <strong class="sidebar-user-name">{{ current_user.nombres.split()[0] if current_user.nombres else current_user.username }}</strong>
                 <small class="sidebar-user-rol">{{ current_user.rol.nombre if current_user.rol else '' }}</small>
             </div>
-            <i class="bi bi-chevron-right sidebar-user-chevron"></i>
+            <i data-lucide="chevron-right" class="sidebar-user-chevron"></i>
         </a>
         <a href="{{ url_for('auth.logout') }}" class="sidebar-logout" title="Cerrar Sesión">
-            <i class="bi bi-box-arrow-left"></i>
+            <i data-lucide="log-out"></i>
         </a>
     </div>
 </nav>

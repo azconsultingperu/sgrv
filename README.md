@@ -48,7 +48,7 @@ _Vista del sistema en producción: dashboard con métricas, gráficos estadísti
 - JavaScript (ES6+)
 - Bootstrap 5.3
 - Chart.js 4.4
-- Bootstrap Icons
+- Lucide Icons
 
 ### Base de Datos
 - **PostgreSQL** (producción y desarrollo local)
