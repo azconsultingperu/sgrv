@@ -68,10 +68,10 @@
                             <div class="password-requirements" id="passwordLabel">Mínimo 8 caracteres, puede usar letras y números.</div>
                         </div>
                         <div class="col-md-4 d-flex align-items-center">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="estado" id="estado" {% if usuario.estado %}checked{% endif %}>
-                                <label class="form-check-label" for="estado">Activo</label>
-                            </div>
+                            <label class="form-check custom-check d-flex align-items-center gap-2 py-2 px-3 rounded-2 w-100" for="estado" style="background:var(--surface-2); border:1px solid var(--border-color); cursor:pointer;">
+                                <input type="checkbox" class="form-check-input m-0" name="estado" id="estado" {% if usuario.estado %}checked{% endif %} style="flex-shrink:0;">
+                                <span class="small fw-medium">Activo</span>
+                            </label>
                         </div>
                         <div class="col-12">
                             <button type="submit" class="btn btn-primary"><i data-lucide="save" class="me-2"></i>Actualizar</button>

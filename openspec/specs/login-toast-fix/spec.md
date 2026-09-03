@@ -2,7 +2,7 @@
 
 Corregir que los mensajes de login inválido no llegan al sistema de toasts porque la plantilla los consume antes de que el JS los lea.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Mensajes de login visibles como toast
 

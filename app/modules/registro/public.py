@@ -18,7 +18,7 @@ def get_visita_by_alumno(alumno_id: int):
     return Visita.query.filter_by(alumno_id=alumno_id).first()
 
 def existe_dni(dni: str) -> bool:
-    return Alumno.query.filter_by(dni=dni).first() is not None
+    return Alumno.query.filter_by(dni=dni, eliminado=False).first() is not None
 
 def buscar_alumnos(**filters):
     q = Alumno.query.filter_by(eliminado=False)

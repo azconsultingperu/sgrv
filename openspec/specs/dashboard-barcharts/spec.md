@@ -2,7 +2,7 @@
 
 Estandariza la presentación visual de los gráficos de barras del dashboard para que las barras sean delgadas y espaciadas y el tooltip aparezca como burbuja flotante con caret visible, mejorando legibilidad sin cambiar datos.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Barras delgadas y espaciadas
 

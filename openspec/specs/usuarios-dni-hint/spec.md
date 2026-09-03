@@ -2,7 +2,7 @@
 
 Aclarar en la creación de usuario que el DNI ingresado será el nombre de usuario para iniciar sesión, reduciendo confusión y logins fallidos.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Hint de DNI como usuario
 

@@ -158,7 +158,7 @@ def _inicializar_bd():
     En produccion el esquema cambia EXCLUSIVAMENTE con migraciones (`flask db upgrade`).
     """
     # Importar dominios para registrar modelos en SQLAlchemy (antes vía app.models shims)
-    from app.modules.identidad.domain import usuario, rol, sesion  # noqa: F401
+    from app.modules.identidad.domain import usuario, rol, sesion, password_reset  # noqa: F401
     from app.modules.registro.domain import alumno, institucion_educativa, visita, promotor, carrera  # noqa: F401
     from app.modules.auditoria.domain import auditoria  # noqa: F401
     from app.modules.reportes.domain import reporte  # noqa: F401

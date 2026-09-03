@@ -89,52 +89,82 @@ document.addEventListener('DOMContentLoaded', function() {
         successBox.style.display = 'none';
         errorBox.style.display = 'none';
         const data = new FormData(form);
-        fetch(form.action || window.location.href, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-            .then(r => r.text().then(t => ({ ok: r.ok, text: t, status: r.status })))
+        const controller = new AbortController();
+        const timeoutMs = 20000;
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        fetch(form.action || window.location.href, { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' }, signal: controller.signal })
+            .then(r => r.text().then(t => {
+                let j = null;
+                try { j = JSON.parse(t); } catch(e) {}
+                return { ok: r.ok, text: t, json: j, status: r.status };
+            }))
             .then(res => {
+                clearTimeout(timeoutId);
                 btn.disabled = false;
                 btn.innerHTML = originalBtnHTML;
-                // Determinar si el backend realmente encontró al usuario por el contenido del HTML
-                // Buscamos el mensaje flash en el HTML de respuesta (render_template incluye get_flashed_messages)
-                const isSuccess = res.text.includes('Se han enviado') || res.text.includes('Hemos enviado');
-                const isNotFound = res.text.includes('No se encontr') || res.text.includes('No se encontró');
-                // Por seguridad, si es éxito mostramos confirmación clara con sonido success
-                // Si es no encontrado, mostramos genérico con sonido error, sin revelar si DNI existe
-                if (res.ok && isSuccess) {
+                // Nuevo: si es JSON (fix-flash-persistente), usar status sin depender de flash en sesión
+                if (res.json) {
+                    if (res.json.status === 'throttled') {
+                        if (typeof mostrarToast === 'function') mostrarToast('error', 'Límite alcanzado', res.json.message || 'Has superado el límite de intentos. Intenta en 15 minutos.');
+                        return;
+                    }
+                    if (res.json.status === 'ok') {
+                        const formElements = form.querySelectorAll('.mb-3, .form-text');
+                        formElements.forEach(el => el.style.display = 'none');
+                        const inputs = form.querySelectorAll('input');
+                        inputs.forEach(i => { const p = i.closest('.mb-3'); if(p) p.style.display = 'none'; });
+                        successBox.style.display = 'block';
+                        successBox.textContent = res.json.message || 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                        if (typeof mostrarToast === 'function') mostrarToast('success', 'Solicitud enviada', res.json.message || 'Si los datos son correctos, recibirás un correo');
+                        return;
+                    }
+                }
+                // Fallback legacy (HTML con flash) por compatibilidad
+                const isThrottle = res.text.includes('Has superado') || res.text.includes('l\u00edmite de intentos');
+                const isGeneric = res.text.includes('Si los datos son correctos');
+                const isSuccessLegacy = res.text.includes('Se han enviado') || res.text.includes('Hemos enviado');
+                const isNotFoundLegacy = res.text.includes('No se encontr') || res.text.includes('No se encontró');
+                if (res.ok && isThrottle) {
+                    if (typeof mostrarToast === 'function') mostrarToast('error', 'Límite alcanzado', 'Has superado el límite de intentos. Intenta en 15 minutos.');
+                } else if (res.ok && (isGeneric || isSuccessLegacy)) {
                     const formElements = form.querySelectorAll('.mb-3, .form-text');
                     formElements.forEach(el => el.style.display = 'none');
                     const inputs = form.querySelectorAll('input');
-                    inputs.forEach(i => i.closest('.mb-3').style.display = 'none');
+                    inputs.forEach(i => { const p = i.closest('.mb-3'); if(p) p.style.display = 'none'; });
                     successBox.style.display = 'block';
-                    successBox.textContent = 'Hemos enviado las instrucciones a tu correo. Revisa tu bandeja de entrada.';
-                    if (typeof mostrarToast === 'function') mostrarToast('success', 'Correo enviado', 'Revisa tu bandeja de entrada');
-                    // sonido success se dispara vía main.js al crear el toast
-                } else if (res.ok && isNotFound) {
+                    successBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                    if (typeof mostrarToast === 'function') mostrarToast('success', 'Solicitud enviada', 'Si los datos son correctos, recibirás un correo');
+                } else if (res.ok && isNotFoundLegacy) {
                     errorBox.style.display = 'block';
                     errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
                     if (typeof mostrarToast === 'function') mostrarToast('error', 'Verifica tus datos', 'Si los datos son correctos, recibirás un correo con las instrucciones');
                 } else if (res.ok) {
-                    // fallback genérico por seguridad (no filtrar existencia): siempre mostrar éxito genérico con sonido success
-                    // pero si el texto no contiene ninguno de los anteriores, asumimos que el backend procesó y mostramos genérico
                     const formElements2 = form.querySelectorAll('.mb-3, .form-text');
                     formElements2.forEach(el => el.style.display = 'none');
                     const inputs2 = form.querySelectorAll('input');
-                    inputs2.forEach(i => i.closest('.mb-3').style.display = 'none');
+                    inputs2.forEach(i => { const p = i.closest('.mb-3'); if(p) p.style.display = 'none'; });
                     successBox.style.display = 'block';
                     successBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
                     if (typeof mostrarToast === 'function') mostrarToast('success', 'Solicitud enviada', 'Si los datos son correctos, recibirás un correo');
                 } else {
-                    errorBox.style.display = 'block';
-                    errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
-                    if (typeof mostrarToast === 'function') mostrarToast('error', 'Error', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+                    if (isThrottle) {
+                        if (typeof mostrarToast === 'function') mostrarToast('error', 'Límite alcanzado', 'Has superado el límite de intentos. Intenta en 15 minutos.');
+                    } else {
+                        errorBox.style.display = 'block';
+                        errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                        if (typeof mostrarToast === 'function') mostrarToast('error', 'Error', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+                    }
                 }
             })
-            .catch(() => {
+            .catch((err) => {
+                clearTimeout(timeoutId);
                 btn.disabled = false;
                 btn.innerHTML = originalBtnHTML;
-                errorBox.style.display = 'block';
-                errorBox.textContent = 'Si los datos son correctos, recibirás un correo con las instrucciones';
-                if (typeof mostrarToast === 'function') mostrarToast('error', 'Error de red', 'Si los datos son correctos, recibirás un correo con las instrucciones');
+                const isAbort = err && err.name === 'AbortError';
+                const msg = isAbort ? 'Tiempo de espera agotado. Intenta nuevamente.' : 'Si los datos son correctos, recibirás un correo con las instrucciones';
+                const title = isAbort ? 'Tiempo agotado' : 'Error de red';
+                // Solo toast, sin duplicar en el card
+                if (typeof mostrarToast === 'function') mostrarToast('error', title, msg);
             });
     });
 });

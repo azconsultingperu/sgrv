@@ -3,6 +3,13 @@ import secrets
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
+def _parse_bool_env(value, default):
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ('1', 'true', 'yes', 'on')
+
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
@@ -27,20 +34,30 @@ class Config:
     PERFIL_AVATAR_FULL_DIM = 600
     PERFIL_AVATAR_THUMB_DIM = 90
     PERFIL_AVATAR_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
-    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.gmail.com'
-    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 587)
-    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') or True
-    MAIL_USE_SSL = os.environ.get('MAIL_USE_SSL') or False
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'azconsultingperu@gmail.com'
+    ALUMNO_FOTO_DIR = os.path.join(os.path.dirname(basedir), 'app', 'static', 'uploads', 'alumnos')
+    ALUMNO_FOTO_MAX_SIZE = 2 * 1024 * 1024
+    ALUMNO_FOTO_MAX_DIM = 1000
+    ALUMNO_FOTO_FULL_DIM = 600
+    ALUMNO_FOTO_THUMB_DIM = 90
+    ALUMNO_FOTO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+    MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'sgrv.azconsultingperu.com'
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 465)
+    MAIL_USE_TLS = _parse_bool_env(os.environ.get('MAIL_USE_TLS'), False)
+    MAIL_USE_SSL = _parse_bool_env(os.environ.get('MAIL_USE_SSL'), True)
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'soporte@sgrv.azconsultingperu.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or ''
-    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'azconsultingperu@gmail.com'
-    NOTIFY_EMAIL = os.environ.get('NOTIFY_EMAIL') or 'azconsultingperu@gmail.com'
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or 'soporte@sgrv.azconsultingperu.com'
+    MAIL_SENDER_NAME = os.environ.get('MAIL_SENDER_NAME') or 'SGRV \u2013 IESTP Paij\u00e1n'
+    NOTIFY_EMAIL = os.environ.get('NOTIFY_EMAIL') or 'soporte@sgrv.azconsultingperu.com'
+    # DX: desactiva rate limit de recuperar solo en dev/testing, nunca en prod
+    DISABLE_RATE_LIMIT = _parse_bool_env(os.environ.get('DISABLE_RATE_LIMIT'), False)
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://usuario:password@localhost:5432/gestion_visitas'
     SESSION_COOKIE_SECURE = True
     INIT_DB_ON_START = False
+    DISABLE_RATE_LIMIT = False  # nunca desactivar en prod, aunque env lo pida
 
 class DevelopmentConfig(Config):
     DEBUG = True

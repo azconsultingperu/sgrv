@@ -12,63 +12,79 @@
 </div>
 
 <div class="row g-4">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white"><h6 class="mb-0">Datos Personales</h6></div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr><th>DNI</th><td>{{ alumno.dni }}</td></tr>
-                    <tr><th>Apellidos</th><td>{{ alumno.apellidos }}</td></tr>
-                    <tr><th>Nombres</th><td>{{ alumno.nombres }}</td></tr>
-                    <tr><th>Fecha de Nacimiento</th><td>{{ alumno.fecha_nacimiento.strftime('%d/%m/%Y') }}</td></tr>
-                    <tr><th>Edad</th><td>{{ alumno.edad }} años</td></tr>
-                    <tr><th>Sexo</th><td>{{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' }}</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-header bg-white"><h6 class="mb-0">Contacto</h6></div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr><th>Celular</th><td>{{ alumno.celular }}</td></tr>
-                    <tr><th>Email</th><td>{{ alumno.email or 'No registrado' }}</td></tr>
-                    <tr><th>Dirección</th><td>{{ alumno.direccion or 'No registrada' }}</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white"><h6 class="mb-0">Datos del Colegio</h6></div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr><th>Institución</th><td>{{ alumno.institucion.nombre if alumno.institucion else '' }}</td></tr>
-                    <tr><th>Distrito</th><td>{{ alumno.institucion.distrito if alumno.institucion else '' }}</td></tr>
-                    <tr><th>Provincia</th><td>{{ alumno.institucion.provincia if alumno.institucion else '' }}</td></tr>
-                    <tr><th>Región</th><td>{{ alumno.institucion.region if alumno.institucion else '' }}</td></tr>
-                    <tr><th>Tipo</th><td>{{ alumno.institucion.tipo if alumno.institucion else '' }}</td></tr>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white"><h6 class="mb-0">Datos Académicos y Visita</h6></div>
-            <div class="card-body">
-                <table class="table table-sm">
-                    <tr><th>Carrera de Interés</th><td>{{ alumno.carrera.nombre if alumno.carrera else 'No especificada' }}</td></tr>
-                    <tr><th>Área de Interés</th><td>{{ alumno.area_interes or 'No especificada' }}</td></tr>
-                    <tr><th>Desea Estudiar</th><td>{{ 'Sí' if alumno.desea_estudiar else 'No' }}</td></tr>
-                    <tr><th>Solicita Información</th><td>{{ 'Sí' if alumno.solicita_info else 'No' }}</td></tr>
-                    <tr><th>Modalidad Contacto</th><td>{{ alumno.modalidad_contacto or 'No especificada' }}</td></tr>
-                    {% if visita %}
-                    <tr><th>Fecha Visita</th><td>{{ visita.fecha_visita.strftime('%d/%m/%Y') }}</td></tr>
-                    <tr><th>Hora</th><td>{{ visita.hora_visita.strftime('%H:%M') }}</td></tr>
-                    <tr><th>Promotor</th><td>{% if visita.promotor %}{{ visita.promotor.nombres }} {{ visita.promotor.apellidos }}{% else %}No asignado{% endif %}</td></tr>
-                    <tr><th>Observaciones</th><td>{{ visita.observaciones or 'Ninguna' }}</td></tr>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm text-center detalle-foto-sticky">
+            <div class="card-body p-4">
+                <div class="mx-auto mb-3" id="alumnoFotoWrap" style="width:110px; height:110px; border:2px solid var(--border-color); border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--surface-2);">
+                    {% if alumno.tiene_foto() %}
+                    <img src="{{ alumno.foto_url() }}" alt="Foto de {{ alumno.nombres }} {{ alumno.apellidos }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                    {% else %}
+                    <span style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; background:{{ alumno.foto_color() }}; color:#fff; font-weight:700; font-size:1.6rem;">{{ alumno.iniciales() }}</span>
                     {% endif %}
+                </div>
+                <h5 class="mb-0">{{ alumno.nombres }} {{ alumno.apellidos }}</h5>
+                <p class="text-muted mb-2"><i data-lucide="badge-check" class="me-1"></i>DNI {{ alumno.dni }}</p>
+                <div class="d-flex flex-wrap justify-content-center gap-1 mb-2">
+                    <span class="badge bg-primary">{{ alumno.sexo if alumno.sexo else '—' }}</span>
+                    <span class="badge bg-secondary">{{ alumno.edad }} años</span>
+                </div>
+                <div class="text-muted small">
+                    {% if alumno.institucion %}{{ alumno.institucion.nombre }}<br>{{ alumno.institucion.distrito }} - {{ alumno.institucion.provincia }}{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="text-primary mb-3"><i data-lucide="contact-2" class="me-2"></i>Datos Personales</h5>
+                <table class="table table-sm profile-table mb-4">
+                    <tbody>
+                        <tr><th class="text-muted">DNI</th><td>{{ alumno.dni }}</td></tr>
+                        <tr><th class="text-muted">Apellidos</th><td>{{ alumno.apellidos }}</td></tr>
+                        <tr><th class="text-muted">Nombres</th><td>{{ alumno.nombres }}</td></tr>
+                        <tr><th class="text-muted">Fecha de Nacimiento</th><td>{{ alumno.fecha_nacimiento.strftime('%d/%m/%Y') if alumno.fecha_nacimiento else '—' }}</td></tr>
+                        <tr><th class="text-muted">Edad</th><td>{{ alumno.edad }} años</td></tr>
+                        <tr><th class="text-muted">Sexo</th><td>{{ 'Masculino' if alumno.sexo == 'M' else 'Femenino' if alumno.sexo == 'F' else 'Otros' if alumno.sexo == 'O' else alumno.sexo }}</td></tr>
+                    </tbody>
+                </table>
+
+                <h5 class="text-success mb-3"><i data-lucide="phone" class="me-2"></i>Contacto</h5>
+                <table class="table table-sm profile-table mb-4">
+                    <tbody>
+                        <tr><th class="text-muted">Celular</th><td>{{ alumno.celular }}</td></tr>
+                        <tr><th class="text-muted">Email</th><td>{{ alumno.email or 'No registrado' }}</td></tr>
+                        <tr><th class="text-muted">Dirección</th><td>{{ alumno.direccion or 'No registrada' }}</td></tr>
+                    </tbody>
+                </table>
+
+                <h5 class="text-warning mb-3"><i data-lucide="school" class="me-2"></i>Datos del Colegio</h5>
+                <table class="table table-sm profile-table mb-4">
+                    <tbody>
+                        <tr><th class="text-muted">Institución</th><td>{{ alumno.institucion.nombre if alumno.institucion else '' }}</td></tr>
+                        <tr><th class="text-muted">Distrito</th><td>{{ alumno.institucion.distrito if alumno.institucion else '' }}</td></tr>
+                        <tr><th class="text-muted">Provincia</th><td>{{ alumno.institucion.provincia if alumno.institucion else '' }}</td></tr>
+                        <tr><th class="text-muted">Región</th><td>{{ alumno.institucion.region if alumno.institucion else '' }}</td></tr>
+                        <tr><th class="text-muted">Tipo</th><td>{{ alumno.institucion.tipo if alumno.institucion else '' }}</td></tr>
+                    </tbody>
+                </table>
+
+                <h5 class="text-info mb-3"><i data-lucide="book-open" class="me-2"></i>Datos Académicos y Visita</h5>
+                <table class="table table-sm profile-table mb-0">
+                    <tbody>
+                        <tr><th class="text-muted">Carrera de Interés</th><td>{{ alumno.carrera.nombre if alumno.carrera else 'No especificada' }}</td></tr>
+                        <tr><th class="text-muted">Área de Interés</th><td>{{ alumno.area_interes or 'No especificada' }}</td></tr>
+                        <tr><th class="text-muted">Desea Estudiar</th><td>{{ 'Sí' if alumno.desea_estudiar else 'No' }}</td></tr>
+                        <tr><th class="text-muted">Solicita Información</th><td>{{ 'Sí' if alumno.solicita_info else 'No' }}</td></tr>
+                        <tr><th class="text-muted">Modalidad Contacto</th><td>{{ alumno.modalidad_contacto or 'No especificada' }}</td></tr>
+                        {% if visita %}
+                        <tr><th class="text-muted">Fecha Visita</th><td>{{ visita.fecha_visita.strftime('%d/%m/%Y') if visita.fecha_visita else '—' }}</td></tr>
+                        <tr><th class="text-muted">Hora</th><td>{{ visita.hora_visita.strftime('%H:%M') if visita.hora_visita else '—' }}</td></tr>
+                        <tr><th class="text-muted">Promotor</th><td>{% if visita.promotor %}{{ visita.promotor.nombres }} {{ visita.promotor.apellidos }}{% else %}No asignado{% endif %}</td></tr>
+                        <tr><th class="text-muted">Observaciones</th><td>{{ visita.observaciones or 'Ninguna' }}</td></tr>
+                        {% endif %}
+                    </tbody>
                 </table>
             </div>
         </div>

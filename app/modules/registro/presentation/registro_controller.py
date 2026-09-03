@@ -1,4 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+import os
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app, abort, send_file
 from flask_login import login_required, current_user
 from app.modules.registro.domain.alumno import Alumno
 from app.modules.registro.domain.visita import Visita
@@ -78,20 +80,23 @@ def registrar():
             errores.append('Debe seleccionar una institución educativa.')
         if not validar_dni(dni):
             errores.append('El DNI debe tener 8 dígitos.')
-        if Alumno.query.filter_by(dni=dni).first():
-            errores.append('El DNI ya está registrado.')
+        if Alumno.query.filter_by(dni=dni, eliminado=False).first():
+            errores.append('Ese DNI ya está registrado como estudiante activo.')
         if not validar_celular(celular):
             errores.append('El celular debe tener 9 dígitos.')
         if email and not validar_email(email):
             errores.append('El correo electrónico no es válido.')
         if not apellidos or not nombres:
             errores.append('Nombres y apellidos son obligatorios.')
+        if sexo not in ('M', 'F', 'O'):
+            errores.append('Debe seleccionar sexo.')
 
         if errores:
             if len(errores) == 1:
-                flash(errores[0], 'danger')
+                flash(f'<strong>{errores[0]}</strong>', 'danger')
             else:
-                flash('Faltan datos por completar. Revisa los campos marcados.', 'danger')
+                lista = ', '.join(f'<strong>{e}</strong>' for e in errores)
+                flash(f'<strong>Faltan datos por completar:</strong> {lista}', 'danger')
             return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
                 form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
@@ -134,7 +139,26 @@ def registrar():
                 'observaciones': observaciones
             }
             alumno, visita = crear_alumno_con_visita(datos, actor_id=current_user.id)
-            flash('Registro creado exitosamente.', 'success')
+            # foto opcional — un solo flash
+            foto_file = request.files.get('foto')
+            if foto_file and foto_file.filename:
+                from app.modules.registro.infrastructure.alumno_foto_storage import guardar_foto
+                try:
+                    ok, err = guardar_foto(alumno, foto_file)
+                except Exception as e:
+                    ok, err = False, f'Error al guardar foto: {str(e)}'
+                if not ok:
+                    flash(f'Registro creado, pero la foto fue ignorada: {err}', 'danger')
+                else:
+                    try:
+                        db.session.commit()
+                    except Exception as e:
+                        db.session.rollback()
+                        flash(f'Registro creado, pero la foto no se pudo guardar: {str(e)}', 'danger')
+                        return redirect(url_for('consulta.index'))
+                    flash('Registro creado exitosamente.', 'success')
+            else:
+                flash('Registro creado exitosamente.', 'success')
             return redirect(url_for('consulta.index'))
 
         except Exception as e:
@@ -188,6 +212,24 @@ def editar(id):
             visita.promotor_id = request.form.get('promotor_id', type=int)
             visita.observaciones = request.form.get('observaciones', '')
 
+        # foto opcional en edición
+        try:
+            foto_file = request.files.get('foto')
+            eliminar_foto = request.form.get('eliminar_foto') == '1'
+            if eliminar_foto and alumno.foto:
+                from app.modules.registro.infrastructure.alumno_foto_storage import _drop_foto_files
+                _drop_foto_files(alumno)
+            elif foto_file and foto_file.filename:
+                from app.modules.registro.infrastructure.alumno_foto_storage import guardar_foto
+                ok, err = guardar_foto(alumno, foto_file)
+                if not ok:
+                    flash(err, 'danger')
+                    return redirect(url_for('registro.editar', id=id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error al procesar foto: {str(e)}', 'danger')
+            return redirect(url_for('registro.editar', id=id))
+
         try:
             from sqlalchemy.exc import IntegrityError
             db.session.commit()
@@ -224,12 +266,59 @@ def editar(id):
         alumno=alumno, visita=visita, colegios=colegios,
         promotores=promotores, carreras=carreras, form=form)
 
+@registro_bp.route('/foto/<int:alumno_id>')
+@login_required
+def servir_foto(alumno_id):
+    alumno = Alumno.query.get_or_404(alumno_id)
+    if not alumno.foto:
+        return send_file(os.path.join(current_app.static_folder, 'img', 'avatar-default.svg'),
+                         mimetype='image/svg+xml', max_age=86400)
+    nombre = alumno.foto
+    if request.args.get('t'):
+        nombre = alumno.foto[:-5] + '_min' + alumno.foto[-5:] if alumno.foto.endswith('.webp') else alumno.foto
+    try:
+        from app.modules.registro.infrastructure.alumno_foto_storage import _foto_dir
+        foto_dir = _foto_dir()
+        real = os.path.realpath(os.path.join(foto_dir, nombre))
+        if not real.startswith(os.path.realpath(foto_dir) + os.sep):
+            raise ValueError('Ruta inválida')
+        ruta = real
+    except ValueError:
+        abort(404)
+    if not os.path.isfile(ruta):
+        # fallback thumb->full
+        if nombre.endswith('_min.webp'):
+            base = alumno.foto
+            try:
+                foto_dir = _foto_dir()
+                real2 = os.path.realpath(os.path.join(foto_dir, base))
+                if real2.startswith(os.path.realpath(foto_dir) + os.sep) and os.path.isfile(real2):
+                    resp = send_file(real2, mimetype='image/webp', conditional=True)
+                    resp.headers['Cache-Control'] = 'private, max-age=0, must-revalidate'
+                    return resp
+            except ValueError:
+                pass
+        return send_file(os.path.join(current_app.static_folder, 'img', 'avatar-default.svg'),
+                         mimetype='image/svg+xml', max_age=86400)
+    resp = send_file(ruta, mimetype='image/webp', conditional=True)
+    resp.headers['Cache-Control'] = 'private, max-age=0, must-revalidate'
+    return resp
+
+
 @registro_bp.route('/eliminar/<int:id>', methods=['POST'])
 @login_required
 @solo_admin_required
 def eliminar(id):
     alumno = Alumno.query.get_or_404(id)
     Visita.query.filter_by(alumno_id=alumno.id).delete()
+    # borrar foto física si existe
+    if alumno.foto:
+        try:
+            from app.modules.registro.infrastructure.alumno_foto_storage import _drop_foto_files
+            _drop_foto_files(alumno)
+        except Exception:
+            pass
+        alumno.foto = None
     dni = alumno.dni
     alumno_id = alumno.id
     alumno.eliminado = True

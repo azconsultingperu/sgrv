@@ -5,23 +5,28 @@
     <h4 class="mb-0"><i data-lucide="circle-plus" class="me-2"></i>Registrar Nueva Visita</h4>
 </div>
 
+<div id="registroProgress" style="position:sticky; top:60px; z-index:1020; height:3px; background:var(--primary-color); width:0%; border-radius:2px; transition:width 0.15s ease; margin-bottom:0.75rem;"></div>
 <div class="card border-0 shadow-sm">
     <div class="card-body p-4">
-        <form method="POST" id="formRegistro" novalidate>
+        <form method="POST" id="formRegistro" novalidate enctype="multipart/form-data">
+            <p class="text-muted small mb-3"><span class="text-danger">*</span> Campos obligatorios — los campos con <small class="text-muted">(opcional)</small> pueden dejarse vacíos</p>
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <h5 class="text-primary mb-3"><i data-lucide="contact-2" class="me-2"></i>Datos Personales</h5>
+            <h5 class="text-primary mb-3 registro-section-header"><span class="badge bg-primary me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">1</span><i data-lucide="contact-2" class="me-2"></i>Datos Personales</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label" for="apellidos">Apellidos <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ form.apellidos or '' }}" required>
+                    <input type="text" class="form-control" name="apellidos" id="apellidos" value="{{ form.apellidos or '' }}" placeholder="Ej. García López" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label" for="nombres">Nombres <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="nombres" id="nombres" value="{{ form.nombres or '' }}" required>
+                    <input type="text" class="form-control" name="nombres" id="nombres" value="{{ form.nombres or '' }}" placeholder="Ej. Juan Carlos" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label" for="dni">DNI <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="dni" id="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" required>
+                    <div style="position:relative;">
+                        <input type="text" class="form-control" name="dni" id="dni" maxlength="8" pattern="[0-9]{8}" value="{{ form.dni or '' }}" placeholder="Ej. 12345678" inputmode="numeric" autocomplete="off" required style="padding-right: 36px;">
+                        <span id="dniStatus" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); display:none; pointer-events:none;"></span>
+                    </div>
                     <div id="dniFeedback" class="invalid-feedback"></div>
                 </div>
                 <div class="col-md-3">
@@ -35,7 +40,7 @@
                 <div class="col-md-3">
                     <label class="form-label" for="sexo">Sexo <span class="text-danger">*</span></label>
                     <select class="form-select" name="sexo" id="sexo" required>
-                        <option value="">Seleccione...</option>
+                        <option value="">Seleccionar sexo...</option>
                         <option value="M" {% if form.sexo == 'M' %}selected{% endif %}>Masculino</option>
                         <option value="F" {% if form.sexo == 'F' %}selected{% endif %}>Femenino</option>
                         <option value="O" {% if form.sexo == 'O' %}selected{% endif %}>Otros</option>
@@ -43,30 +48,30 @@
                 </div>
             </div>
 
-            <h5 class="text-success mb-3"><i data-lucide="phone" class="me-2"></i>Contacto</h5>
+            <h5 class="text-success mb-3 registro-section-header"><span class="badge bg-success me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">2</span><i data-lucide="phone" class="me-2"></i>Contacto</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="celular">Celular <span class="text-danger">*</span></label>
-                    <input type="tel" class="form-control" name="celular" id="celular" maxlength="9" pattern="[0-9]{9}" value="{{ form.celular or '' }}" required>
+                    <input type="tel" class="form-control" name="celular" id="celular" maxlength="9" pattern="[0-9]{9}" value="{{ form.celular or '' }}" placeholder="Ej. 987654321" inputmode="numeric" required>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="email">Correo Electrónico</label>
-                    <input type="email" class="form-control" name="email" id="email" value="{{ form.email or '' }}">
+                    <label class="form-label" for="email">Correo Electrónico <small class="text-muted">(opcional)</small></label>
+                    <input type="email" class="form-control" name="email" id="email" value="{{ form.email or '' }}" placeholder="Ej. juan@ejemplo.com">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="direccion">Dirección</label>
-                    <input type="text" class="form-control" name="direccion" id="direccion" value="{{ form.direccion or '' }}">
+                    <label class="form-label" for="direccion">Dirección <small class="text-muted">(opcional)</small></label>
+                    <input type="text" class="form-control" name="direccion" id="direccion" value="{{ form.direccion or '' }}" placeholder="Ej. Jr. Lima 123, Paiján">
                 </div>
             </div>
 
-            <h5 class="text-warning mb-3"><i data-lucide="school" class="me-2"></i>Colegio</h5>
+            <h5 class="text-warning mb-3 registro-section-header"><span class="badge bg-warning me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">3</span><i data-lucide="school" class="me-2"></i>Colegio</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
                     <label class="form-label" for="institucion_id">Institución Educativa <span class="text-danger">*</span></label>
                     <select class="form-select" name="institucion_id" id="institucion_id" required>
-                        <option value="">Seleccione...</option>
+                        <option value="">Seleccionar institución...</option>
                         {% for c in colegios %}
-                        <option value="{{ c.id }}" {% if form.institucion_id == c.id %}selected{% endif %}>{{ c.nombre }} - {{ c.distrito }}</option>
+                        <option value="{{ c.id }}" {% if form.institucion_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }} - {{ c.distrito }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -80,25 +85,25 @@
                 </div>
             </div>
 
-            <h5 class="text-info mb-3"><i data-lucide="book-open" class="me-2"></i>Datos Académicos</h5>
+            <h5 class="text-info mb-3 registro-section-header"><span class="badge bg-info me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">4</span><i data-lucide="book-open" class="me-2"></i>Datos Académicos</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
-                    <label class="form-label" for="carrera_id">Carrera de Interés</label>
+                    <label class="form-label" for="carrera_id">Carrera de Interés <small class="text-muted">(opcional)</small></label>
                     <select class="form-select" name="carrera_id" id="carrera_id">
-                        <option value="">Seleccione...</option>
+                        <option value="">Seleccionar carrera...</option>
                         {% for c in carreras %}
-                        <option value="{{ c.id }}" {% if form.carrera_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+                        <option value="{{ c.id }}" {% if form.carrera_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="area_interes">Área Profesional de Interés</label>
-                    <input type="text" class="form-control" name="area_interes" id="area_interes" value="{{ form.area_interes or '' }}">
+                    <label class="form-label" for="area_interes">Área Profesional de Interés <small class="text-muted">(opcional)</small></label>
+                    <input type="text" class="form-control" name="area_interes" id="area_interes" value="{{ form.area_interes or '' }}" placeholder="Ej. Ingeniería de Sistemas">
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label" for="modalidad_contacto">Modalidad de Contacto Preferido</label>
+                    <label class="form-label" for="modalidad_contacto">Modalidad de Contacto Preferido <small class="text-muted">(opcional)</small></label>
                     <select class="form-select" name="modalidad_contacto" id="modalidad_contacto">
-                        <option value="">Seleccione...</option>
+                        <option value="">Seleccionar modalidad...</option>
                         <option value="WhatsApp" {% if form.modalidad_contacto == 'WhatsApp' %}selected{% endif %}>WhatsApp</option>
                         <option value="Email" {% if form.modalidad_contacto == 'Email' %}selected{% endif %}>Email</option>
                         <option value="Teléfono" {% if form.modalidad_contacto == 'Teléfono' %}selected{% endif %}>Teléfono</option>
@@ -106,37 +111,37 @@
                     </select>
                 </div>
             </div>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="desea_estudiar" id="desea_estudiar" {% if form.desea_estudiar %}checked{% endif %}>
-                        <label class="form-check-label" for="desea_estudiar">¿Desea estudiar en el IESTP Paiján?</label>
-                    </div>
+            <div class="row g-2 mb-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-check custom-check d-flex align-items-center gap-2 py-2 px-3 rounded-2" for="desea_estudiar" style="background:var(--surface-2); border:1px solid var(--border-color); cursor:pointer; transition:all 0.15s;">
+                        <input type="checkbox" class="form-check-input m-0" name="desea_estudiar" id="desea_estudiar" {% if form.desea_estudiar %}checked{% endif %} style="flex-shrink:0;">
+                        <span class="small fw-medium">¿Desea estudiar en el IESTP Paiján?</span>
+                    </label>
                 </div>
-                <div class="col-md-6">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="solicita_info" id="solicita_info" {% if form.solicita_info %}checked{% endif %}>
-                        <label class="form-check-label" for="solicita_info">¿Solicita mayor información?</label>
-                    </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-check custom-check d-flex align-items-center gap-2 py-2 px-3 rounded-2" for="solicita_info" style="background:var(--surface-2); border:1px solid var(--border-color); cursor:pointer; transition:all 0.15s;">
+                        <input type="checkbox" class="form-check-input m-0" name="solicita_info" id="solicita_info" {% if form.solicita_info %}checked{% endif %} style="flex-shrink:0;">
+                        <span class="small fw-medium">¿Solicita mayor información?</span>
+                    </label>
                 </div>
             </div>
 
-            <h5 class="text-secondary mb-3"><i data-lucide="history" class="me-2"></i>Datos de la Visita</h5>
+            <h5 class="text-secondary mb-3 registro-section-header"><span class="badge bg-secondary me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">5</span><i data-lucide="history" class="me-2"></i>Datos de la Visita</h5>
             <div class="row g-3 mb-4">
                 <div class="col-md-3">
-                    <label class="form-label" for="fecha_visita">Fecha de Visita <span class="text-danger">*</span></label>
+                    <label class="form-label" for="fecha_visita">Fecha de Visita <small class="text-muted">(opcional)</small></label>
                     <input type="date" class="form-control" name="fecha_visita" id="fecha_visita" value="{{ form.fecha_visita or fecha_actual }}" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label" for="hora_visita">Hora <span class="text-danger">*</span></label>
+                    <label class="form-label" for="hora_visita">Hora <small class="text-muted">(opcional)</small></label>
                     <input type="time" class="form-control" name="hora_visita" id="hora_visita" value="{{ form.hora_visita or hora_actual }}" required>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label" for="promotor_id">Promotor Responsable <span class="text-danger">*</span></label>
+                    <label class="form-label" for="promotor_id">Promotor Responsable <small class="text-muted">(opcional)</small></label>
                     <select class="form-select" name="promotor_id" id="promotor_id" required>
-                        <option value="">Seleccione...</option>
+                        <option value="">Seleccionar promotor...</option>
                         {% for p in promotores %}
-                        <option value="{{ p.id }}" {% if form.promotor_id == p.id %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
+                        <option value="{{ p.id }}" {% if form.promotor_id|string == p.id|string %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -147,8 +152,28 @@
             </div>
             <div class="row g-3 mb-4">
                 <div class="col-12">
-                    <label class="form-label" for="observaciones">Observaciones</label>
-                    <textarea class="form-control" name="observaciones" id="observaciones" rows="3">{{ form.observaciones or '' }}</textarea>
+                    <label class="form-label" for="observaciones">Observaciones <small class="text-muted">(opcional)</small></label>
+                    <textarea class="form-control" name="observaciones" id="observaciones" rows="3" placeholder="Ej. Interesado en beca, visita con padres...">{{ form.observaciones or '' }}</textarea>
+                </div>
+            </div>
+
+            <h5 class="text-secondary mb-3 registro-section-header"><span class="badge bg-secondary me-2 d-inline-flex align-items-center justify-content-center" style="width:28px; height:28px; border-radius:50%; padding:0; font-size:0.8rem;">6</span><i data-lucide="image" class="me-2"></i>Foto del Estudiante <small class="text-muted fw-normal ms-2">(opcional)</small></h5>
+            <div class="row g-3 mb-4 align-items-center">
+                <div class="col-12 col-md-auto text-center">
+                    <div id="alumnoFotoWrap" style="width:110px; height:110px; border:2px solid var(--border-color); border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center; background:var(--surface-2); margin:0 auto;">
+                        <img id="alumnoFotoPlaceholder" src="{{ url_for('static', filename='img/avatar-default.svg') }}" alt="Avatar por defecto" style="width:100%; height:100%; object-fit:cover; opacity:0.7;">
+                        <img id="alumnoFotoPreview" src="" alt="Foto del estudiante" style="display:none; width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                    </div>
+                </div>
+                <div class="col-12 col-md-8 text-center text-md-start">
+                    <div class="d-flex flex-wrap gap-2 mb-2 justify-content-center justify-content-md-start">
+                        <button type="button" class="btn btn-sm btn-primary" id="btnCambiarFotoAlumno"><i data-lucide="camera" class="me-1"></i><span id="btnCambiarFotoAlumnoText">Añadir foto</span></button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" id="btnEliminarFotoAlumno" style="display:none;"><i data-lucide="trash-2" class="me-1"></i>Eliminar</button>
+                    </div>
+                    <input type="file" id="foto" name="foto" accept=".png,.jpg,.jpeg,.webp,.gif" capture="environment" style="display:none;">
+                    <input type="hidden" name="eliminar_foto" id="eliminarFotoFlag" value="0">
+                    <div class="text-muted small text-center text-md-start"><i data-lucide="info" class="me-1"></i>JPG, PNG, WebP o GIF · máx. 2 MB · 1000x1000 px · opcional · en móvil puedes usar la cámara</div>
+                    <div id="fotoFeedback" class="invalid-feedback d-block" style="display:none;"></div>
                 </div>
             </div>
 
@@ -193,6 +218,14 @@ document.querySelector('select[name="institucion_id"]').addEventListener('change
         document.getElementById('distrito').value = '';
     }
 });
+// Re-hidratar distrito/provincia si el form ya viene con institucion (tras error)
+(function(){
+    var sel = document.querySelector('select[name="institucion_id"]');
+    if (sel && sel.value) {
+        var ev = new Event('change', {bubbles:true});
+        sel.dispatchEvent(ev);
+    }
+})();
 
 document.querySelector('input[name="dni"]').addEventListener('blur', function() {
     const dni = this.value;
@@ -201,7 +234,7 @@ document.querySelector('input[name="dni"]').addEventListener('blur', function() 
             .then(r => r.json()).then(d => {
                 if (d.existe) {
                     this.classList.add('is-invalid');
-                    document.getElementById('dniFeedback').textContent = 'El DNI ya está registrado.';
+                    document.getElementById('dniFeedback').textContent = 'Ese DNI ya está registrado como estudiante activo.';
                 } else {
                     this.classList.remove('is-invalid');
                     document.getElementById('dniFeedback').textContent = '';
@@ -226,5 +259,100 @@ function actualizarCampos() {
 }
 
 setInterval(actualizarCampos, 1000);
+
+// Foto del estudiante — preview + validación + capture
+(function() {
+    var input = document.getElementById('foto');
+    var btnCambiar = document.getElementById('btnCambiarFotoAlumno');
+    var btnEliminar = document.getElementById('btnEliminarFotoAlumno');
+    var preview = document.getElementById('alumnoFotoPreview');
+    var placeholder = document.getElementById('alumnoFotoPlaceholder');
+    var feedback = document.getElementById('fotoFeedback');
+    var flag = document.getElementById('eliminarFotoFlag');
+    if (!input || !btnCambiar) return;
+    btnCambiar.addEventListener('click', function(){ input.click(); });
+    var btnText = document.getElementById('btnCambiarFotoAlumnoText');
+    if (btnEliminar) btnEliminar.addEventListener('click', function(){
+        input.value = '';
+        preview.style.display = 'none';
+        preview.src = '';
+        placeholder.style.display = 'block';
+        btnEliminar.style.display = 'none';
+        if (btnText) btnText.textContent = 'Añadir foto';
+        if (flag) flag.value = '1';
+        if (feedback) { feedback.textContent=''; feedback.style.display='none'; }
+    });
+    input.addEventListener('change', function(){
+        var file = input.files[0];
+        if (!file) return;
+        var allowed = ['image/png','image/jpeg','image/jpg','image/webp','image/gif'];
+        if (allowed.indexOf(file.type) === -1 && !/\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
+            if (feedback) { feedback.textContent='Formato no permitido. Use JPG, PNG, WebP o GIF.'; feedback.style.display='block'; }
+            input.value=''; return;
+        }
+        if (file.size > 2*1024*1024) {
+            if (feedback) { feedback.textContent='La imagen supera los 2 MB.'; feedback.style.display='block'; }
+            input.value=''; return;
+        }
+        if (feedback) { feedback.textContent=''; feedback.style.display='none'; }
+        if (flag) flag.value='0';
+        var reader = new FileReader();
+        reader.onload = function(e){
+            preview.src = e.target.result;
+            preview.style.display='block';
+            placeholder.style.display='none';
+            if (btnEliminar) btnEliminar.style.display='inline-flex';
+            if (btnText) btnText.textContent = 'Cambiar foto';
+        };
+        reader.readAsDataURL(file);
+    });
+})();
+
+
+// Spinner en Guardar — evita doble submit y da feedback
+(function() {
+    var form = document.getElementById('formRegistro');
+    var btn = form ? form.querySelector('button[type="submit"]') : null;
+    if (!form || !btn) return;
+    var original = btn.innerHTML;
+    form.addEventListener('submit', function(e){
+        if (!form.checkValidity()) {
+            setTimeout(function(){ btn.disabled=false; btn.innerHTML=original; }, 100);
+            return;
+        }
+        if (btn.disabled) { e.preventDefault(); return; }
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+    });
+})();
+
+// Barra de progreso fina por scroll (usa main-content, sin reflow del sidebar)
+(function() {
+    var progress = document.getElementById('registroProgress');
+    var form = document.getElementById('formRegistro') || document.querySelector('form');
+    var mainContent = document.querySelector('.main-content');
+    if (!progress || !form) return;
+    var ticking = false;
+    function updateProgress() {
+        var scrollTop = mainContent ? mainContent.scrollTop : (window.scrollY || document.documentElement.scrollTop);
+        var viewport = mainContent ? mainContent.clientHeight : window.innerHeight;
+        var scrollHeight = mainContent ? mainContent.scrollHeight : document.documentElement.scrollHeight;
+        var maxScroll = scrollHeight - viewport;
+        var scrolled = maxScroll > 0 ? scrollTop / maxScroll : 1;
+        scrolled = Math.max(0, Math.min(1, scrolled));
+        progress.style.width = (scrolled * 100) + '%';
+        ticking = false;
+    }
+    function onScroll() {
+        if (!ticking) {
+            ticking = true;
+            requestAnimationFrame(updateProgress);
+        }
+    }
+    var scroller = mainContent || window;
+    scroller.addEventListener('scroll', onScroll, {passive:true});
+    window.addEventListener('resize', onScroll);
+    updateProgress();
+})();
 </script>
 {% endblock %}

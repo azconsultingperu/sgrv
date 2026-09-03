@@ -9,7 +9,12 @@
             </span>
         </div>
         <div class="ms-auto d-flex align-items-center gap-2 flex-shrink-0">
-            <span class="badge clock-badge px-3 py-2" id="relojNavbar">--:--:--</span>
+            <span class="badge clock-badge px-3 py-2 d-inline-flex align-items-center gap-2" id="relojNavbar" title="Hora local de tu dispositivo" aria-label="Reloj">
+                <i data-lucide="clock" style="width:14px; height:14px; flex-shrink:0;"></i>
+                <span id="relojHora" style="font-variant-numeric: tabular-nums; font-weight:700;">--:--</span>
+                <span id="relojAmPm" style="font-size:0.72rem; font-weight:700; opacity:0.9;"></span>
+                <span id="relojFecha" class="d-none d-sm-inline text-muted small" style="font-variant-numeric: tabular-nums;"></span>
+            </span>
             <button class="btn btn-sm btn-outline-secondary" id="themeToggle" type="button">
                 <i data-lucide="moon" id="themeIcon"></i>
             </button>

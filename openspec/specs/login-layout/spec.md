@@ -2,7 +2,7 @@
 
 Define el layout compacto del login para que la tarjeta sea estrecha y centrada, el link de recuperación quede como acción secundaria debajo del botón y el espaciado vertical quede equilibrado sin afectar autenticación.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Tarjeta estrecha y centrada
 

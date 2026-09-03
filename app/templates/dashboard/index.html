@@ -306,7 +306,7 @@ if (mostrarVacioOSiDatos(document.getElementById('chartColegios'), 'sinDatosCole
 const _maxColegios = Math.max(0, ...colegios.map(c => c.total));
 chartColegios = new Chart(document.getElementById('chartColegios'), {
     type: 'bar',
-    data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: chartColores().primary, barPercentage: 0.35, categoryPercentage: 0.5, maxBarThickness: 70 }] },
+    data: { labels: colegios.map(c => c.colegio.substring(0,20)), datasets: [{ label: 'Alumnos', data: colegios.map(c => c.total), backgroundColor: chartColores().primary, borderRadius: 3, borderSkipped: false, barPercentage: 0.35, categoryPercentage: 0.5, maxBarThickness: 70 }] },
     options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 14 } }, plugins: { legend: { display: false }, tooltip: { enabled: true, position: 'nearest', yAlign: 'bottom', xAlign: 'center', caretSize: 7, caretPadding: 9, padding: 9, cornerRadius: 7, displayColors: false, backgroundColor: 'rgba(17,24,39,0.92)', titleColor: '#fff', bodyColor: '#fff', borderColor: 'rgba(255,255,255,0.12)', borderWidth: 1, titleAlign: 'center', bodyAlign: 'center', titleFont: { weight: '600', size: 13 }, bodyFont: { weight: '400', size: 13 } } },
         scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
                   y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis }, suggestedMax: _maxColegios ? Math.ceil(_maxColegios * 1.12) : undefined, beginAtZero: true } } }
@@ -319,7 +319,7 @@ if (mostrarVacioOSiDatos(document.getElementById('chartDistritos'), 'sinDatosDis
 const _maxDistritos = Math.max(0, ...distritos.map(d => d.total));
 chartDistritos = new Chart(document.getElementById('chartDistritos'), {
     type: 'bar',
-    data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: chartColores().success, barPercentage: 0.35, categoryPercentage: 0.5, maxBarThickness: 70 }] },
+    data: { labels: distritos.map(d => d.distrito), datasets: [{ label: 'Alumnos', data: distritos.map(d => d.total), backgroundColor: chartColores().success, borderRadius: 3, borderSkipped: false, barPercentage: 0.35, categoryPercentage: 0.5, maxBarThickness: 70 }] },
     options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 14 } }, plugins: { legend: { display: false }, tooltip: { enabled: true, position: 'nearest', yAlign: 'bottom', xAlign: 'center', caretSize: 7, caretPadding: 9, padding: 9, cornerRadius: 7, displayColors: false, backgroundColor: 'rgba(17,24,39,0.92)', titleColor: '#fff', bodyColor: '#fff', borderColor: 'rgba(255,255,255,0.12)', borderWidth: 1, titleAlign: 'center', bodyAlign: 'center', titleFont: { weight: '600', size: 13 }, bodyFont: { weight: '400', size: 13 } } },
         scales: { x: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis } },
                   y: { grid: { color: chartColores().grid }, ticks: { color: chartColores().ticks }, border: { color: chartColores().axis }, suggestedMax: _maxDistritos ? Math.ceil(_maxDistritos * 1.12) : undefined, beginAtZero: true } } }

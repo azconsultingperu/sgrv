@@ -7,13 +7,41 @@ document.addEventListener('DOMContentLoaded', function () {
     /* --- Reloj en navbar ------------------------------------ */
     try {
         var relojEl = document.getElementById('relojNavbar');
+        var relojHora = document.getElementById('relojHora');
+        var relojAmPm = document.getElementById('relojAmPm');
+        var relojFecha = document.getElementById('relojFecha');
         if (relojEl) {
             function actualizarReloj() {
                 var d = new Date();
-                var pad = function (n) { return String(n).padStart(2, '0'); };
-                relojEl.textContent =
-                    pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + '/' + d.getFullYear() +
-                    ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                var horaStr = '';
+                var ampm = '';
+                var fechaCorta = '';
+                var fechaLarga = '';
+                try {
+                    var t = d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
+                    // Normalizar "02:05:22 p. m." -> "02:05:22 PM"
+                    t = t.replace(/\./g, '').replace(/\s+/g, ' ').trim().toUpperCase().replace('P M','PM').replace('A M','AM');
+                    var m = t.match(/(.*)\s(AM|PM)$/);
+                    if (m) { horaStr = m[1]; ampm = m[2]; } else { horaStr = t; }
+                    fechaCorta = d.toLocaleDateString('es-PE', {day:'2-digit', month:'short'}).replace('.','').toLowerCase();
+                    fechaLarga = d.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+                    fechaLarga = fechaLarga.charAt(0).toUpperCase() + fechaLarga.slice(1);
+                } catch(e) {
+                    var pad = function(n){ return String(n).padStart(2,'0'); };
+                    var h = d.getHours(); var isPM = h >= 12;
+                    var h12 = h % 12 || 12;
+                    horaStr = pad(h12) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                    ampm = isPM ? 'PM' : 'AM';
+                    var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+                    fechaCorta = pad(d.getDate()) + ' ' + meses[d.getMonth()];
+                    fechaLarga = pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear();
+                }
+                if (relojHora) relojHora.textContent = horaStr;
+                if (relojAmPm) relojAmPm.textContent = ampm;
+                if (relojFecha) relojFecha.textContent = fechaCorta;
+                var title = fechaLarga + ' — ' + horaStr + ' ' + ampm + ' (hora local)';
+                relojEl.setAttribute('title', title);
+                relojEl.setAttribute('aria-label', title);
             }
             actualizarReloj();
             setInterval(actualizarReloj, 1000);
@@ -187,13 +215,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    /* --- Spinner en submit de forms (excluye forms ocultos) - solo si el form es válido */
     document.querySelectorAll('form:not([style*="display:none"])').forEach(function (form) {
         form.addEventListener('submit', function (e) {
-            // Si hay validación inline activa y el form es inválido, no mostrar spinner
             var hasInvalid = form.querySelector('.is-invalid');
-            // checkValidity es sincrónico y respeta required/pattern; si falla, no spinner
-            if (hasInvalid || (typeof form.checkValidity === 'function' && !form.checkValidity())) {
+            var checkValid = typeof form.checkValidity === 'function' ? form.checkValidity() : true;
+            if (hasInvalid || !checkValid) {
                 return;
             }
             var btn = this.querySelector('button[type="submit"]');
@@ -391,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var toastContainer = document.getElementById('toastContainer');
     var flashData      = document.getElementById('flashData');
 
-    var TOAST_ICONOS = { success: 'circle-check', error: 'circle-x', warning: 'triangle-alert', info: 'info' };
+    var TOAST_ICONOS = { success: 'circle-check', error: 'triangle-alert', warning: 'triangle-alert', info: 'info' };
     var TOAST_TITULOS = { success: 'Éxito', error: 'Error', warning: 'Advertencia', info: 'Aviso' };
     var TOAST_DURACION_POR_DEFECTO = { warning: 15000, error: 9000, success: 7000, info: 7000 };
     var TOAST_MAX_VISIBLES = 3;
@@ -490,7 +516,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (entry.descripcion) {
             var desc = document.createElement('div');
             desc.className = 'mc-toast-descripcion';
-            desc.textContent = entry.descripcion;
+            if (entry.descripcion.indexOf('<strong>') !== -1 || entry.descripcion.indexOf('<b>') !== -1) {
+                desc.innerHTML = entry.descripcion;
+            } else {
+                desc.textContent = entry.descripcion;
+            }
             cuerpo.appendChild(desc);
         }
 

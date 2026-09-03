@@ -36,19 +36,77 @@ def crear():
             flash('El DNI debe tener exactamente 8 dígitos numéricos.', 'danger')
             return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
-        if Usuario.query.filter_by(dni=dni).first():
-            flash('El DNI ya está registrado.', 'danger')
-            return render_template('usuarios/crear.html', roles=roles, form=request.form)
-
-        if Usuario.query.filter_by(username=dni).first():
-            flash('El DNI ya está registrado como usuario.', 'danger')
-            return render_template('usuarios/crear.html', roles=roles, form=request.form)
-
         if not email or not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             flash('El correo electrónico no es válido.', 'danger')
             return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
-        if Usuario.query.filter_by(email=email).first():
+        errores_password = validar_fortaleza_password(password)
+        if errores_password:
+            for e in errores_password:
+                flash(e, 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+        # Unicidad solo entre activos (eliminado=False) — permite reusar DNI/email de eliminados
+        if Usuario.query.filter_by(dni=dni, eliminado=False).first():
+            flash('El DNI ya está registrado.', 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+        if Usuario.query.filter_by(username=dni, eliminado=False).first():
+            flash('El DNI ya está registrado como usuario.', 'danger')
+            return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+        # Email: si es reactivación, permitir que el email coincida con la fila eliminada misma
+        eliminado_existente = Usuario.query.filter_by(dni=dni, eliminado=True).first()
+        if eliminado_existente:
+            # Si el nuevo email ya lo usa otro activo distinto al que se va a reactivar, bloquear
+            otro_activo_email = Usuario.query.filter(Usuario.email == email, Usuario.eliminado == False, Usuario.id != eliminado_existente.id).first()
+            if otro_activo_email:
+                flash('El correo electrónico ya está registrado.', 'danger')
+                return render_template('usuarios/crear.html', roles=roles, form=request.form)
+            # Reactivar fila existente
+            eliminado_existente.nombres = nombres
+            eliminado_existente.apellidos = apellidos
+            eliminado_existente.username = username
+            eliminado_existente.email = email
+            eliminado_existente.rol_id = rol_id
+            eliminado_existente.eliminado = False
+            eliminado_existente.estado = True
+            eliminado_existente.intentos_fallidos = 0
+            eliminado_existente.bloqueado_hasta = None
+            eliminado_existente.debe_cambiar_password = False
+            # avatar se conserva si existía, pero si se quiere limpiar se puede; lo dejamos
+            eliminado_existente.set_password(password)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                # Si la BD aún tiene UNIQUE global (MySQL sin índice parcial), traducir a mensaje amigable
+                if 'UNIQUE' in str(e) or 'unique' in str(e).lower() or 'Duplicate' in str(e):
+                    flash('El DNI ya está registrado.', 'danger')
+                else:
+                    flash('Error al reactivar el usuario.', 'danger')
+                return render_template('usuarios/crear.html', roles=roles, form=request.form)
+
+            # Auditoría de reactivación (distinta de creación)
+            try:
+                from app.modules.auditoria.domain.auditoria import Auditoria
+                from flask import request as _req
+                ip = _req.remote_addr if _req else None
+                ua = _req.user_agent.string if _req and getattr(_req, 'user_agent', None) else None
+                aud = Auditoria(usuario_id=current_user.id, accion='Usuario reactivado', modulo='Usuarios', detalle=f'Usuario reactivado: {dni} ({nombres} {apellidos})', ip_address=ip, user_agent=ua)
+                db.session.add(aud)
+                db.session.commit()
+            except Exception:
+                try:
+                    db.session.rollback()
+                except Exception:
+                    pass
+            publish(UsuarioCreado(usuario_id=eliminado_existente.id, username=eliminado_existente.username, dni=eliminado_existente.dni, actor_id=current_user.id))
+            flash('Usuario reactivado exitosamente.', 'success')
+            return redirect(url_for('usuarios.index'))
+
+        # No es reactivación: validar email contra activos
+        if Usuario.query.filter_by(email=email, eliminado=False).first():
             flash('El correo electrónico ya está registrado.', 'danger')
             return render_template('usuarios/crear.html', roles=roles, form=request.form)
 
@@ -56,11 +114,6 @@ def crear():
             dni=dni, nombres=nombres, apellidos=apellidos,
             username=username, email=email, rol_id=rol_id
         )
-        errores_password = validar_fortaleza_password(password)
-        if errores_password:
-            for e in errores_password:
-                flash(e, 'danger')
-            return render_template('usuarios/crear.html', roles=roles, form=request.form)
         usuario.set_password(password)
         db.session.add(usuario)
         db.session.commit()
@@ -168,5 +221,5 @@ def verificar_dni():
     dni = request.args.get('dni', '').strip()
     if not re.match(r'^\d{8}$', dni):
         return jsonify({'existe': False})
-    existe = Usuario.query.filter_by(dni=dni).first() is not None
+    existe = Usuario.query.filter_by(dni=dni, eliminado=False).first() is not None
     return jsonify({'existe': existe})

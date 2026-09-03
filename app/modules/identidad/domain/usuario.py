@@ -9,14 +9,25 @@ from app.shared.time_utils import peru_now
 
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
+    __table_args__ = (
+        db.Index('uq_usuarios_dni_activo', 'dni', unique=True,
+                 postgresql_where=db.text('eliminado = false'),
+                 sqlite_where=db.text('eliminado = 0')),
+        db.Index('uq_usuarios_username_activo', 'username', unique=True,
+                 postgresql_where=db.text('eliminado = false'),
+                 sqlite_where=db.text('eliminado = 0')),
+        db.Index('uq_usuarios_email_activo', 'email', unique=True,
+                 postgresql_where=db.text('eliminado = false'),
+                 sqlite_where=db.text('eliminado = 0')),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
-    dni = db.Column(db.String(8), unique=True, nullable=False, index=True)
+    dni = db.Column(db.String(8), nullable=False, index=True)
     nombres = db.Column(db.String(100), nullable=False)
     apellidos = db.Column(db.String(100), nullable=False)
-    username = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    username = db.Column(db.String(50), nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    email = db.Column(db.String(120), nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
     estado = db.Column(db.Boolean, default=True)
     ultimo_acceso = db.Column(db.DateTime)

@@ -23,7 +23,7 @@
                     </picture>
                     <h4 class="auth-title">SGRV</h4>
                     <p class="auth-subtitle">IESTP "Paiján"</p>
-                    <p class="auth-desc">IESTP Paiján · R.M. N° 498-87-ED</p>
+                    <p class="auth-desc">R.M. N° 498-87-ED</p>
                 </div>
                 <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm" novalidate>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -43,10 +43,10 @@
                         </div>
                     </div>
                     <div class="login-options mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input" name="recordar" id="recordar">
-                            <label class="form-check-label small" for="recordar">Recordar usuario</label>
-                        </div>
+                        <label class="form-check custom-check d-flex align-items-center gap-2 py-2 px-3 rounded-2" for="recordar" style="background:var(--surface-2); border:1px solid var(--border-color); cursor:pointer;">
+                            <input type="checkbox" class="form-check-input m-0" name="recordar" id="recordar" style="flex-shrink:0;">
+                            <span class="small">Recordar usuario</span>
+                        </label>
                     </div>
                     <button type="submit" class="btn btn-primary login-btn w-100">
                         <i data-lucide="log-in" class="me-2"></i>Iniciar Sesión

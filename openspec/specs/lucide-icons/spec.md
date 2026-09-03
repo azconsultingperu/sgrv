@@ -2,7 +2,7 @@
 
 Unificar los íconos de toda la interfaz del SGRV con Lucide para lograr trazos más finos, consistentes y modernos, reemplazando los actuales de Bootstrap Icons.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Íconos Lucide en toda la UI
 

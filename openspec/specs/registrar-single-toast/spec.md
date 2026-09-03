@@ -2,7 +2,7 @@
 
 Evitar spam de notificaciones en el registro de visitas mostrando un solo cartel de error cuando faltan datos, en lugar de uno por cada campo.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Un solo toast para errores de validación
 

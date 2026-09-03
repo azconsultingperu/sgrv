@@ -23,7 +23,7 @@
             <div class="col-md-2">
                 <input type="text" class="form-control form-control-sm" name="apellidos" placeholder="Apellidos" value="{{ search_params.apellidos or '' }}">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <select class="form-select form-select-sm" name="sexo">
                     <option value="">Sexo</option>
                     <option value="M" {% if search_params.sexo == 'M' %}selected{% endif %}>Masculino</option>
@@ -31,11 +31,11 @@
                     <option value="O" {% if search_params.sexo == 'O' %}selected{% endif %}>Otros</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <select class="form-select form-select-sm" name="carrera_id">
                     <option value="">Carrera</option>
                     {% for c in carreras %}
-                    <option value="{{ c.id }}" {% if search_params.carrera_id|string == c.id|string %}selected{% endif %}>{{ c.nombre[:20] }}</option>
+                    <option value="{{ c.id }}" {% if search_params.carrera_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -47,11 +47,16 @@
 </div>
 
 <div class="card border-0 shadow-sm">
-    <div class="card-body p-0">
+    <div class="card-body p-0" style="position:relative;">
+        <div id="consultaCargaOverlay" style="display:none; position:absolute; inset:0; z-index:10; align-items:center; justify-content:center; flex-direction:column; gap:1rem; border-radius:var(--radius-md);" aria-live="polite" aria-busy="true">
+            <div class="spinner-border" role="status" style="width:48px; height:48px; color:var(--primary-color); border-width:4px;"><span class="visually-hidden">Cargando...</span></div>
+            <div class="fw-semibold" style="color:var(--text-primary);">Cargando estudiantes...</div>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead class="table-light">
                     <tr>
+                        <th style="width:48px;"></th>
                         <th>DNI</th>
                         <th>Apellidos</th>
                         <th>Nombres</th>
@@ -65,6 +70,13 @@
                 <tbody>
                     {% for a in alumnos %}
                     <tr>
+                        <td style="width:48px; text-align:center;">
+                            {% if a.tiene_foto() %}
+                            <img src="{{ a.foto_url(thumb=True) }}" alt="Foto de {{ a.nombres }} {{ a.apellidos }}" loading="lazy" class="avatar-sm" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);">
+                            {% else %}
+                            <span class="avatar-sm d-inline-flex align-items-center justify-content-center" style="width:32px; height:32px; border-radius:50%; background:{{ a.foto_color() }}; color:#fff; font-weight:700; font-size:0.72rem; border:1px solid var(--border-color);">{{ a.iniciales() }}</span>
+                            {% endif %}
+                        </td>
                         <td>{{ a.dni }}</td>
                         <td>{{ a.apellidos }}</td>
                         <td>{{ a.nombres }}</td>
@@ -97,7 +109,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="8">
+                        <td colspan="9">
                             {% set ns = namespace(filtros=false) %}
                             {% for k, v in search_params.items() if k != 'page' %}
                                 {% if v %}{% set ns.filtros = true %}{% endif %}
@@ -132,4 +144,71 @@
     </div>
     {% endif %}
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Intercept síncrono — corre inmediato, después de flashData pero antes de DOMContentLoaded de main.js
+(function(){
+  var fd = document.getElementById('flashData');
+  var overlay = document.getElementById('consultaCargaOverlay');
+  if (!fd) return;
+  try {
+    var raw = fd.getAttribute('data-messages') || '[]';
+    var msgs = JSON.parse(raw);
+    var trigger = null;
+    var remaining = [];
+    msgs.forEach(function(m){
+      var txt = Array.isArray(m) ? m[1] : (m.message || '');
+      var cat = Array.isArray(m) ? m[0] : (m.category || 'info');
+      if (!trigger && /Registro (creado|eliminado)/i.test(txt)) {
+        trigger = {cat: cat, txt: txt};
+      } else {
+        remaining.push(m);
+      }
+    });
+    if (trigger) {
+      // Solo deja el trigger para mostrar después, ignora otros flashes en este aterrizaje para no duplicar
+      fd.setAttribute('data-messages', JSON.stringify([]));
+      window._consultaCargaTrigger = trigger;
+      window._consultaCargaRemaining = remaining;
+      if (overlay) overlay.style.display = 'flex';
+      window._consultaCargaStart = performance.now();
+    }
+  } catch(e) {}
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var trigger = window._consultaCargaTrigger;
+  if (!trigger) return;
+  if (window._consultaCargaDone) return;
+  window._consultaCargaDone = true;
+  var overlay = document.getElementById('consultaCargaOverlay');
+  if (!overlay) return;
+  var container = document.getElementById('toastContainer');
+  if (overlay.style.display !== 'flex') {
+    if (container) container.innerHTML = '';
+    overlay.style.display = 'flex';
+  } else {
+    if (container) container.innerHTML = '';
+  }
+  var start = window._consultaCargaStart || performance.now();
+  var elapsedAlready = performance.now() - start;
+  var remaining = Math.max(0, 4500 - elapsedAlready);
+  if (window.console) console.log('[consulta-carga] trigger', trigger.txt, 'remaining', Math.round(remaining));
+  setTimeout(function(){
+    overlay.style.display = 'none';
+    var elapsed = performance.now() - start;
+    if (window.console) console.log('[consulta-carga] overlay', Math.round(elapsed), 'ms');
+    if (window.mostrarToast) {
+      if (container) container.innerHTML = '';
+      var cat = trigger.cat;
+      var titulo = (cat === 'success') ? 'Éxito' : (cat === 'danger' ? 'Error' : 'Aviso');
+      window.mostrarToast(cat, titulo, trigger.txt);
+    }
+  }, remaining);
+});
+</script>
 {% endblock %}
