@@ -41,10 +41,43 @@
     {% endif %}
 
     <div id="flashData" data-messages='{{ get_flashed_messages(with_categories=true) | tojson | safe }}' style="display:none;"></div>
+    <script>
+// Intercept síncrono consulta — debe correr ANTES de main.js para que el guard bloquee el toast inmediato
+// y solo el delayed suene. No-op si no hay overlay.
+(function(){
+  var fd = document.getElementById('flashData');
+  var overlay = document.getElementById('consultaCargaOverlay');
+  // si no estamos en /consulta (no hay overlay), no hacer nada y dejar flashes intactos
+  if (!fd || !overlay) return;
+  try {
+    var raw = fd.getAttribute('data-messages') || '[]';
+    var msgs = JSON.parse(raw);
+    var trigger = null;
+    var remaining = [];
+    msgs.forEach(function(m){
+      var txt = Array.isArray(m) ? m[1] : (m.message || '');
+      var cat = Array.isArray(m) ? m[0] : (m.category || 'info');
+      if (!trigger && /Registro (creado|eliminado)/i.test(txt)) {
+        trigger = {cat: cat, txt: txt};
+      } else {
+        remaining.push(m);
+      }
+    });
+    if (trigger) {
+      fd.setAttribute('data-messages', JSON.stringify(remaining.length ? remaining : []));
+      // si hay remaining, se mostrarán inmediato; el trigger queda para delayed
+      window._consultaCargaTrigger = trigger;
+      window._consultaCargaRemaining = remaining;
+      overlay.style.display = 'flex';
+      window._consultaCargaStart = performance.now();
+    }
+  } catch(e) {}
+})();
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=38"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=40"></script>
     <script src="{{ url_for('static', filename='js/custom-select.js') }}?v=1"></script>
     {% block extra_js %}{% endblock %}
 </body>

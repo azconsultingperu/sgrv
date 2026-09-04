@@ -149,42 +149,15 @@
 
 {% block extra_js %}
 <script>
-// Intercept síncrono — corre inmediato, después de flashData pero antes de DOMContentLoaded de main.js
-(function(){
-  var fd = document.getElementById('flashData');
-  var overlay = document.getElementById('consultaCargaOverlay');
-  if (!fd) return;
-  try {
-    var raw = fd.getAttribute('data-messages') || '[]';
-    var msgs = JSON.parse(raw);
-    var trigger = null;
-    var remaining = [];
-    msgs.forEach(function(m){
-      var txt = Array.isArray(m) ? m[1] : (m.message || '');
-      var cat = Array.isArray(m) ? m[0] : (m.category || 'info');
-      if (!trigger && /Registro (creado|eliminado)/i.test(txt)) {
-        trigger = {cat: cat, txt: txt};
-      } else {
-        remaining.push(m);
-      }
-    });
-    if (trigger) {
-      // Solo deja el trigger para mostrar después, ignora otros flashes en este aterrizaje para no duplicar
-      fd.setAttribute('data-messages', JSON.stringify([]));
-      window._consultaCargaTrigger = trigger;
-      window._consultaCargaRemaining = remaining;
-      if (overlay) overlay.style.display = 'flex';
-      window._consultaCargaStart = performance.now();
-    }
-  } catch(e) {}
-})();
-</script>
-<script>
 document.addEventListener('DOMContentLoaded', function(){
   var trigger = window._consultaCargaTrigger;
   if (!trigger) return;
-  if (window._consultaCargaDone) return;
+  if (window._consultaCargaDone) {
+    if (window.console) console.log('[consulta-carga] ya mostrado, skip');
+    return;
+  }
   window._consultaCargaDone = true;
+  if (window.console) console.log('[consulta-carga] mostrando overlay para', trigger.txt);
   var overlay = document.getElementById('consultaCargaOverlay');
   if (!overlay) return;
   var container = document.getElementById('toastContainer');
@@ -206,6 +179,8 @@ document.addEventListener('DOMContentLoaded', function(){
       if (container) container.innerHTML = '';
       var cat = trigger.cat;
       var titulo = (cat === 'success') ? 'Éxito' : (cat === 'danger' ? 'Error' : 'Aviso');
+      // Permite que el toast delayed sí se cree (limpia el flag que bloquea el inmediato)
+      window._consultaCargaTrigger = null;
       window.mostrarToast(cat, titulo, trigger.txt);
     }
   }, remaining);

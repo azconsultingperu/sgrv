@@ -2,6 +2,30 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-09-04] — Reloj centrado, persistencia de formulario y carga de consulta
+
+### Agregado
+
+- **Specs sincronizadas**: `registro-form` con persistencia de selects/derivados tras error de validación.
+
+### Cambiado
+
+- **Reloj del navbar**: fecha pasa de `04 set` (es-PE) a `Sept 04` (inglés 4 letras Sept) y centrado vertical perfecto icono↔texto (`line-height:1`, `align-self:center`, `display:block` en icono 14px, padding simétrico 0.35rem 0.75rem) en `navbar.html` + `style.css` + `main.js`.
+- **Reportes**: explorada mejora completa (branding B, 2 hojas Resumen+Detalle, filtros, rol 4, gráficos) como `mejora-reportes-excel` (archivada sin aplicar — reportes quedan como antes por decisión de producto).
+
+### Corregido
+
+- **Persistencia de formulario de registro**: selects `institucion/carrera/promotor` ahora usan `|string` compare y `is-invalid`, derivados `distrito/provincia/edad` se rehidratan al recargar con error (`registro/index.html` + `editar.html`).
+- **Doble sonido en consulta**: el sonido de notificación ya no suena 2 veces al aterrizar desde registro/eliminar. Intercept movido a `base.html` antes de `main.js` para que `_consultaCargaTrigger` bloquee el toast inmediato y solo el delayed suene 1 vez (regla 1:1 sonido↔toast visible), overlay 4500ms sin regresión.
+
+### Archivado
+
+- `2026-09-04-fix-registro-persistencia` → `openspec/specs/registro-form`
+- `2026-09-04-fix-reloj-centrado-fecha` (skip-specs, spec `navbar-clock` pendiente de sync manual)
+- `2026-09-04-fix-consulta-doble-sonido` (skip-specs, spec `consulta-listado` pendiente de sync manual)
+- `2026-09-04-mejora-reportes-excel` (skip-specs, descartada — reportes revertidos)
+
+
 ## [2026-08-30] — Iconografía Lucide
 
 ### Cambiado

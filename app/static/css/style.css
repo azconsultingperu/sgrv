@@ -688,6 +688,7 @@ button,
     align-items: center;
     gap: 0.35rem;
     min-height: 34px;
+    padding: 0.35rem 0.75rem;
     color: var(--text-primary) !important;
     background: var(--surface-2) !important;
     border: 1px solid var(--border-color) !important;
@@ -698,22 +699,38 @@ button,
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;
     white-space: nowrap;
+    line-height: 1;
+}
+.clock-badge i[data-lucide="clock"],
+.clock-badge svg.lucide,
+.clock-badge svg {
+    display: block;
+    flex-shrink: 0;
+    align-self: center;
+    width: 14px;
+    height: 14px;
 }
 .clock-badge #relojHora {
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    line-height: 1;
+    align-self: center;
 }
 .clock-badge #relojAmPm {
     font-size: 0.68rem;
     font-weight: 700;
     opacity: 0.9;
     letter-spacing: 0.04em;
+    line-height: 1;
+    align-self: center;
 }
 .clock-badge #relojFecha {
     font-size: 0.74rem;
     color: var(--text-muted) !important;
     font-weight: 500;
     font-variant-numeric: tabular-nums;
+    line-height: 1;
+    align-self: center;
 }
 
 #consultaCargaOverlay {

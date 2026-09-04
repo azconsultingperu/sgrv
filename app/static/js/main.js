@@ -17,24 +17,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 var ampm = '';
                 var fechaCorta = '';
                 var fechaLarga = '';
+                var _pad2 = function(n){ return String(n).padStart(2,'0'); };
+                var _MESES_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sept','Oct','Nov','Dec'];
                 try {
                     var t = d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
                     // Normalizar "02:05:22 p. m." -> "02:05:22 PM"
                     t = t.replace(/\./g, '').replace(/\s+/g, ' ').trim().toUpperCase().replace('P M','PM').replace('A M','AM');
                     var m = t.match(/(.*)\s(AM|PM)$/);
                     if (m) { horaStr = m[1]; ampm = m[2]; } else { horaStr = t; }
-                    fechaCorta = d.toLocaleDateString('es-PE', {day:'2-digit', month:'short'}).replace('.','').toLowerCase();
+                    fechaCorta = _MESES_SHORT[d.getMonth()] + ' ' + _pad2(d.getDate());
                     fechaLarga = d.toLocaleDateString('es-PE', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
                     fechaLarga = fechaLarga.charAt(0).toUpperCase() + fechaLarga.slice(1);
                 } catch(e) {
-                    var pad = function(n){ return String(n).padStart(2,'0'); };
                     var h = d.getHours(); var isPM = h >= 12;
                     var h12 = h % 12 || 12;
-                    horaStr = pad(h12) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                    horaStr = _pad2(h12) + ':' + _pad2(d.getMinutes()) + ':' + _pad2(d.getSeconds());
                     ampm = isPM ? 'PM' : 'AM';
-                    var meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-                    fechaCorta = pad(d.getDate()) + ' ' + meses[d.getMonth()];
-                    fechaLarga = pad(d.getDate()) + '/' + pad(d.getMonth()+1) + '/' + d.getFullYear();
+                    fechaCorta = _MESES_SHORT[d.getMonth()] + ' ' + _pad2(d.getDate());
+                    fechaLarga = _pad2(d.getDate()) + '/' + _pad2(d.getMonth()+1) + '/' + d.getFullYear();
                 }
                 if (relojHora) relojHora.textContent = horaStr;
                 if (relojAmPm) relojAmPm.textContent = ampm;
@@ -483,6 +483,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function crearToast(entry) {
+        // Si hay carga de consulta activa, silencia TODO toast inmediato (sonará solo el delayed)
+        if (window._consultaCargaTrigger && entry.descripcion && /Registro (creado|eliminado)/i.test(entry.descripcion)) {
+            if (window.console) console.log('[toast] bloqueado inmediato por carga', entry.descripcion);
+            return;
+        }
         toastsVisiblesActuales++;
         // Sonido según tipo: error para danger/error, éxito para success
         if (entry.tipo === 'error' || entry.tipo === 'success') {
