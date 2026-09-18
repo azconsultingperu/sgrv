@@ -1,6 +1,8 @@
 from app.modules.identidad.domain.rol import Rol
 from app.modules.identidad.domain.usuario import Usuario
-from app.modules.registro.domain.promotor import Promotor
+# Promotor clásico: sin seed. El Promotor Responsable sale de usuarios con rol
+# Operador (union en vivo en registro_controller); la tabla promotores queda
+# solo para historial de visitas antiguas.
 from app.modules.registro.domain.carrera import Carrera
 from app.modules.registro.domain.institucion_educativa import InstitucionEducativa
 from app import db
@@ -80,23 +82,33 @@ def seed_data():
         db.session.add_all(carreras)
         db.session.commit()
 
-    if InstitucionEducativa.query.count() == 0:
-        colegios = [
-            InstitucionEducativa(nombre='I.E. San Juan', distrito='Paiján', provincia='Ascope', region='La Libertad', tipo='Público'),
-            InstitucionEducativa(nombre='I.E. Santa Rosa', distrito='Paiján', provincia='Ascope', region='La Libertad', tipo='Público'),
-            InstitucionEducativa(nombre='I.E. José Carlos Mariátegui', distrito='Paiján', provincia='Ascope', region='La Libertad', tipo='Público'),
-            InstitucionEducativa(nombre='I.E. Divino Maestro', distrito='Paiján', provincia='Ascope', region='La Libertad', tipo='Privado'),
-            InstitucionEducativa(nombre='I.E. San Martín de Porres', distrito='Rázuri', provincia='Ascope', region='La Libertad', tipo='Público'),
-            InstitucionEducativa(nombre='I.E. Manuel Gonzales Prada', distrito='Chicama', provincia='Ascope', region='La Libertad', tipo='Público'),
-        ]
-        db.session.add_all(colegios)
-        db.session.commit()
-
-    if Promotor.query.count() == 0:
-        promotores = [
-            Promotor(dni='22223333', nombres='Carlos', apellidos='López Pérez', email='clopez@iestppaijan.edu.pe', telefono='987654321'),
-            Promotor(dni='33334444', nombres='María', apellidos='García Torres', email='mgarcia@iestppaijan.edu.pe', telefono='987654322'),
-            Promotor(dni='44445555', nombres='Juan', apellidos='Rodríguez Silva', email='jrodriguez@iestppaijan.edu.pe', telefono='987654323'),
-        ]
-        db.session.add_all(promotores)
-        db.session.commit()
+    # Catálogo 2026-09-18 (imagen de dirección): solo las 10 I.E. visitadas.
+    # Las 6 seed originales (San Juan, Santa Rosa, Mariátegui, Divino Maestro,
+    # San Martín de Porres, Gonzales Prada) se eliminaron del catálogo; en BDs
+    # con historial quedan con activo=false (ver migración siguiente).
+    # Idempotente: solo inserta las que falten (por codigo_modular o nombre+distrito).
+    # 10 I.E. de imagen 2026-09-15 (ver migración 64fa6966886d)
+    nuevas_instituciones = [
+        ("I.E. 80055 Juan Ignacio Gutiérrez Fuente", "80055", "Paiján", "Ascope", "La Libertad", "Público"),
+        ("I.E. José Andrés Rázuri - Pto. Chicama", None, "Rázuri", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80085 Miguel Grau Seminario - Macabí Alto", "80085", "Rázuri", "Ascope", "La Libertad", "Público"),
+        ("I.E. Nuestra Señora de Lourdes", None, "Ascope", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80850 San Salvador", "80850", "Paiján", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80057 Inmaculada Concepción", "80057", "Chicama", "Ascope", "La Libertad", "Público"),
+        ("I.E. Leoncio Prado", None, "Paiján", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80878 Alfonso Ugarte - Licapa", "80878", "Paiján", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80053 José Olaya Balandra - La Arenita", "80053", "Paiján", "Ascope", "La Libertad", "Público"),
+        ("I.E. 80050 José Félix Black", "80050", "Paiján", "Ascope", "La Libertad", "Público"),
+    ]
+    for nombre, codigo, distrito, provincia, region, tipo in nuevas_instituciones:
+        exists = None
+        if codigo:
+            exists = InstitucionEducativa.query.filter_by(codigo_modular=codigo).first()
+        else:
+            exists = InstitucionEducativa.query.filter_by(nombre=nombre, distrito=distrito).first()
+        if not exists:
+            db.session.add(InstitucionEducativa(
+                nombre=nombre, codigo_modular=codigo, distrito=distrito,
+                provincia=provincia, region=region, tipo=tipo, activo=True
+            ))
+    db.session.commit()

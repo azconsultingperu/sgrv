@@ -1,0 +1,181 @@
+/* fecha-input.css — componente híbrido fecha */
+[data-fecha-wrap] {
+  position: relative;
+}
+.fecha-input-group {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  position: relative;
+}
+.fecha-input-group .form-control[data-fecha-visible] {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.fecha-input-group .fecha-btn {
+  flex: 0 0 auto;
+  min-height: var(--control-height);
+  padding: 0 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-left: 0;
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.fecha-input-group .fecha-btn:hover {
+  color: var(--primary-color);
+  background: var(--primary-soft);
+  border-color: var(--primary-color);
+}
+.fecha-input-group .fecha-btn.is-invalid {
+  border-color: var(--danger-color);
+}
+.fecha-input-group .fecha-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+.fecha-overlay {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 1055;
+  width: 300px;
+  max-width: min(300px, 90vw);
+  background: var(--surface-1);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 0.6rem;
+}
+.fecha-cal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.fecha-cal-header .fecha-nav {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.fecha-cal-header .fecha-nav:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary-color);
+}
+.fecha-month, .fecha-year {
+  flex: 1 1 auto;
+  min-height: var(--control-height-sm);
+  /* hereda 100% del form-select de SGRV — sin duplicar colores */
+}
+.fecha-cal-header .custom-select {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.fecha-cal-header .custom-select-button {
+  min-height: var(--control-height-sm);
+  font-size: var(--font-size-sm);
+}
+.fecha-cal-header .custom-select-menu {
+  z-index: 1060;
+  max-height: 200px;
+}
+/* Cuando no se ha inicializado custom-select (fallback), estilizar nativo igual a form-select */
+select.fecha-month:not(.custom-select-init),
+select.fecha-year:not(.custom-select-init) {
+  appearance: auto;
+  min-height: var(--control-height-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-sans);
+  padding: 0 0.5rem;
+}
+select.fecha-month:focus,
+select.fecha-year:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.16);
+  outline: none;
+}
+.fecha-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 0.2rem;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.fecha-weekdays span { padding: 0.2rem 0; }
+.fecha-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.fecha-day {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+  min-height: 32px;
+}
+.fecha-day:hover:not(:disabled) {
+  background: var(--primary-soft);
+  border-color: rgba(var(--bs-primary-rgb), 0.22);
+}
+.fecha-day.today {
+  border-color: var(--primary-color);
+  font-weight: 700;
+}
+.fecha-day.selected {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+.fecha-day.disabled {
+  color: var(--text-muted);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.fecha-day.muted {
+  visibility: hidden;
+}
+.fecha-cal-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+.fecha-feedback {
+  font-size: var(--font-size-xs);
+  color: var(--danger-color);
+  margin-top: 0.25rem;
+}
+[data-fecha-visible].is-invalid {
+  border-color: var(--danger-color);
+}

@@ -81,7 +81,7 @@
                         {% if visita %}
                         <tr><th class="text-muted">Fecha Visita</th><td>{{ visita.fecha_visita.strftime('%d/%m/%Y') if visita.fecha_visita else '—' }}</td></tr>
                         <tr><th class="text-muted">Hora</th><td>{{ visita.hora_visita.strftime('%H:%M') if visita.hora_visita else '—' }}</td></tr>
-                        <tr><th class="text-muted">Promotor</th><td>{% if visita.promotor %}{{ visita.promotor.nombres }} {{ visita.promotor.apellidos }}{% else %}No asignado{% endif %}</td></tr>
+                        <tr><th class="text-muted">Promotor</th><td>{{ visita.promotor_nombre or 'No asignado' }}</td></tr>
                         <tr><th class="text-muted">Observaciones</th><td>{{ visita.observaciones or 'Ninguna' }}</td></tr>
                         {% endif %}
                     </tbody>

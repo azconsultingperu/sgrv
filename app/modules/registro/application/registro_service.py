@@ -16,8 +16,11 @@ def crear_alumno_con_visita(datos: dict, actor_id: int):
     Crea Alumno + Visita en una transacción atómica y publica AlumnoRegistrado solo en commit.
     datos espera claves: apellidos, nombres, dni, fecha_nacimiento (date), sexo, celular, email, direccion,
     institucion_id, carrera_id, area_interes, desea_estudiar, solicita_info, modalidad_contacto,
-    fecha_visita (date), hora_visita (time), promotor_id, observaciones
+    fecha_visita (date), hora_visita (time), promotor_id, operador_promotor_id, observaciones.
+    Invariante: a lo sumo uno de (promotor_id, operador_promotor_id) puede estar seteado.
     """
+    if datos.get('promotor_id') and datos.get('operador_promotor_id'):
+        raise ValueError('La visita no puede tener promotor clásico y operador a la vez.')
     alum_repo = AlumnoRepository()
     visita_repo = VisitaRepository()
     with UnitOfWork() as uow:
@@ -46,6 +49,7 @@ def crear_alumno_con_visita(datos: dict, actor_id: int):
         visita = Visita(
             alumno_id=alumno.id,
             promotor_id=datos.get('promotor_id'),
+            operador_promotor_id=datos.get('operador_promotor_id'),
             usuario_id=actor_id,
             fecha_visita=datos.get('fecha_visita') or peru_today(),
             hora_visita=datos.get('hora_visita') or peru_now().time(),

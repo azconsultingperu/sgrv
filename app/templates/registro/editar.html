@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block extra_css %}<link href="{{ url_for('static', filename='css/fecha-input.css') }}?v=2" rel="stylesheet">{% endblock %}
 {% block title %}Editar Registro{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -42,7 +43,7 @@
                     <label class="form-label" for="institucion_id">Institución Educativa <span class="text-danger">*</span></label>
                     <select class="form-select" name="institucion_id" id="institucion_id">
                         {% for c in colegios %}
-                        <option value="{{ c.id }}" {% if form.institucion_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>
+                        <option value="{{ c.id }}" data-distrito="{{ c.distrito }}" data-provincia="{{ c.provincia }}" data-region="{{ c.region }}" {% if form.institucion_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }} - {{ c.distrito }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -54,6 +55,20 @@
                         <option value="{{ c.id }}" {% if form.carrera_id|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>
                         {% endfor %}
                     </select>
+                </div>
+            </div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label" for="distrito">Distrito</label>
+                    <input type="text" class="form-control" id="distrito" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="provincia">Provincia</label>
+                    <input type="text" class="form-control" id="provincia" readonly>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label" for="region">Región</label>
+                    <input type="text" class="form-control" id="region" value="La Libertad" readonly>
                 </div>
             </div>
 
@@ -89,7 +104,14 @@
             <div class="row g-3 mb-4">
                 <div class="col-md-4">
                     <label class="form-label" for="fecha_visita">Fecha de Visita <small class="text-muted">(opcional)</small></label>
-                    <input type="date" class="form-control" name="fecha_visita" id="fecha_visita" value="{{ form.fecha_visita }}">
+                    <div data-fecha-wrap data-fecha-nombre="fecha_visita">
+                        <div class="fecha-input-group">
+                            <input type="text" class="form-control" id="fecha_visita" data-fecha-visible placeholder="DD/MM/AAAA" inputmode="numeric" autocomplete="off">
+                            <input type="hidden" name="fecha_visita" data-fecha-hidden value="{{ form.fecha_visita }}">
+                            <button type="button" class="fecha-btn" data-fecha-btn aria-label="Abrir calendario para fecha de visita"><i data-lucide="calendar" style="width:16px;height:16px;"></i></button>
+                        </div>
+                        <div class="invalid-feedback fecha-feedback" data-fecha-feedback style="display:none"></div>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="hora_visita">Hora <small class="text-muted">(opcional)</small></label>
@@ -98,9 +120,21 @@
                 <div class="col-md-4">
                     <label class="form-label" for="promotor_id">Promotor Responsable <small class="text-muted">(opcional)</small></label>
                     <select class="form-select" name="promotor_id" id="promotor_id">
-                        {% for p in promotores %}
-                        <option value="{{ p.id }}" {% if form.promotor_id|string == p.id|string %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
-                        {% endfor %}
+                        <option value="" {% if not form.promotor_id %}selected{% endif %}>Seleccionar promotor...</option>
+                        {% if promotores %}
+                        <optgroup label="Promotores">
+                            {% for p in promotores %}
+                            <option value="promotor:{{ p.id }}" data-origen="promotor" {% if form.promotor_id|string == ('promotor:' ~ p.id|string) or form.promotor_id|string == p.id|string %}selected{% endif %}>{{ p.nombres }} {{ p.apellidos }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
+                        {% if operadores %}
+                        <optgroup label="Operadores">
+                            {% for o in operadores %}
+                            <option value="operador:{{ o.id }}" data-origen="operador" {% if form.promotor_id|string == ('operador:' ~ o.id|string) %}selected{% endif %}>{{ o.nombres }} {{ o.apellidos }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
                     </select>
                 </div>
                 <div class="col-12">
@@ -143,6 +177,7 @@
 </div>
 {% endblock %}
 {% block extra_js %}
+<script src="{{ url_for('static', filename='js/fecha-input.js') }}?v=2"></script>
 <script>
 // Foto del estudiante — preview + validación + capture
 (function() {
@@ -193,6 +228,29 @@
     });
 })();
 
+
+document.querySelector('select[name="institucion_id"]').addEventListener('change', function() {
+    const selected = this.options[this.selectedIndex];
+    var distritoEl = document.getElementById('distrito');
+    var provinciaEl = document.getElementById('provincia');
+    var regionEl = document.getElementById('region');
+    if (selected.value) {
+        if (distritoEl) distritoEl.value = selected.dataset.distrito || '';
+        if (provinciaEl) provinciaEl.value = selected.dataset.provincia || '';
+        if (regionEl) regionEl.value = selected.dataset.region || '';
+    } else {
+        if (distritoEl) distritoEl.value = '';
+        if (provinciaEl) provinciaEl.value = '';
+        if (regionEl) regionEl.value = '';
+    }
+});
+(function(){
+    var sel = document.querySelector('select[name="institucion_id"]');
+    if (sel && sel.value) {
+        var ev = new Event('change', {bubbles:true});
+        sel.dispatchEvent(ev);
+    }
+})();
 
 // Spinner en Guardar — evita doble submit y da feedback
 (function() {

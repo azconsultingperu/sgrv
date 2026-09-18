@@ -19,6 +19,17 @@ def get_usuario_by_username(username: str):
 def list_usuarios_activos():
     return _repo.list_active()
 
+def list_operadores_activos():
+    """Usuarios activos no eliminados con rol Operador (rol_id=3), ordenados.
+
+    Fuente en vivo del select "Promotor Responsable": cada render consulta de
+    nuevo, asi un Operador recien creado aparece sin sincronizacion manual.
+    """
+    return (Usuario.query
+            .filter_by(rol_id=3, estado=True, eliminado=False)
+            .order_by(Usuario.apellidos, Usuario.nombres)
+            .all())
+
 def crear_usuario(*args, **kwargs):
     # delega a application si existe, sino directo
     u = Usuario(*args, **kwargs)

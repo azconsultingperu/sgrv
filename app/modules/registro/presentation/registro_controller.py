@@ -47,19 +47,82 @@ def validar_celular(celular):
 def validar_email(email):
     return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) if email else True
 
+def _normalizar_fecha(fecha_str):
+    """Acepta YYYY-MM-DD o DD/MM/AAAA, retorna YYYY-MM-DD o '' si vacío."""
+    if not fecha_str:
+        return ''
+    fecha_str = fecha_str.strip()
+    # ya es ISO
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', fecha_str):
+        return fecha_str
+    m = re.match(r'^(\d{2})/(\d{2})/(\d{4})$', fecha_str)
+    if m:
+        return f'{m.group(3)}-{m.group(2)}-{m.group(1)}'
+    # permitir con guiones DD-MM-YYYY
+    m2 = re.match(r'^(\d{2})-(\d{2})-(\d{4})$', fecha_str)
+    if m2:
+        return f'{m2.group(3)}-{m2.group(2)}-{m2.group(1)}'
+    return fecha_str
+
+def _get_operadores_activos():
+    """Operadores elegibles como Promotor Responsable (consulta en vivo).
+
+    Import lazy de identidad.public para respetar la frontera modular
+    (registro no importa identidad.domain; ver setup.cfg). Cada render
+    consulta de nuevo: un Operador recien creado aparece sin sync manual.
+    """
+    from app.modules.identidad.public import list_operadores_activos
+    return list_operadores_activos()
+
+def _parse_promotor_ref(raw):
+    """Parsea el valor del select 'Promotor Responsable'.
+
+    Retorna (promotor_id, operador_promotor_id). Acepta el formato con
+    prefijo ('promotor:<id>' / 'operador:<id>') y el legado (entero =
+    promotor clasico) para no romper POSTs anteriores. Vacio -> (None, None).
+    """
+    if raw is None:
+        return None, None
+    raw = str(raw).strip()
+    if not raw:
+        return None, None
+    if raw.startswith('operador:'):
+        try:
+            return None, int(raw.split(':', 1)[1])
+        except ValueError:
+            return None, None
+    if raw.startswith('promotor:'):
+        try:
+            return int(raw.split(':', 1)[1]), None
+        except ValueError:
+            return None, None
+    try:
+        return int(raw), None
+    except ValueError:
+        return None, None
+
+def _validar_operador_promotor(operador_id):
+    """Verifica que el id corresponda a un Operador activo no eliminado."""
+    if not operador_id:
+        return True
+    from app.modules.identidad.public import get_usuario
+    u = get_usuario(operador_id)
+    return bool(u and u.rol_id == 3 and u.estado and not u.eliminado)
+
 @registro_bp.route('/', methods=['GET', 'POST'])
 @login_required
 @admin_or_supervisor_required
 def registrar():
     colegios = InstitucionEducativa.query.filter_by(activo=True).all()
     promotores = Promotor.query.filter_by(activo=True).all()
+    operadores = _get_operadores_activos()
     carreras = Carrera.query.filter_by(activo=True).all()
 
     if request.method == 'POST':
         apellidos = request.form.get('apellidos', '').strip().upper()
         nombres = request.form.get('nombres', '').strip().upper()
         dni = request.form.get('dni', '').strip()
-        fecha_nac = request.form.get('fecha_nacimiento', '')
+        fecha_nac = _normalizar_fecha(request.form.get('fecha_nacimiento', ''))
         sexo = request.form.get('sexo', '').upper()
         celular = request.form.get('celular', '').strip()
         email = request.form.get('email', '').strip()
@@ -70,14 +133,16 @@ def registrar():
         desea_estudiar = request.form.get('desea_estudiar') == 'on'
         solicita_info = request.form.get('solicita_info') == 'on'
         modalidad_contacto = request.form.get('modalidad_contacto', '')
-        fecha_visita = request.form.get('fecha_visita', '')
+        fecha_visita = _normalizar_fecha(request.form.get('fecha_visita', ''))
         hora_visita = request.form.get('hora_visita', '')
-        promotor_id = request.form.get('promotor_id', type=int)
+        promotor_id, operador_promotor_id = _parse_promotor_ref(request.form.get('promotor_id'))
         observaciones = request.form.get('observaciones', '')
 
         errores = []
         if not institucion_id:
             errores.append('Debe seleccionar una institución educativa.')
+        if not _validar_operador_promotor(operador_promotor_id):
+            errores.append('El promotor seleccionado no es válido.')
         if not validar_dni(dni):
             errores.append('El DNI debe tener 8 dígitos.')
         if Alumno.query.filter_by(dni=dni, eliminado=False).first():
@@ -97,7 +162,7 @@ def registrar():
             else:
                 lista = ', '.join(f'<strong>{e}</strong>' for e in errores)
                 flash(f'<strong>Faltan datos por completar:</strong> {lista}', 'danger')
-            return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+            return render_template('registro/index.html', colegios=colegios, promotores=promotores, operadores=operadores, carreras=carreras,
                 form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
         try:
@@ -105,7 +170,7 @@ def registrar():
             edad = calcular_edad(fecha_nac_date)
         except ValueError:
             flash('La fecha de nacimiento tiene un formato inválido o está vacía.', 'danger')
-            return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+            return render_template('registro/index.html', colegios=colegios, promotores=promotores, operadores=operadores, carreras=carreras,
                 form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
         try:
@@ -113,7 +178,7 @@ def registrar():
             hv = datetime.strptime(hora_visita, '%H:%M').time() if hora_visita else peru_now().time()
         except ValueError:
             flash('La fecha u hora de visita tienen un formato inválido.', 'danger')
-            return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+            return render_template('registro/index.html', colegios=colegios, promotores=promotores, operadores=operadores, carreras=carreras,
                 form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
         try:
@@ -136,6 +201,7 @@ def registrar():
                 'fecha_visita': fv,
                 'hora_visita': hv,
                 'promotor_id': promotor_id,
+                'operador_promotor_id': operador_promotor_id,
                 'observaciones': observaciones
             }
             alumno, visita = crear_alumno_con_visita(datos, actor_id=current_user.id)
@@ -165,7 +231,7 @@ def registrar():
             db.session.rollback()
             flash(f'Error al registrar: {str(e)}', 'danger')
 
-    return render_template('registro/index.html', colegios=colegios, promotores=promotores, carreras=carreras,
+    return render_template('registro/index.html', colegios=colegios, promotores=promotores, operadores=operadores, carreras=carreras,
         form=request.form, fecha_actual=peru_today().isoformat(), hora_actual=peru_now().strftime('%H:%M'))
 
 @registro_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -176,6 +242,7 @@ def editar(id):
     visita = Visita.query.filter_by(alumno_id=alumno.id).first()
     colegios = InstitucionEducativa.query.filter_by(activo=True).all()
     promotores = Promotor.query.filter_by(activo=True).all()
+    operadores = _get_operadores_activos()
     carreras = Carrera.query.filter_by(activo=True).all()
 
     if request.method == 'POST':
@@ -183,7 +250,7 @@ def editar(id):
         if dni:
             alumno.dni = dni
         
-        fecha_nac = request.form.get('fecha_nacimiento', '')
+        fecha_nac = _normalizar_fecha(request.form.get('fecha_nacimiento', ''))
         if fecha_nac:
             try:
                 alumno.fecha_nacimiento = datetime.strptime(fecha_nac, '%Y-%m-%d').date()
@@ -209,8 +276,25 @@ def editar(id):
         alumno.modalidad_contacto = request.form.get('modalidad_contacto', '')
 
         if visita:
-            visita.promotor_id = request.form.get('promotor_id', type=int)
+            promotor_id_edit, operador_promotor_id_edit = _parse_promotor_ref(request.form.get('promotor_id'))
+            if operador_promotor_id_edit and not _validar_operador_promotor(operador_promotor_id_edit):
+                flash('El promotor seleccionado no es válido.', 'danger')
+                return redirect(url_for('registro.editar', id=id))
+            visita.promotor_id = promotor_id_edit
+            visita.operador_promotor_id = operador_promotor_id_edit
             visita.observaciones = request.form.get('observaciones', '')
+            fv_edit = _normalizar_fecha(request.form.get('fecha_visita', ''))
+            if fv_edit:
+                try:
+                    visita.fecha_visita = datetime.strptime(fv_edit, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+            hv_edit = request.form.get('hora_visita', '').strip()
+            if hv_edit:
+                try:
+                    visita.hora_visita = datetime.strptime(hv_edit, '%H:%M').time()
+                except ValueError:
+                    pass
 
         # foto opcional en edición
         try:
@@ -258,13 +342,13 @@ def editar(id):
         'modalidad_contacto': alumno.modalidad_contacto or '',
         'fecha_visita': visita.fecha_visita.strftime('%Y-%m-%d') if visita else '',
         'hora_visita': visita.hora_visita.strftime('%H:%M') if visita else '',
-        'promotor_id': visita.promotor_id if visita else '',
+        'promotor_id': visita.promotor_ref if visita else '',
         'observaciones': visita.observaciones if visita else ''
     }
 
     return render_template('registro/editar.html',
         alumno=alumno, visita=visita, colegios=colegios,
-        promotores=promotores, carreras=carreras, form=form)
+        promotores=promotores, operadores=operadores, carreras=carreras, form=form)
 
 @registro_bp.route('/foto/<int:alumno_id>')
 @login_required
@@ -330,7 +414,7 @@ def eliminar(id):
 
 @registro_bp.route('/calcular-edad', methods=['GET'])
 def calcular_edad_route():
-    fecha = request.args.get('fecha_nacimiento', '')
+    fecha = _normalizar_fecha(request.args.get('fecha_nacimiento', ''))
     if fecha:
         try:
             fn = datetime.strptime(fecha, '%Y-%m-%d').date()

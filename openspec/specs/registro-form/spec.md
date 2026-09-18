@@ -120,3 +120,51 @@ Cuando `POST /registro/` falla por validación y el controller hace `render_temp
 #### Scenario: Editar también persiste
 - **WHEN** `POST /registro/editar/<id>` falla por validación
 - **THEN** los mismos 3 selects y derivados se repintan igual que en `index`
+
+#### Scenario: Provincia autocompletada al elegir colegio
+- **WHEN** el usuario cambia `institucion_id` a un colegio con `provincia="Ascope"`
+- **THEN** los inputs `distrito`, `provincia` y `region` se actualizan inmediatamente a los valores del colegio sin recargar
+
+#### Scenario: Limpieza al deseleccionar
+- **WHEN** el usuario vuelve a `Seleccionar institución...`
+- **THEN** `distrito`, `provincia` y `region` quedan vacíos (o región vuelve a valor por defecto si aplica)
+
+### Requirement: Fecha con componente híbrido en registro y edición
+
+Los templates `registro/index.html` y `registro/editar.html` SHALL usar el componente `registro-fecha-input` para `fecha_nacimiento` (requerida) y `fecha_visita` (opcional) en lugar de `input type="date"` nativo. SHALL mostrar placeholder `DD/MM/AAAA`, `inputmode="numeric"`, y botón calendario Lucide. El valor visible SHALL ser `DD/MM/AAAA` y el enviado SHALL ser `YYYY-MM-DD`.
+
+#### Scenario: Registro muestra nuevo componente
+- **WHEN** se abre `registro/index.html`
+- **THEN** `fecha_nacimiento` y `fecha_visita` renderizan input texto con `placeholder="DD/MM/AAAA"` y botón `calendar`, no `type="date"`
+
+#### Scenario: Editar muestra valor convertido
+- **WHEN** se abre `registro/editar.html` con `form.fecha_visita="2026-03-15"`
+- **THEN** el input muestra `15/03/2026`
+
+#### Scenario: Submit envía ISO
+- **WHEN** el usuario envía el form con `15/03/2008` visible
+- **THEN** el payload contiene `fecha_nacimiento=2008-03-15`
+
+### Requirement: Validación preservada con nuevo formato
+
+La validación frontend y backend SHALL aceptar el nuevo formato. Si `fecha_nacimiento` está vacía o inválida, SHALL añadir error a `errores` y marcar el input con `is-invalid` igual que antes.
+
+#### Scenario: Vacío bloquea
+- **WHEN** se envía `POST /registro/` sin `fecha_nacimiento`
+- **THEN** la respuesta es `200` re-render con error "Fecha de nacimiento requerida" y el input con `is-invalid`
+
+### Requirement: Select de institución lista las nuevas I.E.
+
+El `<select id="institucion_id">` en `registro/index.html` y `registro/editar.html` SHALL listar las 10 I.E. activas del catálogo 2026-09-18 ordenadas por nombre, cada `<option>` con `value=c.id`, texto `c.nombre - c.distrito` y atributos `data-distrito`, `data-provincia`, `data-region`, y el autocompletado de `provincia` SHALL funcionar para las nuevas.
+
+#### Scenario: Listado en registro
+- **WHEN** un usuario autenticado abre `GET /registro/`
+- **THEN** el HTML contiene al menos 10 `<option value="` dentro de `#institucion_id` y contiene `data-provincia="Ascope"` para una de las nuevas con `80055`
+
+#### Scenario: Autocompletado para nueva I.E.
+- **WHEN** el usuario selecciona `Alfonso Ugarte - Licapa` (80878)
+- **THEN** `#provincia` muestra la provincia de Licapa y `#distrito` su distrito sin recargar
+
+#### Scenario: Editar también lista
+- **WHEN** se abre `GET /registro/editar/<id>` de un alumno existente
+- **THEN** el select también contiene las 10 nuevas opciones

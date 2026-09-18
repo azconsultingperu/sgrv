@@ -18,7 +18,8 @@ def generar_reporte_csv(tipo, params=None):
             writer.writerow([a.dni, a.nombres, a.apellidos, a.edad, a.sexo, a.celular, a.email, a.institucion.nombre, a.carrera.nombre if a.carrera else ''])
     elif tipo == 'visitas':
         writer.writerow(['Fecha', 'Hora', 'Alumno', 'DNI', 'Colegio', 'Promotor'])
-        query = Visita.query.join(Alumno).join(Promotor).filter(Alumno.eliminado == False)
+        # outerjoin: incluye visitas sin promotor clasico (NULL u Operador)
+        query = Visita.query.join(Alumno).outerjoin(Promotor, Visita.promotor_id == Promotor.id).filter(Alumno.eliminado == False)
         try:
             f_desde = datetime.strptime(params['fecha_desde'], '%Y-%m-%d').date() if params and params.get('fecha_desde') else None
             f_hasta = datetime.strptime(params['fecha_hasta'], '%Y-%m-%d').date() if params and params.get('fecha_hasta') else None
@@ -29,10 +30,10 @@ def generar_reporte_csv(tipo, params=None):
         if f_hasta:
             query = query.filter(Visita.fecha_visita <= f_hasta)
         for v in query:
-            writer.writerow([v.fecha_visita, v.hora_visita, f'{v.alumno.nombres} {v.alumno.apellidos}', v.alumno.dni, v.alumno.institucion.nombre, f'{v.promotor.nombres} {v.promotor.apellidos}'])
+            writer.writerow([v.fecha_visita, v.hora_visita, f'{v.alumno.nombres} {v.alumno.apellidos}', v.alumno.dni, v.alumno.institucion.nombre, v.promotor_nombre or 'No asignado'])
     elif tipo == 'colegios':
         writer.writerow(['Colegio', 'Distrito', 'Provincia', 'Región', 'Tipo', 'Total Alumnos'])
-        for ie in InstitucionEducativa.query.all():
+        for ie in InstitucionEducativa.query.filter_by(activo=True).all():
             total = Alumno.query.filter_by(institucion_id=ie.id, eliminado=False).count()
             writer.writerow([ie.nombre, ie.distrito, ie.provincia, ie.region, ie.tipo, total])
     elif tipo == 'carreras':
@@ -53,7 +54,7 @@ def generar_reporte_excel(tipo, params=None):
             ws.append([a.dni, a.nombres, a.apellidos, a.edad, a.sexo, a.celular, a.email, a.institucion.nombre, a.carrera.nombre if a.carrera else ''])
     elif tipo == 'visitas':
         ws.append(['Fecha', 'Hora', 'Alumno', 'DNI', 'Colegio', 'Promotor'])
-        query = Visita.query.join(Alumno).join(Promotor).filter(Alumno.eliminado == False)
+        query = Visita.query.join(Alumno).outerjoin(Promotor, Visita.promotor_id == Promotor.id).filter(Alumno.eliminado == False)
         try:
             f_desde = datetime.strptime(params['fecha_desde'], '%Y-%m-%d').date() if params and params.get('fecha_desde') else None
             f_hasta = datetime.strptime(params['fecha_hasta'], '%Y-%m-%d').date() if params and params.get('fecha_hasta') else None
@@ -64,10 +65,10 @@ def generar_reporte_excel(tipo, params=None):
         if f_hasta:
             query = query.filter(Visita.fecha_visita <= f_hasta)
         for v in query:
-            ws.append([str(v.fecha_visita), str(v.hora_visita), f'{v.alumno.nombres} {v.alumno.apellidos}', v.alumno.dni, v.alumno.institucion.nombre, f'{v.promotor.nombres} {v.promotor.apellidos}'])
+            ws.append([str(v.fecha_visita), str(v.hora_visita), f'{v.alumno.nombres} {v.alumno.apellidos}', v.alumno.dni, v.alumno.institucion.nombre, v.promotor_nombre or 'No asignado'])
     elif tipo == 'colegios':
         ws.append(['Colegio', 'Distrito', 'Provincia', 'Región', 'Tipo', 'Total Alumnos'])
-        for ie in InstitucionEducativa.query.all():
+        for ie in InstitucionEducativa.query.filter_by(activo=True).all():
             total = Alumno.query.filter_by(institucion_id=ie.id, eliminado=False).count()
             ws.append([ie.nombre, ie.distrito, ie.provincia, ie.region, ie.tipo, total])
     elif tipo == 'carreras':

@@ -30,7 +30,8 @@ def list_alumnos_activos():
     return Alumno.query.filter_by(eliminado=False).all()
 
 def list_instituciones():
-    return InstitucionEducativa.query.all()
+    # Solo catálogo activo: las I.E. fuera de catálogo no salen en filtros ni selects.
+    return InstitucionEducativa.query.filter_by(activo=True).order_by(InstitucionEducativa.nombre).all()
 
 def list_carreras():
     return Carrera.query.all()
@@ -50,7 +51,7 @@ def dashboard_get_totales():
     from app.modules.identidad.public import count_usuarios as _count_usuarios  # noqa: F401 - excepción public→public controlada
     return {
         'total_registros': _Visita.query.count(),
-        'total_colegios': _IE.query.count(),
+        'total_colegios': _IE.query.filter_by(activo=True).count(),
         'total_promotores': _Prom.query.count(),
         'total_alumnos': Alumno.query.filter_by(eliminado=False).count(),
         'total_usuarios': _count_usuarios()
