@@ -9,18 +9,18 @@
 <div class="card border-0 shadow-sm">
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 tabla-acciones">
                 <thead class="table-light">
                     <tr>
                         <th></th>
                         <th>DNI</th>
                         <th>Nombres</th>
-                        <th>Apellidos</th>
-                        <th>Usuario</th>
-                        <th>Rol</th>
-                        <th>Email</th>
-                        <th>Estado</th>
-                        <th>Último Acceso</th>
+                        <th class="d-none d-md-table-cell">Apellidos</th>
+                        <th class="d-none d-md-table-cell">Usuario</th>
+                        <th class="d-none d-md-table-cell">Rol</th>
+                        <th class="d-none d-md-table-cell">Email</th>
+                        <th class="d-none d-md-table-cell">Estado</th>
+                        <th class="d-none d-md-table-cell">Último Acceso</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -33,18 +33,18 @@
                         </td>
                         <td>{{ u.dni }}</td>
                         <td>{{ u.nombres }}</td>
-                        <td>{{ u.apellidos }}</td>
-                        <td>{{ u.username }}</td>
-                        <td><span class="badge bg-{{ 'danger' if u.rol_id == 1 else 'warning' if u.rol_id == 2 else 'info' }}">{{ u.rol.nombre }}</span></td>
-                        <td>{{ u.email }}</td>
-                        <td>
+                        <td class="d-none d-md-table-cell">{{ u.apellidos }}</td>
+                        <td class="d-none d-md-table-cell">{{ u.username }}</td>
+                        <td class="d-none d-md-table-cell"><span class="badge bg-{{ 'danger' if u.rol_id == 1 else 'warning' if u.rol_id == 2 else 'info' }}">{{ u.rol.nombre }}</span></td>
+                        <td class="d-none d-md-table-cell">{{ u.email }}</td>
+                        <td class="d-none d-md-table-cell">
                             {% if u.estado %}
                             <span class="badge bg-success">Activo</span>
                             {% else %}
                             <span class="badge bg-danger">Inactivo</span>
                             {% endif %}
                         </td>
-                        <td><small>{{ u.ultimo_acceso.strftime('%d/%m/%Y %H:%M') if u.ultimo_acceso else 'Nunca' }}</small></td>
+                        <td class="d-none d-md-table-cell"><small>{{ u.ultimo_acceso.strftime('%d/%m/%Y %H:%M') if u.ultimo_acceso else 'Nunca' }}</small></td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('usuarios.editar', id=u.id) }}" class="btn btn-warning" title="Editar"><i data-lucide="pencil"></i></a>

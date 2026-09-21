@@ -262,6 +262,16 @@ body {
     text-rendering: optimizeLegibility;
 }
 
+/* En móvil el scroll pertenece al body/html, no al main-content */
+@media (max-width: 991.98px) {
+    html, body {
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+}
+
 h1,
 h2,
 h3,
@@ -419,12 +429,18 @@ button,
     z-index: 1040;
     width: var(--sidebar-width);
     height: 100vh;
+    height: 100dvh;
     min-height: 100vh;
+    min-height: 100dvh;
     overflow-y: auto;
+    overflow-x: hidden;
     background: var(--sidebar-bg);
     color: var(--sidebar-text);
     border-right: 1px solid var(--sidebar-border);
     transition: transform var(--transition-base);
+    /* Asegura que el sidebar-user siempre sea alcanzable */
+    display: flex;
+    flex-direction: column;
 }
 
 .sidebar-header {
@@ -464,6 +480,8 @@ button,
 .sidebar .nav {
     padding-right: 0.62rem !important;
     padding-left: 0.62rem !important;
+    flex: 1 1 auto;
+    /* Permite que la lista de navegación crezca y empuje el sidebar-user al fondo */
 }
 
 .sidebar .nav-link {
@@ -526,10 +544,13 @@ button,
     align-items: center;
     gap: var(--space-2);
     margin: 0.85rem 0.62rem 1rem;
+    /* En móvil, agregar espacio para safe-area (notch/barra inferior) */
+    margin-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     padding: 0.5rem;
     background: var(--sidebar-surface);
     border: 1px solid var(--sidebar-border);
     border-radius: var(--radius-md);
+    flex-shrink: 0;
 }
 
 .sidebar-user-link {
@@ -2176,6 +2197,21 @@ body.sidebar-open #toastContainer {
     }
 }
 
+/* Bloqueo de scroll de página con drawer abierto (móvil). El menú fijo
+   conserva su propio scroll; el guard de JS excluye #sidebar.
+   En móvil el body tiene overflow-y:auto por defecto (ver media query arriba),
+   por lo que este override re-bloquea temporalmente mientras el drawer está abierto. */
+body.scroll-locked {
+    overflow: hidden !important;
+    /* Evita el salto de layout por scrollbar en desktop */
+    padding-right: 0 !important;
+}
+
+/* Botón ✕ del drawer: oculto por defecto, solo visible en móvil. */
+.sidebar-close {
+    display: none;
+}
+
 @media (max-width: 991.98px) {
     .sidebar {
         transform: translateX(-100%);
@@ -2186,14 +2222,72 @@ body.sidebar-open #toastContainer {
         transform: translateX(0);
     }
 
+    .sidebar-header {
+        position: relative;
+    }
+
+    .sidebar-close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0.55rem;
+        right: 0.55rem;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        color: var(--sidebar-text);
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+    }
+
+    .sidebar-close:hover {
+        background: var(--sidebar-surface);
+        border-color: var(--sidebar-border);
+    }
+
+    .sidebar-close svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Acciones-visibles-movil: el scroll vertical pertenece al body en móvil.
+       El main-content NO tiene overflow propio: así Chrome móvil puede esconder
+       su barra inferior al scrollear y el final de cada vista (Guardar/Actualizar/
+       Volver) queda siempre alcanzable. Desktop (>991px) no cambia. */
     .main-content {
         margin-left: 0;
+        height: auto;
+        min-height: 100dvh;
+        overflow-x: clip;
+        overflow-y: visible;
+        /* Zona segura inferior (gestos Android/iOS) + respiro, con fallback */
+        padding-bottom: 12px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     }
 }
 
 @media (max-width: 767.98px) {
     .container-fluid.p-4 {
         padding: 0.9rem !important;
+    }
+
+    /* Acciones-visibles-movil: última columna (acciones) fija a la derecha
+       dentro del scroll horizontal, con fondo sólido. Solo tablas marcadas
+       con .tabla-acciones (consulta, usuarios). */
+    .table-responsive > .tabla-acciones > :not(caption) > tr > :last-child {
+        position: sticky;
+        right: 0;
+        background: var(--surface-1);
+        box-shadow: -8px 0 12px -8px rgba(0, 0, 0, 0.25);
+        z-index: 2;
+    }
+
+    .table-responsive > .tabla-acciones > thead > tr > :last-child {
+        background: var(--surface-2) !important;
+        z-index: 3;
     }
 
     .page-header {

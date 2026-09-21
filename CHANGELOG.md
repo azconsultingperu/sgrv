@@ -2,6 +2,14 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-09-21] — Acciones visibles en móvil y scroll desbloqueado
+
+### Corregido
+
+- **Scroll bloqueado en móvil**: `body { overflow: hidden }` permanente impedía desplazar con el dedo en ≤991px. Ahora `html, body` usan `height: auto; overflow-y: auto` en móvil y `overflow-x: clip` contra scroll horizontal fantasma (`style.css`, `?v=71`).
+- **Botones fuera de pantalla**: columnas secundarias de consulta/usuarios se ocultan en móvil (`d-none d-md-table-cell` + `.tabla-acciones`), el drawer lateral es `100dvh` flex con `safe-area-inset-bottom` y botón ✕ accesible, y el scroll solo se bloquea (`body.scroll-locked`) con el drawer abierto (`main.js ?v=41`, `sidebar.html`).
+- Verificado en emulación 360×640 (11/11) y en teléfono físico; desplegado a producción.
+
 ## [2026-09-04] — Reloj centrado, persistencia de formulario y carga de consulta
 
 ### Agregado

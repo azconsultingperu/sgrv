@@ -98,21 +98,23 @@ document.addEventListener('DOMContentLoaded', function () {
     var sidebarBackdrop = document.getElementById('sidebarBackdrop');
     var movilQuery      = window.matchMedia('(max-width: 991.98px)');
 
+    /* Con scroll de página (móvil), el bloqueo debe aplicarse al body:
+       el menú fijo (#sidebar) conserva su propio scroll interno. */
     function lockMainScroll(locked) {
-        var mc = document.querySelector('.main-content');
-        if (!mc) return;
         if (locked) {
-            if (mc._lockWheel) return;
-            mc._lockWheel = function (e) { e.preventDefault(); };
-            mc._lockTouch = function (e) { e.preventDefault(); };
-            mc.addEventListener('wheel', mc._lockWheel, { passive: false });
-            mc.addEventListener('touchmove', mc._lockTouch, { passive: false });
+            document.body.classList.add('scroll-locked');
+            if (!lockMainScroll._t) {
+                lockMainScroll._t = function (e) {
+                    if (e.target.closest && e.target.closest('#sidebar')) return;
+                    e.preventDefault();
+                };
+                document.addEventListener('touchmove', lockMainScroll._t, { passive: false });
+            }
         } else {
-            if (mc._lockWheel) {
-                mc.removeEventListener('wheel', mc._lockWheel);
-                mc.removeEventListener('touchmove', mc._lockTouch);
-                mc._lockWheel = null;
-                mc._lockTouch = null;
+            document.body.classList.remove('scroll-locked');
+            if (lockMainScroll._t) {
+                document.removeEventListener('touchmove', lockMainScroll._t);
+                lockMainScroll._t = null;
             }
         }
     }
@@ -145,6 +147,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (sidebarToggle)   sidebarToggle.addEventListener('click', toggleSidebar);
     if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeSidebar);
+    var sidebarClose = document.getElementById('sidebarClose');
+    if (sidebarClose)    sidebarClose.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', function (e) {
+        if ((e.key === 'Escape' || e.key === 'Esc') && movilQuery.matches &&
+            sidebar && sidebar.classList.contains('show')) {
+            closeSidebar();
+        }
+    });
     if (sidebar) {
         sidebar.querySelectorAll('.nav-link').forEach(function (link) {
             link.addEventListener('click', function () {
