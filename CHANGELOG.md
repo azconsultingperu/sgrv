@@ -2,6 +2,18 @@
 
 Todas las mejoras y correcciones del proyecto SGRV.
 
+## [2026-09-21] — Operador registra, edita y ve reportes
+
+### Cambiado
+
+- **Rol Operador (rol 3)**: ahora puede abrir `/registro/` (GET+POST), `/registro/editar/<id>` y todo `/reportes/`, con el mismo comportamiento que Supervisor; el sidebar le muestra "Registrar" y "Reportes" (`registro_controller.py`, `reportes_controller.py`, `sidebar.html`).
+- **Sin cambios**: Eliminar/Usuarios/Auditoría siguen solo-admin; Consultas sigue solo-lectura; Supervisor y Admin intactos. Auditoría ya trazaba `actor_id`, así que lo creado por operadores queda registrado.
+- Test `test_reportes_requieren_rol` actualizado al nuevo comportamiento (operador 200, consultas 302).
+
+### Archivado
+
+- `acceso-operador-registro-reportes` → `openspec/specs/acceso-operador`
+
 ## [2026-09-21] — Acciones visibles en móvil y scroll desbloqueado
 
 ### Corregido

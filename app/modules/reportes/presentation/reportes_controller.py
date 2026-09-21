@@ -30,7 +30,7 @@ TITULOS = {
 def supervisor_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if current_user.rol_id not in (1, 2):
+        if current_user.rol_id not in (1, 2, 3):
             flash('No tiene permisos para acceder a esta sección.', 'danger')
             return redirect(url_for('dashboard.index'))
         return f(*args, **kwargs)

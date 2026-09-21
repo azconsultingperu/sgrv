@@ -26,7 +26,7 @@ def test_excel_alumnos_vacio_no_explota(auth_client):
 
 
 def test_reportes_requieren_rol(client, auth_client, app):
-    """Un operador (rol 3) no debe poder exportar."""
+    """Operador (rol 3) SÍ accede a reportes (acceso-operador); Consultas (rol 4) sigue rebotando."""
     from app.modules.identidad.domain.usuario import Usuario
     from app import db
     with app.app_context():
@@ -36,5 +36,8 @@ def test_reportes_requieren_rol(client, auth_client, app):
         db.session.commit()
     c = app.test_client()
     c.post('/auth/login', data={'username': '11112222', 'password': 'opera123'})
-    r = c.get('/reportes/', follow_redirects=False)
+    assert c.get('/reportes/', follow_redirects=False).status_code == 200
+    c2 = app.test_client()
+    c2.post('/auth/login', data={'username': '99998888', 'password': 'consul123'})
+    r = c2.get('/reportes/', follow_redirects=False)
     assert r.status_code == 302 and '/dashboard' in r.headers['Location']
